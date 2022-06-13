@@ -1,0 +1,149 @@
+// To parse this JSON data, do
+//
+//     final dbUserinfoModel = dbUserinfoModelFromJson(jsonString);
+
+import 'dart:convert';
+
+import 'package:mongo_dart/mongo_dart.dart';
+
+DbUserinfoModel dbUserinfoModelFromJson(String str) =>
+    DbUserinfoModel.fromJson(json.decode(str));
+
+String dbUserinfoModelToJson(DbUserinfoModel data) =>
+    json.encode(data.toJson());
+
+class DbUserinfoModel {
+  DbUserinfoModel(
+      {this.memberid,
+      this.nickname,
+      this.account,
+      this.chatroomId,
+      this.avatar,
+      this.avatar_sub,
+      this.cover,
+      this.height,
+      this.age,
+      this.sex,
+      this.money,
+      this.constellation,
+      this.introduction,
+      this.size,
+      this.interest_list,
+      this.personality,
+      this.profession,
+      this.area,
+      this.position,
+      this.date,
+      this.lookfor,
+      this.education,
+      this.language,
+      this.smoke,
+      this.drink,
+      this.voice_introduction,
+      this.profilepic_list,
+      this.little_profilepic_list,
+      this.followme_num});
+
+  ObjectId? memberid;
+  String? account;
+  String? sex;
+  String? nickname;
+  List? chatroomId;
+  String? avatar;
+  String? avatar_sub;
+  String? cover;
+  int? height;
+  int? age;
+  int? followme_num;
+  String? money;
+  String? constellation;
+  String? introduction;
+  String? size;
+  String? personality;
+  String? profession;
+  String? area;
+  Map? position;
+  String? lookfor;
+  String? date;
+  String? education;
+  String? language;
+  String? smoke;
+  String? drink;
+  String? voice_introduction;
+  List? profilepic_list;
+  List? little_profilepic_list;
+  List? interest_list;
+
+  factory DbUserinfoModel.fromJson(Map<String, dynamic> json) =>
+      DbUserinfoModel(
+        memberid: json["_id"],
+        nickname: json["nickname"] == null ? null : json["nickname"],
+        account: json["account"],
+        chatroomId: json["chatroomid"],
+        avatar: json["avatar"],
+        avatar_sub: json["avatar_sub"],
+        cover: json['cover'],
+        height: json['height'] != null ? json['height'] : null,
+        age: json['age'] != null ? json['age'] : null,
+        sex: json['sex'] != null ? json['sex'] : null,
+        money: json['money'] != null ? json['money'] : null,
+        followme_num: json['follow_num'] != null ? json['follow_num'] : null,
+        constellation:
+            json["constellation"] != null ? json['constellation'] : null,
+        introduction:
+            json["introduction"] != null ? json['introduction'] : null,
+        size: json["size"] != null ? json['size'] : null,
+        interest_list:
+            json["interest_list"] != null ? json['interest_list'] : null,
+        personality: json["personality"] != null ? json['personality'] : null,
+        profession: json["profession"] != null ? json['profession'] : null,
+        area: json["area"] != null ? json['area'] : null,
+        position: json["position"] != null ? json['position'] : null,
+        date: json["date"] != null ? json['date'] : null,
+        lookfor: json["lookfor"] != null ? json['lookfor'] : null,
+        education: json["education"] != null ? json['education'] : null,
+        language: json["language"] != null ? json['language'] : null,
+        smoke: json["smoke"] != null ? json['smoke'] : null,
+        drink: json["drink"] != null ? json['drink'] : null,
+        profilepic_list:
+            json["profile_pic"] != null ? json['profile_pic'] : null,
+        little_profilepic_list: json["little_profile_pic"] != null
+            ? json['little_profile_pic']
+            : null,
+        voice_introduction: json["voice_introduction"] != null
+            ? json['voice_introduction']
+            : null,
+      );
+
+  Map<String, dynamic> toJson() => {
+        "_id": memberid,
+        "account": account,
+        "nickname": nickname,
+        "chatroomid": chatroomId,
+        "follow_num": followme_num,
+        "avatar": avatar,
+        "avatar_sub": avatar_sub,
+        "cover": cover,
+        "height": height,
+        "age": age,
+        "sex": sex,
+        "money": money,
+        "constellation": constellation,
+        "introduction": introduction,
+        "size": size,
+        "interest_list": interest_list,
+        "personality": personality,
+        "profession": profession,
+        "area": area,
+        'position': position,
+        "lookfor": lookfor,
+        "date": date,
+        "education": education,
+        "language": language,
+        "profile_pic": profilepic_list,
+        "little_profile_pic": little_profilepic_list,
+        "smoke": smoke,
+        "drink": drink,
+        "voice_introduction": voice_introduction,
+      };
+}
