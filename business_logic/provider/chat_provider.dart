@@ -1137,7 +1137,7 @@ class ChatProvider with ChangeNotifier {
     action_newest_value = 1;
     print("get_action_list");
     newest_actionlist = await readremotemongodb(ActionModel.fromJson, 'action',
-        field: mongo.where.sortBy('time', descending: true));
+        field: mongo.where.sortBy('time', descending: true).limit(pagesize));
     print("get_action_list $newest_actionlist");
     notifyListeners();
   }
@@ -1146,9 +1146,8 @@ class ChatProvider with ChangeNotifier {
     action_favorite_value = 1;
     print("get_action_list");
     favorite_actionlist = await readremotemongodb(
-      ActionModel.fromJson,
-      'action',
-    );
+        ActionModel.fromJson, 'action',
+        field: mongo.where.sortBy('time', descending: true).limit(pagesize));
     print("get_action_list $favorite_actionlist");
     notifyListeners();
   }
@@ -1159,6 +1158,7 @@ class ChatProvider with ChangeNotifier {
         ActionMsgModel.fromJson, 'action_msg',
         field: mongo.where
             .eq('action_id', action_id)
+            .limit(pagesize)
             .sortBy('time', descending: false));
     print("get_action_msg $actionmsglist");
     notifyListeners();
@@ -1170,7 +1170,7 @@ class ChatProvider with ChangeNotifier {
   }
 
   Future addpage_newest_action() async {
-    var newpage = await readremotemongodb(DbUserinfoModel.fromJson, 'action',
+    var newpage = await readremotemongodb(ActionModel.fromJson, 'action',
         field: mongo.where
             .sortBy('time', descending: true)
             .skip(action_newest_value * pagesize)
@@ -1340,7 +1340,7 @@ class ChatProvider with ChangeNotifier {
   }
 
   Future pre_Subscribed() async {
-    print('rrr88888');
+    ;
     await getaccountinfo().then((value) async {
       if (value == false) {
         print('預先要資料失敗');
@@ -1382,7 +1382,7 @@ class ChatProvider with ChangeNotifier {
       var readresult = await readremotemongodb(
           DbUserinfoModel.fromJson, 'member',
           field: mongo.where.eq('account', account_id));
-      print('444444$readresult');
+      print('獲得使用者資料$readresult');
       if (readresult == null) {
       } else {
         remoteUserInfo = readresult;
@@ -1590,22 +1590,69 @@ class ChatProvider with ChangeNotifier {
   var filter_grouppersonlist;
   var filter_groupteamlist;
 
-  Future setfilter_chatroom(num, filter) async {
-    print("filter filter$filter");
+  Future setfilter_chatroom(num, {area,}) async {
+    print("filter filter");
     if (num == 2) {
-      filter_grouppersonlist = await readremotemongodb(
-          ChatRoomModel.fromJson, 'chatroom',
-          field: mongo.where
-              .eq('area', filter)
-              .and(mongo.where.eq('type', 1))
-              .sortBy('create_time', descending: true));
+      if (area != null) {
+        if (purposelist.isNotEmpty) {
+          print('有目的 有地區');
+          filter_grouppersonlist = await readremotemongodb(
+              ChatRoomModel.fromJson, 'chatroom',
+              field: mongo.where
+                  .eq('area', area)
+                  .and(mongo.where.eq('purpose', purposelist[0]))
+                  .and(mongo.where.eq('type', 1))
+                  .sortBy('create_time', descending: true));
+        } else {
+          filter_grouppersonlist = await readremotemongodb(
+              ChatRoomModel.fromJson, 'chatroom',
+              field: mongo.where
+                  .eq('area', area)
+                  .and(mongo.where.eq('type', 1))
+                  .sortBy('create_time', descending: true));
+        }
+      } else {
+        if (purposelist.isNotEmpty) {
+          filter_grouppersonlist = await readremotemongodb(
+              ChatRoomModel.fromJson, 'chatroom',
+              field: mongo.where
+                  .eq('purpose',purposelist[0])
+                  .and(mongo.where.eq('type', 1))
+                  .sortBy('create_time', descending: true));
+        } else {
+          filter_grouppersonlist = [];
+        }
+      }
     } else {
-      filter_groupteamlist = await readremotemongodb(
-          ChatRoomModel.fromJson, 'chatroom',
-          field: mongo.where
-              .eq('area', filter)
-              .and(mongo.where.eq('type', 0))
-              .sortBy('create_time', descending: true));
+      if (area != null) {
+        if (purposelist.isNotEmpty) {
+          filter_groupteamlist = await readremotemongodb(
+              ChatRoomModel.fromJson, 'chatroom',
+              field: mongo.where
+                  .eq('area', area)
+                  .and(mongo.where.eq('purpose', purposelist[0]))
+                  .and(mongo.where.eq('type', 0))
+                  .sortBy('create_time', descending: true));
+        } else {
+          filter_groupteamlist = await readremotemongodb(
+              ChatRoomModel.fromJson, 'chatroom',
+              field: mongo.where
+                  .eq('area', area)
+                  .and(mongo.where.eq('type', 0))
+                  .sortBy('create_time', descending: true));
+        }
+      } else {
+        if (purposelist.isNotEmpty) {
+          filter_groupteamlist = await readremotemongodb(
+              ChatRoomModel.fromJson, 'chatroom',
+              field: mongo.where
+                  .eq('purpose', purposelist[0])
+                  .and(mongo.where.eq('type', 1))
+                  .sortBy('create_time', descending: true));
+        } else {
+          filter_groupteamlist = [];
+        }
+      }
     }
     notifyListeners();
   }
@@ -1703,7 +1750,7 @@ class ChatProvider with ChangeNotifier {
       String? area,
       String imgurl,
       int type,
-      String purpose,
+      // String purpose,
       String note,
       String rule,
       DateTime createtime,
@@ -1715,7 +1762,7 @@ class ChatProvider with ChangeNotifier {
         "imgurl": imgurl,
         "type": type,
         "title": title,
-        "purpose": purpose,
+        "purpose": purposelist[0],
         "note": note,
         "area": area,
         "rule": rule,
@@ -1738,12 +1785,12 @@ class ChatProvider with ChangeNotifier {
     print('all delete');
     // await _mongoDB.deletealltable('chatmsg');
     // await _mongoDB.deletealltable('action');
-    // await _mongoDB.deletealltable('groupchatmsg');
+    await _mongoDB.deletealltable('groupchatmsg');
     // await _mongoDB.deletealltable('o2ochatmsg');
     // await _mongoDB.deletealltable('o2olog');
     // await _mongoDB.deletealltable('block_log');
-    // await _mongoDB.deletealltable('chatroom');
-    await _mongoDB.deletealltable('member');
+    await _mongoDB.deletealltable('chatroom');
+    // await _mongoDB.deletealltable('member');
   }
 
   void dbclose() {
@@ -1756,7 +1803,9 @@ class ChatProvider with ChangeNotifier {
     // print('idididid  $id');
     chatroomsetting = await readremotemongodb(
         ChatroomSettingModel.fromJson, 'chatroom',
-        field: mongo.where.eq('_id', id).fields(['imgurl', 'note', 'rule','purpose']));
+        field: mongo.where
+            .eq('_id', id)
+            .fields(['imgurl', 'note', 'rule', 'purpose']));
     print('setting image $chatroomsetting');
     notifyListeners();
   }
@@ -1921,7 +1970,6 @@ class ChatProvider with ChangeNotifier {
   var follow_me_list;
 
   Future getmyfollowlog() async {
-    print('rrr86666');
     print('查詢我的追蹤跟追蹤我的');
     //我的追蹤
     myfollowlog = await readremotemongodb(FollowLogModel.fromJson, 'follow_log',
@@ -2000,7 +2048,6 @@ class ChatProvider with ChangeNotifier {
   var myblocklog;
 
   Future getmyblocklog() async {
-    print('rrr8777');
     myblocklog = await readremotemongodb(FollowLogModel.fromJson, 'block_log',
         field: mongo.where.eq('member_id', remoteUserInfo[0].memberid));
     print('my blocklist $myblocklog');
@@ -2335,7 +2382,23 @@ class ChatProvider with ChangeNotifier {
     notifyListeners();
   }
 
+//加入目的列表
+  List purposelist = [];
 
+  add_purposelist(item) {
+    print('加入');
+    if (purposelist.contains(item)) {
+      purposelist.remove(item);
+    } else {
+      if (purposelist.length > 0) {
+        purposelist.removeAt(0);
+        purposelist.add(item);
+      } else {
+        purposelist.add(item);
+      }
+    }
+    notifyListeners();
+  }
 
   Future saveinterest() async {
     await _mongoDB.upsertData2(
@@ -2528,7 +2591,6 @@ class ChatProvider with ChangeNotifier {
   List? recommend_memberlist;
 
   Future find_recommend_people() async {
-    print('rrr8999');
     find_recommend_people_value = 1;
     if (remoteUserInfo != null) {
       // print('找到推薦 我的${remoteUserInfo[0].sex} 年紀${remoteUserInfo[0].age}');
@@ -2541,19 +2603,26 @@ class ChatProvider with ChangeNotifier {
                   // .oneFrom('interest_list', remoteUserInfo[0].interest_list)
                   // .and(mongo.where
                   //     .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
+
+                  .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女')
+                  .sortBy('follow_num')
                   .limit(pagesize));
+          recommend_memberlist?.removeWhere(
+              (element) => element.memberid == remoteUserInfo[0].memberid);
         } else {
           print('mongo db沒有 年齡 沒有性別');
           recommend_memberlist = null;
         }
       } else {
         print('mongo db 有 年齡');
-        recommend_memberlist =
-            await readremotemongodb(DbUserinfoModel.fromJson, 'member',
-                field: mongo.where
-                    // .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女')
-                    .sortBy('create_time', descending: true)
-                    .limit(pagesize));
+        recommend_memberlist = await readremotemongodb(
+            DbUserinfoModel.fromJson, 'member',
+            field: mongo.where
+                .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女')
+                .sortBy('follow_num', descending: true)
+                .limit(pagesize));
+        recommend_memberlist?.removeWhere(
+            (element) => element.memberid == remoteUserInfo[0].memberid);
         // field:
         // mongo.where
         //     .oneFrom('interest_list', remoteUserInfo[0].interest_list)
@@ -2580,11 +2649,13 @@ class ChatProvider with ChangeNotifier {
         var newpage = await readremotemongodb(
             DbUserinfoModel.fromJson, 'member',
             field: mongo.where
-                .oneFrom('interest_list', remoteUserInfo[0].interest_list)
-                .and(mongo.where.gte('age', remoteUserInfo[0].age - 5))
-                .and(mongo.where.lte('age', remoteUserInfo[0].age + 5))
-                .and(mongo.where
-                    .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
+                // .oneFrom('interest_list', remoteUserInfo[0].interest_list)
+                // .and(mongo.where.gte('age', remoteUserInfo[0].age - 5))
+                // .and(mongo.where.lte('age', remoteUserInfo[0].age + 5))
+                // .and(mongo.where
+                //     .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
+                .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女')
+                .sortBy('follow_num', descending: true)
                 .skip(find_recommend_people_value * pagesize)
                 .limit(pagesize));
         newpage?.removeWhere(
@@ -2595,9 +2666,11 @@ class ChatProvider with ChangeNotifier {
         var newpage = await readremotemongodb(
             DbUserinfoModel.fromJson, 'member',
             field: mongo.where
-                .oneFrom('interest_list', remoteUserInfo[0].interest_list)
-                .and(mongo.where
-                    .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
+                // .oneFrom('interest_list', remoteUserInfo[0].interest_list)
+                // .and(mongo.where
+                //     .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
+                .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女')
+                .sortBy('follow_num', descending: true)
                 .skip(find_recommend_people_value * pagesize)
                 .limit(pagesize));
         newpage?.removeWhere(

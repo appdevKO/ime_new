@@ -89,7 +89,6 @@ List<String> stickers_list = [
   'assets/sticker/85-01.png',
   'assets/sticker/86-01.png',
   'assets/sticker/87-01.png',
-  'assets/sticker/88-01.png',
   'assets/sticker/89-01.png',
   'assets/sticker/90-01.png',
   'assets/sticker/91-01.png',

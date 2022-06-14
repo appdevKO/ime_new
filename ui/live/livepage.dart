@@ -21,7 +21,7 @@ class _LivePageState extends State<LivePage> {
     _tabController = TabController(
       length: 3,
       vsync: ScrollableState(),
-      initialIndex: 2,
+      initialIndex: 0,
     );
     super.initState();
   }

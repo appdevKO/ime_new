@@ -174,7 +174,6 @@ class _TurthOrDareState extends State<TurthOrDare> {
                               borderRadius: BorderRadius.circular(8.0))),
                     ),
                   ),
-                  Platform.isIOS ? Container(height: 168) : Container()
                 ],
               ),
             ),

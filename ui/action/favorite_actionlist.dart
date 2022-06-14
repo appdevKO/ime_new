@@ -132,7 +132,7 @@ class _SingleAction2State extends State<SingleAction2> {
                     ),
                   ],
                 ),
-                Expanded(
+                Container(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [

@@ -377,11 +377,6 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
                     // Container(
                     //   height: 75,
                     // ),
-                    Platform.isIOS
-                        ? Container(
-                            height: 168,
-                          )
-                        : Container(),
                   ],
                 ),
                 //輸入框的那一排

@@ -507,11 +507,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                       //     ))
                     ],
                   ),
-                  Platform.isIOS
-                      ? Container(
-                          height: 168,
-                        )
-                      : Container()
+
                 ],
               ),
             ),

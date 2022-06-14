@@ -246,6 +246,9 @@ class _GetGroupState extends State<GetGroup> {
                     onTap: () {
                       if (value.isgroupteam_filter == true) {
                         value.change_filter(1);
+                        Provider.of<ChatProvider>(context, listen: false)
+                            .purposelist
+                            .clear();
                       } else {
                         bottomSheet(context,
                             StatefulBuilder(builder: (context2, sheetstate) {
@@ -295,8 +298,14 @@ class _GetGroupState extends State<GetGroup> {
                                         onTap: () {
                                           //儲存篩選狀態
                                           value.change_filter(1);
-                                          value.setfilter_chatroom(
-                                              1, dropvalue2);
+                                          if (value.purposelist.isNotEmpty) {
+                                            value.setfilter_chatroom(1,
+                                                area: dropvalue2);
+                                          } else {
+                                            value.setfilter_chatroom(1,
+                                                area: dropvalue2);
+                                          }
+
                                           //重新載入篩選後的結果
 
                                           Navigator.pop(context);
@@ -347,17 +356,62 @@ class _GetGroupState extends State<GetGroup> {
                                           ),
                                         ),
                                       )),
-                                  // Text('人數限制'),
-                                  // Padding(
-                                  //   padding: const EdgeInsets.symmetric(
-                                  //       horizontal: 5, vertical: 8),
-                                  //   child: TextField(
-                                  //       keyboardType: TextInputType.number,
-                                  //       controller: _filter_quotaController,
-                                  //       decoration: InputDecoration(
-                                  //         hintText: '幾個人',
-                                  //       )),
-                                  // ),
+                                  Text('目的篩選'),
+                                  Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 5, vertical: 8),
+                                      child: Container(
+                                        height: purposelist.length / 4 * 32,
+                                        width:
+                                            MediaQuery.of(context).size.width -
+                                                100,
+                                        child: Wrap(
+                                          children: List.generate(
+                                              purposelist.length,
+                                              (index) => GestureDetector(
+                                                    child: Container(
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 10,
+                                                              vertical: 4),
+                                                      child: Text(
+                                                        '${purposelist[index]}',
+                                                        style: TextStyle(
+                                                            color: value
+                                                                    .purposelist
+                                                                    .contains(
+                                                                        purposelist[
+                                                                            index])
+                                                                ? Colors.orange
+                                                                : Colors.black),
+                                                      ),
+                                                      decoration: BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(12),
+                                                          border: Border.all(
+                                                              width: 1,
+                                                              color: value
+                                                                      .purposelist
+                                                                      .contains(
+                                                                          purposelist[
+                                                                              index])
+                                                                  ? Colors
+                                                                      .orange
+                                                                  : Colors
+                                                                      .black)),
+                                                    ),
+                                                    onTap: () {
+                                                      sheetstate(() {
+                                                        value.add_purposelist(
+                                                            purposelist[index]);
+                                                      });
+                                                    },
+                                                  )),
+                                          spacing: 10,
+                                          runSpacing: 5,
+                                        ),
+                                      )),
                                 ],
                               ),
                             ),
@@ -399,6 +453,9 @@ class _GetGroupState extends State<GetGroup> {
                     ),
                   ),
                   onTap: () {
+                    Provider.of<ChatProvider>(context, listen: false)
+                        .purposelist
+                        .clear();
                     setState(() {
                       index = 1;
                     });
@@ -457,61 +514,49 @@ class _GetGroupState extends State<GetGroup> {
                       ),
                     ),
                     Text('目的'),
-                    Consumer<ChatProvider>(
-                        builder: (context, value, child) {
-                          return Container(
-                            height: interestlist.length / 4 * 32,
-                            width: MediaQuery.of(context).size.width - 100,
-                            child: Wrap(
-                              children: List.generate(
-                                  interestlist.length,
-                                      (index) => GestureDetector(
-                                    child: Container(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 10, vertical: 4),
-                                      child: Text(
-                                        '${interestlist[index]}',
-                                        style: TextStyle(
-                                            color: value.interestlist
-                                                .contains(
-                                                interestlist[
-                                                index])
-                                                ? Colors.orange
-                                                : Colors.black),
-                                      ),
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                          BorderRadius.circular(12),
-                                          border: Border.all(
-                                              width: 1,
-                                              color: value.interestlist
-                                                  .contains(
-                                                  interestlist[
-                                                  index])
-                                                  ? Colors.orange
-                                                  : Colors.black)),
-                                    ),
-                                    onTap: () {
-                                      value.add_interest(
-                                          interestlist[index]);
-                                    },
-                                  )),
-                              spacing: 10,
-                              runSpacing: 5,
-                            ),
-                          );
-                        }),
                     Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 5, vertical: 8),
-                      child: TextField(
-                        controller: _purposeController,
-                        decoration: InputDecoration(
-                          hintText: '輸入目的',
-                        ),
-                        maxLength: 30,
-                        maxLines: null,
-                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Consumer<ChatProvider>(
+                          builder: (context, value, child) {
+                        return Container(
+                          height: purposelist.length / 4 * 32,
+                          width: MediaQuery.of(context).size.width - 100,
+                          child: Wrap(
+                            children: List.generate(
+                                purposelist.length,
+                                (index) => GestureDetector(
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 10, vertical: 4),
+                                        child: Text(
+                                          '${purposelist[index]}',
+                                          style: TextStyle(
+                                              color: value.purposelist.contains(
+                                                      purposelist[index])
+                                                  ? Colors.orange
+                                                  : Colors.black),
+                                        ),
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            border: Border.all(
+                                                width: 1,
+                                                color: value.purposelist
+                                                        .contains(
+                                                            purposelist[index])
+                                                    ? Colors.orange
+                                                    : Colors.black)),
+                                      ),
+                                      onTap: () {
+                                        value.add_purposelist(
+                                            purposelist[index]);
+                                      },
+                                    )),
+                            spacing: 10,
+                            runSpacing: 5,
+                          ),
+                        );
+                      }),
                     ),
                     Text('區域'),
                     Padding(
@@ -660,7 +705,10 @@ class _GetGroupState extends State<GetGroup> {
                                 dropvalue != null &&
                                 selectedDateTime != null &&
                                 _titleController.text != '' &&
-                                _purposeController.text != '') {
+                                Provider.of<ChatProvider>(context,
+                                        listen: false)
+                                    .purposelist
+                                    .isNotEmpty) {
                               FocusScope.of(context).unfocus();
                               Provider.of<ChatProvider>(context, listen: false)
                                   .createchatroom(
@@ -672,7 +720,6 @@ class _GetGroupState extends State<GetGroup> {
                                               .avatar_sub ??
                                           '',
                                       0,
-                                      _purposeController.text,
                                       _noteController.text,
                                       _ruleController.text,
                                       DateTime.now().add(Duration(hours: 8)),
@@ -689,6 +736,10 @@ class _GetGroupState extends State<GetGroup> {
                                 selectedDateTime = null;
                                 index = 0;
                               });
+
+                              Provider.of<ChatProvider>(context, listen: false)
+                                  .purposelist
+                                  .clear();
                             } else {
                               print('沒反應');
                             }
@@ -698,7 +749,12 @@ class _GetGroupState extends State<GetGroup> {
                               minimumSize: Size(115, 40),
                               primary: checkvalue == true &&
                                       dropvalue != null &&
-                                      selectedDateTime != null
+                                      selectedDateTime != null &&
+                                      _titleController.text != '' &&
+                                      Provider.of<ChatProvider>(context,
+                                              listen: false)
+                                          .purposelist
+                                          .isNotEmpty
                                   ? Colors.red
                                   : Colors.grey,
                               shape: RoundedRectangleBorder(
@@ -748,7 +804,7 @@ class _GroupteamState extends State<Groupteam> {
                 ? value.remoteUserInfo?.isNotEmpty
                     ? value.isgroupteam_filter
                         ? value.filter_groupteamlist != null
-                            ? value.groupteamlist!.isNotEmpty
+                            ? value.filter_groupteamlist!.isNotEmpty
                                 ? SmartRefresher(
                                     enablePullDown: true,
                                     enablePullUp: true,

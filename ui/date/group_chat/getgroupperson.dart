@@ -110,6 +110,9 @@ class _GetPersonState extends State<GetPerson> {
                     if (value.isgroupperson_filter == true) {
                       //取消篩選
                       value.change_filter(2);
+                      Provider.of<ChatProvider>(context, listen: false)
+                          .purposelist
+                          .clear();
                     } else {
                       //打開篩選
                       bottomSheet(context,
@@ -160,7 +163,8 @@ class _GetPersonState extends State<GetPerson> {
                                       onTap: () {
                                         //儲存篩選狀態
                                         value.change_filter(2);
-                                        value.setfilter_chatroom(2, dropvalue2);
+                                        value.setfilter_chatroom(2,
+                                            area: dropvalue2);
                                         //重新載入篩選後的結果
                                         Navigator.pop(context);
                                       },
@@ -171,19 +175,6 @@ class _GetPersonState extends State<GetPerson> {
                                   height: 1,
                                 ),
 
-                                // Padding(
-                                //   padding: const EdgeInsets.only(top: 8.0),
-                                //   child: Text('目的'),
-                                // ),
-                                // Padding(
-                                //   padding: const EdgeInsets.symmetric(
-                                //       horizontal: 5, vertical: 8),
-                                //   child: TextField(
-                                //       decoration: InputDecoration(
-                                //     hintText: '輸入目的',
-                                //     border: OutlineInputBorder(gapPadding: 2),
-                                //   )),
-                                // ),
                                 Text('區域'),
                                 Padding(
                                     padding: const EdgeInsets.symmetric(
@@ -224,17 +215,60 @@ class _GetPersonState extends State<GetPerson> {
                                         ),
                                       ),
                                     )),
-                                // Text('人數限制'),
-                                // Padding(
-                                //   padding: const EdgeInsets.symmetric(
-                                //       horizontal: 5, vertical: 8),
-                                //   child: TextField(
-                                //       keyboardType: TextInputType.number,
-                                //       controller: _filter_quotaController,
-                                //       decoration: InputDecoration(
-                                //         hintText: '幾個人',
-                                //       )),
-                                // ),
+                                Text('目的篩選'),
+                                Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 5, vertical: 8),
+                                    child: Container(
+                                      height: purposelist.length / 4 * 32,
+                                      width: MediaQuery.of(context).size.width -
+                                          100,
+                                      child: Wrap(
+                                        children: List.generate(
+                                            purposelist.length,
+                                            (index) => GestureDetector(
+                                                  child: Container(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 10,
+                                                            vertical: 4),
+                                                    child: Text(
+                                                      '${purposelist[index]}',
+                                                      style: TextStyle(
+                                                          color: value
+                                                                  .purposelist
+                                                                  .contains(
+                                                                      purposelist[
+                                                                          index])
+                                                              ? Colors.orange
+                                                              : Colors.black),
+                                                    ),
+                                                    decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(12),
+                                                        border: Border.all(
+                                                            width: 1,
+                                                            color: value
+                                                                    .purposelist
+                                                                    .contains(
+                                                                        purposelist[
+                                                                            index])
+                                                                ? Colors.orange
+                                                                : Colors
+                                                                    .black)),
+                                                  ),
+                                                  onTap: () {
+                                                    sheetstate(() {
+                                                      value.add_purposelist(
+                                                          purposelist[index]);
+                                                    });
+                                                  },
+                                                )),
+                                        spacing: 10,
+                                        runSpacing: 5,
+                                      ),
+                                    )),
                               ],
                             ),
                           ),
@@ -275,6 +309,9 @@ class _GetPersonState extends State<GetPerson> {
                   ),
                 ),
                 onTap: () {
+                  Provider.of<ChatProvider>(context, listen: false)
+                      .purposelist
+                      .clear();
                   setState(() {
                     index = 2;
                   });
@@ -335,16 +372,48 @@ class _GetPersonState extends State<GetPerson> {
                     ),
                     Text('目的'),
                     Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 5, vertical: 8),
-                      child: TextField(
-                        controller: _purposeController,
-                        decoration: InputDecoration(
-                          hintText: '輸入目的',
-                        ),
-                        maxLength: 30,
-                        maxLines: null,
-                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Consumer<ChatProvider>(
+                          builder: (context, value, child) {
+                        return Container(
+                          height: purposelist.length / 4 * 32,
+                          width: MediaQuery.of(context).size.width - 100,
+                          child: Wrap(
+                            children: List.generate(
+                                purposelist.length,
+                                (index) => GestureDetector(
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 10, vertical: 4),
+                                        child: Text(
+                                          '${purposelist[index]}',
+                                          style: TextStyle(
+                                              color: value.purposelist.contains(
+                                                      purposelist[index])
+                                                  ? Colors.orange
+                                                  : Colors.black),
+                                        ),
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            border: Border.all(
+                                                width: 1,
+                                                color: value.purposelist
+                                                        .contains(
+                                                            purposelist[index])
+                                                    ? Colors.orange
+                                                    : Colors.black)),
+                                      ),
+                                      onTap: () {
+                                        value.add_purposelist(
+                                            purposelist[index]);
+                                      },
+                                    )),
+                            spacing: 10,
+                            runSpacing: 5,
+                          ),
+                        );
+                      }),
                     ),
                     Text('區域'),
                     Padding(
@@ -508,7 +577,10 @@ class _GetPersonState extends State<GetPerson> {
                                 dropvalue != null &&
                                 selectedDateTime != null &&
                                 _titleController.text != '' &&
-                                _purposeController.text != '') {
+                                Provider.of<ChatProvider>(context,
+                                        listen: false)
+                                    .purposelist
+                                    .isNotEmpty) {
                               FocusScope.of(context).unfocus();
                               Provider.of<ChatProvider>(context, listen: false)
                                   .createchatroom(
@@ -520,7 +592,6 @@ class _GetPersonState extends State<GetPerson> {
                                               .avatar_sub ??
                                           '',
                                       1,
-                                      _purposeController.text,
                                       _noteController.text,
                                       _ruleController.text,
                                       DateTime.now().add(Duration(hours: 8)),
@@ -537,6 +608,11 @@ class _GetPersonState extends State<GetPerson> {
                                 index = 0;
                                 selectedDateTime = null;
                               });
+                              Provider.of<ChatProvider>(context, listen: false)
+                                  .purposelist
+                                  .clear();
+                            } else {
+                              print('沒反應');
                             }
                           },
                           child: Text('創建房間'),
@@ -544,7 +620,11 @@ class _GetPersonState extends State<GetPerson> {
                               minimumSize: Size(115, 40),
                               primary: checkvalue == true &&
                                       dropvalue != null &&
-                                      selectedDateTime != null
+                                      selectedDateTime != null &&
+                                      Provider.of<ChatProvider>(context,
+                                              listen: false)
+                                          .purposelist
+                                          .isNotEmpty
                                   ? Colors.red
                                   : Colors.grey,
                               shape: RoundedRectangleBorder(
@@ -582,6 +662,7 @@ class _GroupPersonState extends State<GroupPerson> {
         Container(
           height: 50,
         ),
+        //房間列表
         Expanded(child: Consumer<ChatProvider>(
           builder: (context, value, child) {
             return value.remoteUserInfo != null
@@ -627,13 +708,7 @@ class _GroupPersonState extends State<GroupPerson> {
                                               margin: EdgeInsets.symmetric(
                                                   horizontal: 10, vertical: 1),
                                               decoration: BoxDecoration(
-                                                color: value
-                                                            .filter_grouppersonlist![
-                                                                index]
-                                                            .owner_sex ==
-                                                        1
-                                                    ? Color(0xcfb8E6FF)
-                                                    : Color(0xcfffbbbb),
+                                                color: Colors.white,
                                                 borderRadius:
                                                     BorderRadius.circular(10),
                                                 boxShadow: [

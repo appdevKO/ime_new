@@ -31,9 +31,7 @@ class _DateNearState extends State<DateNear> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Container(
-        padding: Platform.isIOS
-            ? EdgeInsets.only(top: 10, left: 10, right: 10, bottom: 168)
-            : EdgeInsets.only(top: 10, left: 10, right: 10, bottom: 10),
+        padding: EdgeInsets.only(top: 10, left: 10, right: 10, bottom: 10),
         child: Consumer<ChatProvider>(builder: (context, value, child) {
           return value.nearpeoplelist == null
               ? Container(child: Center(child: Text('正在幫你搜尋附近的人02')))

@@ -598,11 +598,7 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                           }))
                     ],
                   ),
-                  Platform.isIOS
-                      ? Container(
-                          height: 168,
-                        )
-                      : Container()
+
                 ],
               ),
             ),

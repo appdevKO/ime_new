@@ -639,11 +639,7 @@ class _ProfileOptionState extends State<ProfileOption> {
                   ],
                 ),
               ),
-              Platform.isIOS
-                  ? Container(
-                      height: 168,
-                    )
-                  : Container()
+
             ],
           ),
         ),

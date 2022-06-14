@@ -392,11 +392,6 @@ class _ProfileSettingState extends State<ProfileSetting> {
                     backgroundColor: MaterialStateProperty.all(Colors.grey)),
               ),
             ),
-            Platform.isIOS
-                ? Container(
-                    height: 168,
-                  )
-                : Container()
           ],
         ),
       ),

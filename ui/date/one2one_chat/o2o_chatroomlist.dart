@@ -173,11 +173,6 @@ class _OneChatState extends State<OneChat> {
         Container(
           height: 10,
         ),
-        Platform.isIOS
-            ? Container(
-                height: 168,
-              )
-            : Container()
       ],
     );
     // return Container();

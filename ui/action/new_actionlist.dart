@@ -34,25 +34,31 @@ class _NewestActionListState extends State<NewestActionList> {
                     WaterDropMaterialHeader(backgroundColor: Color(0xffaCEA00)),
                 onRefresh: _onRefresh,
                 onLoading: _onLoading,
-                child: ListView.separated(
-                  itemBuilder: (context, index) {
-                    return SingleAction(
-                      index: index,
-                    );
-                  },
-                  separatorBuilder: (context, index) {
-                    return Padding(
-                      padding: EdgeInsets.symmetric(
-                        vertical: 6,
+                child: value.newest_actionlist != null
+                    ? ListView.separated(
+                        itemBuilder: (context, index) {
+                          return SingleAction(
+                            index: index,
+                          );
+                        },
+                        separatorBuilder: (context, index) {
+                          return Padding(
+                            padding: EdgeInsets.symmetric(
+                              vertical: 6,
+                            ),
+                            child: Divider(
+                              color: Colors.grey,
+                              thickness: 5,
+                            ),
+                          );
+                        },
+                        itemCount: value.newest_actionlist!.length,
+                      )
+                    : Container(
+                        child: Center(
+                          child: Text('動態載入中'),
+                        ),
                       ),
-                      child: Divider(
-                        color: Colors.grey,
-                        thickness: 5,
-                      ),
-                    );
-                  },
-                  itemCount: value.newest_actionlist!.length,
-                ),
               )
             : Container(
                 child: Center(
@@ -248,101 +254,97 @@ class _SingleActionState extends State<SingleAction> {
                             value.newest_actionlist![widget.index!].image_sub !=
                                 null
                         ? Container(
-                          height: 150,
-                          decoration: BoxDecoration(
-                              color: Colors.grey,
-                              image: DecorationImage(
-                                  image: NetworkImage(
-                                      '${value.newest_actionlist![widget.index!].image_sub}'),
-                                  fit: BoxFit.cover)),
-                        )
+                            height: 150,
+                            decoration: BoxDecoration(
+                                color: Colors.grey,
+                                image: DecorationImage(
+                                    image: NetworkImage(
+                                        '${value.newest_actionlist![widget.index!].image_sub}'),
+                                    fit: BoxFit.cover)),
+                          )
                         : Container(),
                   ),
                   //三個icon
-                  Padding(
+                  Container(
                     padding:
                         const EdgeInsets.only(top: 8.0, right: 15, left: 15),
-                    child: Expanded(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.favorite,
+                              size: 18,
+                              color: Colors.red,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 3.0),
+                              child: Text(
+                                value.newest_actionlist![widget.index!]
+                                                .like_num !=
+                                            '' &&
+                                        value.newest_actionlist![widget.index!]
+                                                .like_num !=
+                                            null
+                                    ? '${value.newest_actionlist![widget.index!].like_num}'
+                                    : '-',
+                                style: TextStyle(fontSize: 12),
+                              ),
+                            )
+                          ],
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 38.0),
+                          child: Row(
                             children: [
                               Icon(
-                                Icons.favorite,
+                                Icons.message,
                                 size: 18,
-                                color: Colors.red,
+                                color: Colors.green,
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(left: 3.0),
                                 child: Text(
                                   value.newest_actionlist![widget.index!]
-                                                  .like_num !=
+                                                  .msg_num !=
                                               '' &&
                                           value
                                                   .newest_actionlist![
                                                       widget.index!]
-                                                  .like_num !=
+                                                  .msg_num !=
                                               null
-                                      ? '${value.newest_actionlist![widget.index!].like_num}'
+                                      ? '${value.newest_actionlist![widget.index!].msg_num}'
                                       : '-',
                                   style: TextStyle(fontSize: 12),
                                 ),
                               )
                             ],
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 38.0),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.message,
-                                  size: 18,
-                                  color: Colors.green,
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 3.0),
-                                  child: Text(
-                                    value.newest_actionlist![widget.index!]
-                                                    .msg_num !=
-                                                '' &&
-                                            value
-                                                    .newest_actionlist![
-                                                        widget.index!]
-                                                    .msg_num !=
-                                                null
-                                        ? '${value.newest_actionlist![widget.index!].msg_num}'
-                                        : '-',
-                                    style: TextStyle(fontSize: 12),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 38.0),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.share,
+                                size: 15,
+                                color: Colors.transparent,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 3.0),
+                                child: Text(
+                                  '分享',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.transparent,
                                   ),
-                                )
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 38.0),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.share,
-                                  size: 15,
-                                  color: Colors.transparent,
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 3.0),
-                                  child: Text(
-                                    '分享',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.transparent,
-                                    ),
-                                  ),
-                                )
-                              ],
-                            ),
+                              )
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ],

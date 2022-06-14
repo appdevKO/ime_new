@@ -45,7 +45,7 @@ class _ActionPageState extends State<ActionPage> {
               child: Container(
                 decoration: new BoxDecoration(
                   gradient: new LinearGradient(
-                    colors: [Color(0xffaCEA00), Color(0xffFFFF6F)],
+                    colors: [Color(0xff228b22), Color(0xffFFFF6F)],
                   ),
                 ),
                 child: TabBar(

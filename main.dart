@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<MqttListen>(create: (context) => MqttListen()),
       ],
       child: GetMaterialApp(
-        title: 'Flutter Demo',
+        title: 'IME',
         // routes: {
         //   'make_friend': (context) {
         //     return IndexPage();
@@ -98,45 +98,45 @@ class _LoginPageState extends State<LoginPage> {
         ),
         body: Column(
           children: [
-            Row(
-              children: [
-                Text('test登入1 大鵝'),
-                Padding(
-                  padding: const EdgeInsets.only(left: 8.0),
-                  child: ElevatedButton(
-                      onPressed: () {
-                        Provider.of<ChatProvider>(context, listen: false)
-                            .account_id = '10028';
-                        Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(builder: (context) => HomePage()),
-                            (route) => route == null);
-                      },
-                      child: Text('test登入1 大鵝')),
-                )
-              ],
-            ),
-            Row(
-              children: [
-                Text('test登入2 木木'),
-                Padding(
-                  padding: const EdgeInsets.only(left: 8.0),
-                  child: ElevatedButton(
-                      onPressed: () {
-                        Provider.of<ChatProvider>(context, listen: false)
-                            .account_id = '10103';
-                        Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(builder: (context) => HomePage()),
-                            (route) => route == null);
-                      },
-                      child: Text('test登入2 木木')),
-                )
-              ],
-            ),
-            Container(
-              height: 120,
-            ),
+            // Row(
+            //   children: [
+            //     Text('test登入1 大鵝'),
+            //     Padding(
+            //       padding: const EdgeInsets.only(left: 8.0),
+            //       child: ElevatedButton(
+            //           onPressed: () {
+            //             Provider.of<ChatProvider>(context, listen: false)
+            //                 .account_id = '10028';
+            //             Navigator.pushAndRemoveUntil(
+            //                 context,
+            //                 MaterialPageRoute(builder: (context) => HomePage()),
+            //                 (route) => route == null);
+            //           },
+            //           child: Text('test登入1 大鵝')),
+            //     )
+            //   ],
+            // ),
+            // Row(
+            //   children: [
+            //     Text('test登入2 木木'),
+            //     Padding(
+            //       padding: const EdgeInsets.only(left: 8.0),
+            //       child: ElevatedButton(
+            //           onPressed: () {
+            //             Provider.of<ChatProvider>(context, listen: false)
+            //                 .account_id = '10103';
+            //             Navigator.pushAndRemoveUntil(
+            //                 context,
+            //                 MaterialPageRoute(builder: (context) => HomePage()),
+            //                 (route) => route == null);
+            //           },
+            //           child: Text('test登入2 木木')),
+            //     )
+            //   ],
+            // ),
+            // Container(
+            //   height: 120,
+            // ),
             // Row(
             //   children: [
             //     Text('google 登出'),
@@ -151,6 +151,9 @@ class _LoginPageState extends State<LoginPage> {
             //     )
             //   ],
             // ),
+            Container(
+              height: 140,
+            ),
             SignInButton(
               Buttons.Google,
               text: "Google 登入",
@@ -162,20 +165,16 @@ class _LoginPageState extends State<LoginPage> {
                   //跳轉
                   await Provider.of<ChatProvider>(context, listen: false)
                       .register(result.user)
-                      .whenComplete(
-                          () => Future.delayed(Duration(seconds: 2), () {
-                                Navigator.pushAndRemoveUntil(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => HomePage()),
-                                    (route) => route == null);
-                              }));
+                      .whenComplete(() => Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(builder: (context) => HomePage()),
+                          (route) => route == null));
                 } else
                   print('不是');
               },
             ),
             Container(
-              height: 120,
+              height: 40,
             ),
             // Row(
             //   children: [
@@ -330,24 +329,19 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: pages[pageIndex],
-      bottomNavigationBar: Container(
-        height: 65,
-        decoration: BoxDecoration(
-          color: Colors.grey.withOpacity(.2),
-          // borderRadius: BorderRadius.only(
-          //     topLeft: Radius.circular(20), topRight: Radius.circular(20))
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            IconButton(
-              enableFeedback: false,
-              onPressed: () {
-                setState(() {
-                  pageIndex = 0;
-                });
-              },
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: Colors.red,
+        unselectedItemColor: Colors.black45,
+        currentIndex: pageIndex,
+        // height: 65,
+        // decoration: BoxDecoration(
+        //   color: Colors.grey.withOpacity(.2),
+        //   // borderRadius: BorderRadius.only(
+        //   //     topLeft: Radius.circular(20), topRight: Radius.circular(20))
+        // ),
+        items: [
+          BottomNavigationBarItem(
               icon: pageIndex == 0
                   ? const Icon(
                       Icons.live_tv,
@@ -359,14 +353,8 @@ class _HomePageState extends State<HomePage> {
                       color: Colors.black,
                       size: 35,
                     ),
-            ),
-            IconButton(
-              enableFeedback: false,
-              onPressed: () {
-                setState(() {
-                  pageIndex = 1;
-                });
-              },
+              label: '直播'),
+          BottomNavigationBarItem(
               icon: pageIndex == 1
                   ? const Icon(
                       Icons.home_filled,
@@ -378,33 +366,21 @@ class _HomePageState extends State<HomePage> {
                       color: Colors.black,
                       size: 35,
                     ),
-            ),
-            IconButton(
-              enableFeedback: false,
-              onPressed: () {
-                setState(() {
-                  pageIndex = 2;
-                });
-              },
+              label: '交友'),
+          BottomNavigationBarItem(
               icon: pageIndex == 2
                   ? const Icon(
-                      Icons.local_fire_department,
+                      Icons.timelapse,
                       color: Colors.red,
                       size: 35,
                     )
                   : const Icon(
-                      Icons.local_fire_department_outlined,
+                      Icons.timelapse,
                       color: Colors.black,
                       size: 35,
                     ),
-            ),
-            IconButton(
-              enableFeedback: false,
-              onPressed: () {
-                setState(() {
-                  pageIndex = 3;
-                });
-              },
+              label: '動態'),
+          BottomNavigationBarItem(
               icon: pageIndex == 3
                   ? const Icon(
                       Icons.group_add,
@@ -416,14 +392,8 @@ class _HomePageState extends State<HomePage> {
                       color: Colors.black,
                       size: 35,
                     ),
-            ),
-            IconButton(
-              enableFeedback: false,
-              onPressed: () {
-                setState(() {
-                  pageIndex = 4;
-                });
-              },
+              label: '聯誼'),
+          BottomNavigationBarItem(
               icon: pageIndex == 4
                   ? const Icon(
                       Icons.person,
@@ -435,9 +405,114 @@ class _HomePageState extends State<HomePage> {
                       color: Colors.black,
                       size: 35,
                     ),
-            ),
-          ],
-        ),
+              label: '我的'),
+        ],
+        onTap: (currentindex) {
+          setState(() {
+            pageIndex = currentindex;
+          });
+        },
+        // child: Row(
+        //   mainAxisAlignment: MainAxisAlignment.spaceAround,
+        //   crossAxisAlignment: CrossAxisAlignment.center,
+        //   children: [
+        //     IconButton(
+        //       enableFeedback: false,
+        //       onPressed: () {
+        //         setState(() {
+        //           pageIndex = 0;
+        //         });
+        //       },
+        //       icon: pageIndex == 0
+        //           ? const Icon(
+        //               Icons.live_tv,
+        //               color: Colors.red,
+        //               size: 35,
+        //             )
+        //           : const Icon(
+        //               Icons.live_tv_outlined,
+        //               color: Colors.black,
+        //               size: 35,
+        //             ),
+        //     ),
+        //     IconButton(
+        //       enableFeedback: false,
+        //       onPressed: () {
+        //         setState(() {
+        //           pageIndex = 1;
+        //         });
+        //       },
+        //       icon: pageIndex == 1
+        //           ? const Icon(
+        //               Icons.home_filled,
+        //               color: Colors.red,
+        //               size: 35,
+        //             )
+        //           : const Icon(
+        //               Icons.home_outlined,
+        //               color: Colors.black,
+        //               size: 35,
+        //             ),
+        //     ),
+        //     IconButton(
+        //       enableFeedback: false,
+        //       onPressed: () {
+        //         setState(() {
+        //           pageIndex = 2;
+        //         });
+        //       },
+        //       icon: pageIndex == 2
+        //           ? const Icon(
+        //               Icons.local_fire_department,
+        //               color: Colors.red,
+        //               size: 35,
+        //             )
+        //           : const Icon(
+        //               Icons.local_fire_department_outlined,
+        //               color: Colors.black,
+        //               size: 35,
+        //             ),
+        //     ),
+        //     IconButton(
+        //       enableFeedback: false,
+        //       onPressed: () {
+        //         setState(() {
+        //           pageIndex = 3;
+        //         });
+        //       },
+        //       icon: pageIndex == 3
+        //           ? const Icon(
+        //               Icons.group_add,
+        //               color: Colors.red,
+        //               size: 35,
+        //             )
+        //           : const Icon(
+        //               Icons.group_add_outlined,
+        //               color: Colors.black,
+        //               size: 35,
+        //             ),
+        //     ),
+        //     IconButton(
+        //       enableFeedback: false,
+        //       onPressed: () {
+        //         setState(() {
+        //           pageIndex = 4;
+        //         });
+        //       },
+        //       icon: pageIndex == 4
+        //           ? const Icon(
+        //               Icons.person,
+        //               color: Colors.red,
+        //               size: 35,
+        //             )
+        //           : const Icon(
+        //               Icons.person_outline,
+        //               color: Colors.black,
+        //               size: 35,
+        //             ),
+        //     ),
+        //   ],
+        // ),
       ),
     );
   }

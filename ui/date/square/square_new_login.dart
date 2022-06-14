@@ -29,9 +29,7 @@ class _DatelastloginState extends State<Datelastlogin> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: Platform.isIOS
-          ? EdgeInsets.only(top: 10, left: 10, right: 10, bottom: 168)
-          : EdgeInsets.only(top: 10, left: 10, right: 10, bottom: 10),
+      padding: EdgeInsets.only(top: 10, left: 10, right: 10, bottom: 10),
       child: Consumer<ChatProvider>(builder: (context, value, child) {
         return value.last_login_memberlist == null
             ? Container(child: Center(child: Text('正在幫你搜尋最近登入的人02')))

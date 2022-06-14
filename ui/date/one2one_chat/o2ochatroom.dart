@@ -433,19 +433,16 @@ class _O2OChatroomState extends State<O2OChatroom> {
                         );
                       },
                     )),
-                    Container(
-                      height: 75,
-                    ),
-                    Platform.isIOS
-                        ? Container(
-                      height: 168,
-                    )
-                        : Container(),
+                    bottomEnter(),
+                    bottomRecord(),
+                    bottomsticker()
                   ],
                 ),
                 //輸入框的那一排
                 Positioned(
-                  bottom: 0,
+                  bottom: bottomrecordheight != 0 || bottomstickerheight != 0
+                      ? 220
+                      : 75,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -534,105 +531,6 @@ class _O2OChatroomState extends State<O2OChatroom> {
                         ),
                       )
                           : Container(),
-                      Consumer<ChatProvider>(
-                        builder: (context, value, child) {
-                          return value.myblocklog != null
-                              ? value.myblocklog[0].list_id == null
-                              ? Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: Column(
-                              children: [
-                                bottomEnter(),
-                                // Container(height: 20,width: MediaQuery.of(context).size.width,color: Colors.red,),
-                                // Container(height: 20,width: MediaQuery.of(context).size.width,color: Colors.green,),
-                                bottomRecord(),
-                                bottomsticker()
-                              ],
-                            ),
-                          )
-                              : value.myblocklog[0].list_id.indexWhere(
-                                  (element) =>
-                              element == widget.chatroomid) !=
-                              -1
-                              ? Container(
-                            width: MediaQuery
-                                .of(context)
-                                .size
-                                .width,
-                            decoration: BoxDecoration(
-                              color: Color(0xffb9b9b9),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 10),
-                              child: Row(
-                                mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
-                                children: [
-                                  IconButton(
-                                    icon: Icon(
-                                      Icons.add,
-                                      color: Colors.transparent,
-                                    ),
-                                    onPressed: () {},
-                                  ),
-                                  Text('已經加入黑名單'),
-                                  IconButton(
-                                    icon: Icon(Icons.add,
-                                        color: Colors.transparent),
-                                    onPressed: () {},
-                                  ),
-                                ],
-                              ),
-                            ),
-                          )
-                              : Padding(
-                            padding:
-                            const EdgeInsets.only(top: 8.0),
-                            child: Column(
-                              children: [
-                                bottomEnter(),
-                                // Container(
-                                //   height: 20,
-                                //   width: MediaQuery.of(context)
-                                //       .size
-                                //       .width,
-                                //   color: Colors.red,
-                                // ),
-                                // Container(
-                                //   height: 20,
-                                //   width: MediaQuery.of(context)
-                                //       .size
-                                //       .width,
-                                //   color: Colors.green,
-                                // ),
-                                bottomRecord(),
-                                bottomsticker()
-                              ],
-                            ),
-                          )
-                              : Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: Column(
-                              children: [
-                                bottomEnter(),
-                                // Container(
-                                //   height: 20,
-                                //   width: MediaQuery.of(context).size.width,
-                                //   color: Colors.red,
-                                // ),
-                                // Container(
-                                //   height: 20,
-                                //   width: MediaQuery.of(context).size.width,
-                                //   color: Colors.green,
-                                // ),
-                                bottomRecord(),
-                                bottomsticker()
-                              ],
-                            ),
-                          );
-                        },
-                      ),
                     ],
                   ),
                 ),

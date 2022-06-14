@@ -1182,16 +1182,6 @@ class _ProfileSetting2State extends State<ProfileSetting2> {
                   ],
                 ),
               ),
-              Platform.isIOS
-                  ? Container(
-                      height: 168,
-                    )
-                  : Container(),
-              // //墊鍵盤
-              // Container(
-              //   height: bottominsetheight,
-              //   color: Colors.white,
-              // )
             ],
           ),
         ),
