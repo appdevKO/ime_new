@@ -148,19 +148,6 @@ class _ProfileOptionState extends State<ProfileOption> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Container(
-                      //   height: 56,
-                      //   width: 50,
-                      //   color: Colors.transparent,
-                      //   child: IconButton(
-                      //       icon: Icon(
-                      //         Icons.arrow_back,
-                      //         color: Colors.red,
-                      //       ),
-                      //       onPressed: () {
-                      //         Navigator.pop(context);
-                      //       }),
-                      // ),
                       //頭像
                       GestureDetector(
                         child: Stack(
@@ -229,6 +216,7 @@ class _ProfileOptionState extends State<ProfileOption> {
                               .change_avatar();
                         },
                       ),
+                      // 按鈕
                       Padding(
                         padding: const EdgeInsets.only(left: 25.0),
                         child: Column(
@@ -281,7 +269,24 @@ class _ProfileOptionState extends State<ProfileOption> {
                             ),
                           ],
                         ),
-                      )
+                      ),
+                      //出去 離開
+                      Padding(
+                        padding: const EdgeInsets.only(left: 3.0),
+                        child: Container(
+                          height: 56,
+                          width: 50,
+                          color: Colors.transparent,
+                          child: IconButton(
+                              icon: Icon(
+                                Icons.arrow_forward,
+                                color: Colors.red,
+                              ),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              }),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -639,7 +644,6 @@ class _ProfileOptionState extends State<ProfileOption> {
                   ],
                 ),
               ),
-
             ],
           ),
         ),

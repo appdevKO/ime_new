@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 
 List<List<Color>> colorlist = [
-  [
-    Color(0xff5ac9e8),
-    Color(0xffa1e4ac),
-  ],
+
   [
     Color(0xff1a79e8),
     Color(0xff7fb1ec),
@@ -16,6 +13,10 @@ List<List<Color>> colorlist = [
   [
     Color(0xff5832e3),
     Color(0xffb796f5),
+  ],
+  [
+    Color(0xff5ac9e8),
+    Color(0xffa1e4ac),
   ],
 ];
 String default_roomimg =

@@ -382,7 +382,7 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
                 //輸入框的那一排
                 Positioned(
                   bottom: bottomrecordheight != 0 || bottomstickerheight != 0
-                      ? 220
+                      ? 365
                       : 75,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -606,10 +606,11 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
                     width: 50.0,
                   ),
                 )
-              : Padding(
-                  padding: const EdgeInsets.only(top: 20.0),
+              : Container(
+                  height: bottomrecordheight,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Container(
                           margin: EdgeInsets.all(20),
@@ -629,15 +630,15 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
                                       primary: Colors.grey,
                                       shape: RoundedRectangleBorder(
                                           borderRadius:
-                                              BorderRadius.circular(8.0))),
+                                              BorderRadius.circular(8.0),)),
                                 )
                               : Container()),
-                      Column(
+                      Column(mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(recorderTxt),
+                          Text(recorderTxt,style: TextStyle(fontSize: 18),),
                           GestureDetector(
                             child: Container(
-                              height: 80,
+                              height: 130,width: 130,
                               margin: EdgeInsets.all(10),
                               padding: EdgeInsets.all(15),
                               decoration: BoxDecoration(
@@ -655,7 +656,7 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
                                       ? Text(
                                           '已錄音',
                                           style: TextStyle(
-                                              color: Colors.blue, fontSize: 12),
+                                              color: Colors.blue, fontSize: 18),
                                         )
                                       : Icon(
                                           myrecord == recordState.recording
@@ -856,7 +857,6 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-
                       // 泡泡
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
@@ -982,7 +982,6 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
                               ),
                             ),
                           ),
-
                         ],
                       ),
                       SizedBox(
@@ -1104,112 +1103,116 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
                             ),
                             msg.type == 3
                                 ? Container(
-                              padding: EdgeInsets.only(
-                                top: 10,
-                                bottom: 10,
-                              ),
-                              constraints: BoxConstraints(
-                                maxWidth:
-                                MediaQuery.of(context).size.width * .6,
-                              ),
-                              child: Image.asset(
-                                  '${stickers_list[int.parse(msg.text!)]}'),
-                            )
-                                : Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 15.0, vertical: 10.0),
-                              //控制泡泡裡面的大小
-                              //大小
-                              constraints: BoxConstraints(
-                                maxWidth:
-                                MediaQuery.of(context).size.width * .6,
-                              ),
-                              //泡泡顏色
-                              decoration: BoxDecoration(
-                                color: Color(0xffEAEFF6),
-                                // gradient: LinearGradient(
-                                //     colors: [Color(0xfffd669a), Color(0xffff836a)]),
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(text_radius),
-                                  bottomRight: Radius.circular(text_radius),
-                                  bottomLeft: Radius.circular(text_radius),
-                                ),
-                              ),
-                              // 泡泡內容
-                              // 判斷type
-                              //type  1 文字 / 2 圖片 / 3 貼圖 / 4 音頻 / 6 通知
-                              child: msg.type == 1
-                                  ? Container(child: Text('${msg.text}'))
-                                  : msg.type == 2
-                                  ? msg.text != '' && msg.text != null
-                                  ? GestureDetector(
-                                child: Container(
-                                  child: Image.network(
-                                      '${msg.text}'),
-                                ),
-                                onTap: () {
-                                  print(
-                                      '${msg.text}//////${msg.note}');
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder:
-                                              (context) =>
-                                              ShowImage(
-                                                img: msg
-                                                    .note!,
-                                              )));
-                                },
-                              )
-                                  : Container(
-                                child: Text('圖片損毀'),
-                              )
-                              // : msg.type == 3
-                              //     ? Image.asset(
-                              //         '${stickers_list[int.parse(msg.text!)]}')
-                                  : msg.type == 4
-                                  ? Container(
-                                child: Column(
-                                  children: [
-                                    Text('已傳送錄音'),
-                                    Padding(
-                                      padding:
-                                      EdgeInsets.only(
-                                          top: 10),
-                                      child: msg.recordtime ==
-                                          '' ||
-                                          msg.recordtime ==
-                                              null
-                                          ? Text(
-                                        '00:00:00 / 00:00:00',
-                                        style: TextStyle(
-                                            color: Colors
-                                                .transparent),
-                                      )
-                                          : Text(
-                                          '${msg.recordtime} / ${msg.current_play_position}'),
+                                    padding: EdgeInsets.only(
+                                      top: 10,
+                                      bottom: 10,
                                     ),
-                                    IconButton(
-                                        icon: msg.play ==
-                                            false
-                                            ? Icon(Icons
-                                            .play_arrow)
-                                            : Icon(
-                                            Icons.pause),
-                                        onPressed: () {
-                                          startplay(msg,
-                                              topicindex);
-                                        })
-                                  ],
-                                ),
-                              )
-                                  : msg.type == 6
-                                  ? Container(
-                                child: Text(
-                                    '通知:${msg.text}'),
-                              )
-                                  : Container(),
-                            ),
+                                    constraints: BoxConstraints(
+                                      maxWidth:
+                                          MediaQuery.of(context).size.width *
+                                              .6,
+                                    ),
+                                    child: Image.asset(
+                                        '${stickers_list[int.parse(msg.text!)]}'),
+                                  )
+                                : Container(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 15.0, vertical: 10.0),
+                                    //控制泡泡裡面的大小
+                                    //大小
+                                    constraints: BoxConstraints(
+                                      maxWidth:
+                                          MediaQuery.of(context).size.width *
+                                              .6,
+                                    ),
+                                    //泡泡顏色
+                                    decoration: BoxDecoration(
+                                      color: Color(0xffEAEFF6),
+                                      // gradient: LinearGradient(
+                                      //     colors: [Color(0xfffd669a), Color(0xffff836a)]),
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(text_radius),
+                                        bottomRight:
+                                            Radius.circular(text_radius),
+                                        bottomLeft:
+                                            Radius.circular(text_radius),
+                                      ),
+                                    ),
+                                    // 泡泡內容
+                                    // 判斷type
+                                    //type  1 文字 / 2 圖片 / 3 貼圖 / 4 音頻 / 6 通知
+                                    child: msg.type == 1
+                                        ? Container(child: Text('${msg.text}'))
+                                        : msg.type == 2
+                                            ? msg.text != '' && msg.text != null
+                                                ? GestureDetector(
+                                                    child: Container(
+                                                      child: Image.network(
+                                                          '${msg.text}'),
+                                                    ),
+                                                    onTap: () {
+                                                      print(
+                                                          '${msg.text}//////${msg.note}');
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder:
+                                                                  (context) =>
+                                                                      ShowImage(
+                                                                        img: msg
+                                                                            .note!,
+                                                                      )));
+                                                    },
+                                                  )
+                                                : Container(
+                                                    child: Text('圖片損毀'),
+                                                  )
+                                            // : msg.type == 3
+                                            //     ? Image.asset(
+                                            //         '${stickers_list[int.parse(msg.text!)]}')
+                                            : msg.type == 4
+                                                ? Container(
+                                                    child: Column(
+                                                      children: [
+                                                        Text('已傳送錄音'),
+                                                        Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  top: 10),
+                                                          child: msg.recordtime ==
+                                                                      '' ||
+                                                                  msg.recordtime ==
+                                                                      null
+                                                              ? Text(
+                                                                  '00:00:00 / 00:00:00',
+                                                                  style: TextStyle(
+                                                                      color: Colors
+                                                                          .transparent),
+                                                                )
+                                                              : Text(
+                                                                  '${msg.recordtime} / ${msg.current_play_position}'),
+                                                        ),
+                                                        IconButton(
+                                                            icon: msg.play ==
+                                                                    false
+                                                                ? Icon(Icons
+                                                                    .play_arrow)
+                                                                : Icon(Icons
+                                                                    .pause),
+                                                            onPressed: () {
+                                                              startplay(msg,
+                                                                  topicindex);
+                                                            })
+                                                      ],
+                                                    ),
+                                                  )
+                                                : msg.type == 6
+                                                    ? Container(
+                                                        child: Text(
+                                                            '通知:${msg.text}'),
+                                                      )
+                                                    : Container(),
+                                  ),
                             Padding(
                               padding: const EdgeInsets.symmetric(vertical: 4),
                               child: Text(
@@ -1256,7 +1259,7 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
       _focus.unfocus();
     }
     setState(() {
-      bottomrecordheight = 150;
+      bottomrecordheight = 300;
       insetopen = true;
     });
   }
@@ -1276,7 +1279,7 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
       _focus.unfocus();
     }
     setState(() {
-      bottomstickerheight = 150;
+      bottomstickerheight = 300;
       audiobuttonclose();
       insetopen = true;
     });

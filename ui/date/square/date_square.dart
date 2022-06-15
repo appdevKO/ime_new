@@ -21,6 +21,11 @@ class _DateSquareState extends State<DateSquare>
     _tabController = TabController(length: 4, vsync: this, initialIndex: 0);
     super.initState();
   }
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

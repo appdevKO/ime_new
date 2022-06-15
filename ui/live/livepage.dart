@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ime_new/business_logic/provider/chat_provider.dart';
 import 'package:ime_new/ui/live/spylive.dart';
-import 'package:ime_new/ui/live/sweetlive.dart';
+import 'package:ime_new/ui/live/sweetlivepage.dart';
 import 'package:ime_new/ui/live/truth_or_dare/truth_or_dare_page.dart';
 import 'package:provider/provider.dart';
 

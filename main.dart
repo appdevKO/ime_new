@@ -7,6 +7,7 @@ import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:ime_new/ui/action/actionpage.dart';
+import 'package:ime_new/ui/date/indexpage2.dart';
 import 'package:ime_new/ui/me/profileoption.dart';
 import 'package:ime_new/ui/meet/meet_page.dart';
 import 'package:provider/provider.dart';
@@ -39,23 +40,6 @@ class MyApp extends StatelessWidget {
       ],
       child: GetMaterialApp(
         title: 'IME',
-        // routes: {
-        //   'make_friend': (context) {
-        //     return IndexPage();
-        //   },
-        //   'true_or_dare': (context) {
-        //     return TurthOrDare();
-        //     // return ChatTestPage();
-        //   },
-        //   'offline_action': (context) {
-        //     return MeetPage();
-        //     // return ChatTestPage();
-        //   },
-        //   // 'spy_stream': (context) {
-        //   //   return SpyLivePage();
-        //   //   // return IndexPage();
-        //   // },
-        // },
         home:
             // FutureBuilder(
             //   future: _firebaseApp,
@@ -167,7 +151,7 @@ class _LoginPageState extends State<LoginPage> {
                       .register(result.user)
                       .whenComplete(() => Navigator.pushAndRemoveUntil(
                           context,
-                          MaterialPageRoute(builder: (context) => HomePage()),
+                          MaterialPageRoute(builder: (context) => IndexPage2()),
                           (route) => route == null));
                 } else
                   print('不是');
@@ -221,7 +205,7 @@ class _LoginPageState extends State<LoginPage> {
                                 Navigator.pushAndRemoveUntil(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => HomePage()),
+                                        builder: (context) => IndexPage2()),
                                     (route) => route == null);
                               }));
                 } else

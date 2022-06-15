@@ -1111,6 +1111,7 @@ class ChatProvider with ChangeNotifier {
   }
 
   Future upload_action_msg(action_id, text) async {
+    print('送出留言 $action_id /$text');
     try {
       //傳上db
       _mongoDB.inserttomongo(
@@ -1152,8 +1153,9 @@ class ChatProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  int action_msg_value = 1;
   Future get_action_msg(action_id) async {
-    print("get_action_msg");
+    print("get_action_msg $action_id");
     actionmsglist = await readremotemongodb(
         ActionMsgModel.fromJson, 'action_msg',
         field: mongo.where
@@ -1161,6 +1163,21 @@ class ChatProvider with ChangeNotifier {
             .limit(pagesize)
             .sortBy('time', descending: false));
     print("get_action_msg $actionmsglist");
+    notifyListeners();
+  }
+
+  Future addpage_action_msg(action_id) async {
+    var newpage = await readremotemongodb(ActionMsgModel.fromJson, 'action_msg',
+        field: mongo.where
+            .eq('action_id', action_id)
+            .sortBy('time', descending: true)
+            .skip(action_msg_value * pagesize)
+            .limit(pagesize));
+    actionmsglist!.addAll(newpage);
+    notifyListeners();
+  }
+  void actionmsg_plus(){
+    action_msg_value++;
     notifyListeners();
   }
 

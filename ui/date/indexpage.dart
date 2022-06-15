@@ -27,7 +27,7 @@ class _IndexPageState extends State<IndexPage>
     with AutomaticKeepAliveClientMixin {
   late TabController _tabController;
   int currentindex = 0;
-  late List menuItems;
+  // late List menuItems;
   CustomPopupMenuController _controller = CustomPopupMenuController();
   String area = '';
   String age = '';
@@ -56,7 +56,7 @@ class _IndexPageState extends State<IndexPage>
     Provider.of<ChatProvider>(context, listen: false).mqtt_connect();
     Provider.of<ChatProvider>(context, listen: false).initialGCP();
 
-    menuItems = ['123', '456', '777'];
+    // menuItems = ['123', '456', '777'];
     super.initState();
   }
 
