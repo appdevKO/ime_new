@@ -24,7 +24,6 @@ class _SweetLivePageState extends State<SweetLivePage> {
     return Scaffold(
       body: Column(
         children: [
-          Text('甜心直播'),
           Expanded(
             child: SweetLiveList(),
           ),

@@ -1342,13 +1342,11 @@ class ChatProvider with ChangeNotifier {
   var Userinfo; //本地 sharedpreference 存放的資料
 
   Future register(account) async {
-    // create member table on mongo
+
     print("註冊mongo123 ${account.uid}");
     account_id = account.uid;
     notifyListeners();
 
-    // 註冊ime
-    print("註冊ime - insert user info  ");
     if (account != null) {
       await createnewperson(
         account,
@@ -1855,33 +1853,32 @@ class ChatProvider with ChangeNotifier {
   }
 
   Future createnewperson(account) async {
+    // create member table on mongo
+    // 註冊ime
+    print("註冊ime - insert user info  ");
     //獲得地址
-    var location;
-    List<Placemark> placemarks = [];
-    try {
-      LocationPermission permission;
-      permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.deniedForever) {
-          return Future.error('Location Not Available');
-        }
-      } else {
-        var result = await Geolocator.getCurrentPosition();
-        print('獲得地址 ${result}結果');
-        location = result;
-        placemarks =
-            await placemarkFromCoordinates(result.latitude, result.longitude);
-      }
-    } catch (e) {
-      print('get device position exception $e');
-      location = null;
-    }
-    // var a = '';
-    // var b = avatar;
-    // if (nickname != null) {
-    //   a = nickname;
+    // var location;
+    // List<Placemark> placemarks = [];
+    // try {
+    //   LocationPermission permission;
+    //   permission = await Geolocator.checkPermission();
+    //   if (permission == LocationPermission.denied) {
+    //     permission = await Geolocator.requestPermission();
+    //     if (permission == LocationPermission.deniedForever) {
+    //       return Future.error('Location Not Available');
+    //     }
+    //   } else {
+    //     var result = await Geolocator.getCurrentPosition();
+    //     print('獲得地址 ${result}結果');
+    //     location = result;
+    //     placemarks =
+    //         await placemarkFromCoordinates(result.latitude, result.longitude);
+    //   }
+    // } catch (e) {
+    //   print('get device position exception $e');
+    //   location = null;
     // }
+    //
     print("登入時建立 /更新 member資料 ");
 
     Future.delayed(Duration(seconds: 3), () async {
@@ -1904,42 +1901,53 @@ class ChatProvider with ChangeNotifier {
         'follow_num': 0,
         'nickname': account.displayName,
         'avatar': account.photoURL,
+        'introduction': '',
       });
       // 每次登入都刷新
       print('每次登入都刷新');
-      if (location != null && placemarks.isNotEmpty) {
-        // print('placemarks${placemarks}');
+      // if (location != null && placemarks.isNotEmpty) {
+      //   // print('placemarks${placemarks}');
+      //
+      //   ///在改 測試
+      //   await _mongoDB.upsertData2(
+      //     "member",
+      //     'account',
+      //     account.uid,
+      //     {
+      //       'position': {
+      //         'coordinates': [
+      //           location.longitude,
+      //           location.latitude,
+      //         ],
+      //         'type': 'Point',
+      //       },
+      //       'lastlogin': DateTime.now().add(Duration(hours: 8)),
+      //       'area': placemarks[0].administrativeArea,
+      //       'introduction': '',
+      //     },
+      //   );
+      // } else {
+      //   await _mongoDB.upsertData2(
+      //     "member",
+      //     'account',
+      //     account,
+      //     {
+      //       'lastlogin': DateTime.now().add(Duration(hours: 8)),
+      //       // 'area': placemarks[0].administrativeArea,
+      //       'introduction': '',
+      //     },
+      //   );
+      // }
 
-        ///在改 測試
-        await _mongoDB.upsertData2(
-          "member",
-          'account',
-          account.uid,
-          {
-            'position': {
-              'coordinates': [
-                location.longitude,
-                location.latitude,
-              ],
-              'type': 'Point',
-            },
-            'lastlogin': DateTime.now().add(Duration(hours: 8)),
-            'area': placemarks[0].administrativeArea,
-            'introduction': '',
-          },
-        );
-      } else {
-        await _mongoDB.upsertData2(
-          "member",
-          'account',
-          account,
-          {
-            'lastlogin': DateTime.now().add(Duration(hours: 8)),
-            // 'area': placemarks[0].administrativeArea,
-            'introduction': '',
-          },
-        );
-      }
+      await _mongoDB.upsertData2(
+        "member",
+        'account',
+        account.uid,
+        {
+          'lastlogin': DateTime.now().add(Duration(hours: 8)),
+          // 'area': placemarks[0].administrativeArea,
+        },
+      );
     });
   }
 
@@ -2471,11 +2479,35 @@ class ChatProvider with ChangeNotifier {
   int find_recommend_people_value = 1;
 
   List? nearpeoplelist;
-
+bool locate_permission=false;
   Future find_near_people() async {
     find_near_people_value = 1;
     print('find near people');
-    var location = await Geolocator.getCurrentPosition();
+
+
+    var location;
+    List<Placemark> placemarks = [];
+    try {
+      LocationPermission permission;
+      permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.deniedForever) {
+          locate_permission=false;
+          return Future.error('Location Not Available');
+        }
+      } else {
+        var result = await Geolocator.getCurrentPosition();
+        print('獲得地址 ${result}結果');
+        location = result;
+        placemarks =
+            await placemarkFromCoordinates(result.latitude, result.longitude);
+      }
+    } catch (e) {
+      print('get device position exception $e');
+      location = null;
+    }
+
     print('my location ${location.longitude}/ ${location.latitude}');
     var _loc = {
       'type': 'Point',

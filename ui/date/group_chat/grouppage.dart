@@ -35,22 +35,47 @@ class _GroupPageState extends State<GroupPage>
       appBar: PreferredSize(
         preferredSize: new Size(MediaQuery.of(context).size.width, 50),
         child: Container(
-          height: 35,
+          height: 40,
+          padding: EdgeInsets.only(top: 5),
           decoration: new BoxDecoration(color: Colors.white),
           child: TabBar(
             controller: _tabController,
-            unselectedLabelColor: Colors.grey,
-            labelColor: Colors.red,
-            labelStyle: TextStyle(fontSize: 12),
-            unselectedLabelStyle: TextStyle(fontSize: 10),
+            unselectedLabelColor: Colors.redAccent,
+            labelColor: Colors.white,
+            labelStyle: TextStyle(fontSize: 14),
+            unselectedLabelStyle:
+                TextStyle(fontSize: 14, color: Colors.redAccent),
             indicatorColor: Colors.red,
             indicatorSize: TabBarIndicatorSize.label,
+            indicator: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                gradient: LinearGradient(
+                    colors: [Color(0xfffa8072), Color(0xffdc344c)])),
             tabs: [
               Tab(
-                text: '揪團',
+                child: Container(
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      "揪團",
+                    ),
+                  ),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.redAccent, width: 1)),
+                ),
               ),
               Tab(
-                text: '揪咖',
+                child: Container(
+                  child: Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        "揪咖",
+                      )),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.redAccent, width: 1)),
+                ),
               ),
             ],
           ),
@@ -61,7 +86,7 @@ class _GroupPageState extends State<GroupPage>
         child: TabBarView(
           physics: NeverScrollableScrollPhysics(),
           controller: _tabController,
-          children: [GetGroup(), GetPerson()],
+          children: [GetTeam(), GetPerson()],
         ),
       ),
     ));

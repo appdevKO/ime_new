@@ -83,16 +83,16 @@ class _GetPersonState extends State<GetPerson> {
     return Stack(children: [
       GroupPerson(),
       Positioned(
-        top: 8,
+        bottom: 8,
         child: Container(
           width: MediaQuery.of(context).size.width,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Consumer<ChatProvider>(builder: (context, value, child) {
                 return GestureDetector(
                   child: Container(
-                      width: 135,
+                      width: 100,
                       height: 35,
                       decoration: BoxDecoration(
                           gradient: LinearGradient(
@@ -278,44 +278,47 @@ class _GetPersonState extends State<GetPerson> {
                   },
                 );
               }),
-              GestureDetector(
-                child: Container(
-                  width: 135,
-                  height: 35,
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          colors: [Colors.red, Color(0xffffbbbb)]),
-                      borderRadius: BorderRadius.circular(15)),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.group_add,
-                        color: Colors.white,
-                        size: 24,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
-                        child: Text(
-                          '我想約會',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600),
+              Padding(
+                padding: const EdgeInsets.only(top: 3.0),
+                child: GestureDetector(
+                  child: Container(
+                    width: 100,
+                    height: 35,
+                    decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            colors: [Colors.red, Color(0xffffbbbb)]),
+                        borderRadius: BorderRadius.circular(15)),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.group_add,
+                          color: Colors.white,
+                          size: 24,
                         ),
-                      ),
-                    ],
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: Text(
+                            '我想約會',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+                  onTap: () {
+                    Provider.of<ChatProvider>(context, listen: false)
+                        .purposelist
+                        .clear();
+                    setState(() {
+                      index = 2;
+                    });
+                  },
                 ),
-                onTap: () {
-                  Provider.of<ChatProvider>(context, listen: false)
-                      .purposelist
-                      .clear();
-                  setState(() {
-                    index = 2;
-                  });
-                },
               ),
             ],
           ),
@@ -660,7 +663,7 @@ class _GroupPersonState extends State<GroupPerson> {
     return Column(
       children: [
         Container(
-          height: 50,
+          height: 10,
         ),
         //房間列表
         Expanded(child: Consumer<ChatProvider>(

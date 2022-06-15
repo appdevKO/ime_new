@@ -13,14 +13,14 @@ import '../../../utils/list_config.dart';
 import '../../../utils/viewconfig.dart';
 import 'chatroom2.dart';
 
-class GetGroup extends StatefulWidget {
-  const GetGroup({Key? key}) : super(key: key);
+class GetTeam extends StatefulWidget {
+  const GetTeam({Key? key}) : super(key: key);
 
   @override
-  _GetGroupState createState() => _GetGroupState();
+  _GetTeamState createState() => _GetTeamState();
 }
 
-class _GetGroupState extends State<GetGroup> {
+class _GetTeamState extends State<GetTeam> {
   bool checkvalue = false;
   int index = 0;
   late TextEditingController _titleController;
@@ -219,17 +219,17 @@ class _GetGroupState extends State<GetGroup> {
         //   ),
         // ),
         Positioned(
-          top: 8,
+          bottom: 8,
+          right: 8,
           child: Container(
-            width: MediaQuery.of(context).size.width,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 //篩選
                 Consumer<ChatProvider>(builder: (context, value, child) {
                   return GestureDetector(
                     child: Container(
-                        width: 135,
+                        width: 100,
                         height: 35,
                         decoration: BoxDecoration(
                             gradient: LinearGradient(
@@ -422,44 +422,47 @@ class _GetGroupState extends State<GetGroup> {
                   );
                 }),
                 //建立房間
-                GestureDetector(
-                  child: Container(
-                    width: 135,
-                    height: 35,
-                    decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                            colors: [Colors.blue, Color(0xff9ebbeb)]),
-                        borderRadius: BorderRadius.circular(15)),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.group_add,
-                          color: Colors.white,
-                          size: 24,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8.0),
-                          child: Text(
-                            '我想揪團',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600),
+                Padding(
+                  padding: const EdgeInsets.only(top: 3.0),
+                  child: GestureDetector(
+                    child: Container(
+                      width: 100,
+                      height: 35,
+                      decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                              colors: [Colors.blue, Color(0xff9ebbeb)]),
+                          borderRadius: BorderRadius.circular(15)),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.group_add,
+                            color: Colors.white,
+                            size: 20,
                           ),
-                        ),
-                      ],
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.0),
+                            child: Text(
+                              '我想揪團',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
+                    onTap: () {
+                      Provider.of<ChatProvider>(context, listen: false)
+                          .purposelist
+                          .clear();
+                      setState(() {
+                        index = 1;
+                      });
+                    },
                   ),
-                  onTap: () {
-                    Provider.of<ChatProvider>(context, listen: false)
-                        .purposelist
-                        .clear();
-                    setState(() {
-                      index = 1;
-                    });
-                  },
                 ),
               ],
             ),
@@ -795,7 +798,7 @@ class _GroupteamState extends State<Groupteam> {
     return Column(
       children: [
         Container(
-          height: 50,
+          height: 10,
         ),
         //房間列表
         Expanded(child: Consumer<ChatProvider>(

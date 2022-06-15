@@ -32,7 +32,6 @@ class _SpyLivePageState extends State<SpyLivePage> {
     return Scaffold(
       body: Column(
         children: [
-          Text('特務直播'),
           Container(
             color: Colors.white,
             child: TabBar(
@@ -54,8 +53,9 @@ class _SpyLivePageState extends State<SpyLivePage> {
             child: TabBarView(
               controller: _tabController,
               children: [
-                SweetLiveList(),
-                SweetLiveList(),
+                Container(),Container()
+                // SweetLiveList(),
+                // SweetLiveList(),
               ],
             ),
           ),

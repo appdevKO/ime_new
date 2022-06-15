@@ -532,7 +532,7 @@ class _IndexPageState extends State<IndexPage>
                 controller: _tabController,
                 children: [
                   value.search ? SearchResult() : DateSquare(),
-                  GetGroup(),
+                  GetTeam(),
                   GetPerson(),
                   OneChat()
                 ],
