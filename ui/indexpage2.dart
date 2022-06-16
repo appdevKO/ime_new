@@ -7,7 +7,7 @@ import 'package:ime_new/ui/meet/meet_page.dart';
 import 'package:ime_new/utils/viewconfig.dart';
 import 'package:provider/provider.dart';
 
-import 'datepage.dart';
+import 'date/datepage.dart';
 
 class IndexPage2 extends StatefulWidget {
   const IndexPage2({Key? key}) : super(key: key);
@@ -49,13 +49,16 @@ class _IndexPage2State extends State<IndexPage2> {
 
   Future initdata() async {
     // print('init 111 index data');
+    //
+    // await Provider.of<ChatProvider>(context, listen: false)
+    //     .pre_Subscribed()
+    //     .whenComplete(() async {
+    //   await Provider.of<ChatProvider>(context, listen: false)
+    //       .find_recommend_people();
+    // });
 
     await Provider.of<ChatProvider>(context, listen: false)
-        .pre_Subscribed()
-        .whenComplete(() async {
-      await Provider.of<ChatProvider>(context, listen: false)
-          .find_recommend_people();
-    });
+        .find_recommend_people();
   }
 
   @override
@@ -84,8 +87,10 @@ class _IndexPage2State extends State<IndexPage2> {
                         color: Colors.white,
                       ),
                       onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context)=>ProfileOption()));
-
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ProfileOption()));
                       }),
                   Expanded(
                       child: Container(
@@ -122,26 +127,27 @@ class _IndexPage2State extends State<IndexPage2> {
                       ],
                     ),
                   )),
-                  _tabController.index == 0
-                      ? Consumer<ChatProvider>(
-                          builder: (context, value, child) {
-                          return GestureDetector(
-                            onTap: () {},
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  color: value.search
-                                      ? Color(0xff77cc77)
-                                      : Colors.transparent,
-                                  shape: BoxShape.circle),
-                              padding: EdgeInsets.all(4),
-                              child: Icon(
-                                Icons.search,
-                                color: Colors.white,
-                              ),
-                            ),
-                          );
-                        })
-                      : IconButton(
+                  // _tabController.index == 0
+                  //     ? Consumer<ChatProvider>(
+                  //         builder: (context, value, child) {
+                  //         return GestureDetector(
+                  //           onTap: () {},
+                  //           child: Container(
+                  //             decoration: BoxDecoration(
+                  //                 color: value.search
+                  //                     ? Color(0xff77cc77)
+                  //                     : Colors.transparent,
+                  //                 shape: BoxShape.circle),
+                  //             padding: EdgeInsets.all(4),
+                  //             child: Icon(
+                  //               Icons.search,
+                  //               color: Colors.white,
+                  //             ),
+                  //           ),
+                  //         );
+                  //       })
+                  //     :
+                  IconButton(
                           icon: Icon(
                             Icons.search,
                             color: Colors.transparent,

@@ -94,8 +94,7 @@ class _NewestActionListState extends State<NewestActionList> {
     items.add((items.length + 1).toString());
     if (mounted) setState(() {});
     _refreshController.loadComplete();
-
-    Provider.of<ChatProvider>(context, listen: false).action_plus_page(1);
+    
     await Provider.of<ChatProvider>(context, listen: false)
         .addpage_newest_action();
   }

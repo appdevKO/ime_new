@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:ime_new/ui/live/sweetlive_list.dart';
+import 'package:ime_new/ui/live/spylive/spy_anchor_live.dart';
+import 'package:ime_new/ui/live/spylive/spy_player_live.dart';
 
 class SpyLivePage extends StatefulWidget {
   const SpyLivePage({Key? key}) : super(key: key);
@@ -41,10 +42,10 @@ class _SpyLivePageState extends State<SpyLivePage> {
               unselectedLabelColor: Colors.grey,
               tabs: [
                 Tab(
-                  text: '直播區',
+                  text: '玩家',
                 ),
                 Tab(
-                  text: '任務欄',
+                  text: '直播主',
                 ),
               ],
             ),
@@ -53,7 +54,7 @@ class _SpyLivePageState extends State<SpyLivePage> {
             child: TabBarView(
               controller: _tabController,
               children: [
-                Container(),Container()
+                SpyPlayerLive(), SpyAnchorLive()
                 // SweetLiveList(),
                 // SweetLiveList(),
               ],

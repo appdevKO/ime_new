@@ -106,7 +106,7 @@ class _O2OChatroomState extends State<O2OChatroom> {
             child: Container(
               height: Platform.isIOS ? 44 : 168,
               decoration: BoxDecoration(
-                gradient: LinearGradient(colors: colorlist[3]),
+                gradient: LinearGradient(colors: colorlist[2]),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -233,7 +233,7 @@ class _GetTeamState extends State<GetTeam> {
                         height: 35,
                         decoration: BoxDecoration(
                             gradient: LinearGradient(
-                                colors: [Colors.blue, Color(0xff9ebbeb)]),
+                                colors: [Colors.red, Color(0xffffbbbb)]),
                             borderRadius: BorderRadius.circular(15)),
                         child: Center(
                             child: Text(
@@ -430,7 +430,7 @@ class _GetTeamState extends State<GetTeam> {
                       height: 35,
                       decoration: BoxDecoration(
                           gradient: LinearGradient(
-                              colors: [Colors.blue, Color(0xff9ebbeb)]),
+                              colors: [Colors.red, Color(0xffffbbbb)]),
                           borderRadius: BorderRadius.circular(15)),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -811,7 +811,8 @@ class _GroupteamState extends State<Groupteam> {
                                 ? SmartRefresher(
                                     enablePullDown: true,
                                     enablePullUp: true,
-                                    header: WaterDropMaterialHeader(),
+                                    header: WaterDropMaterialHeader(
+                                        backgroundColor: Color(0xffffbbbb)),
                                     // footer: CustomFooter(
                                     //   builder: (BuildContext context,
                                     //       LoadStatus? mode) {
@@ -1042,7 +1043,7 @@ class _GroupteamState extends State<Groupteam> {
                                                                   color: value.remoteUserInfo[0].chatroomId == null
                                                                       ? Color(0xff9f9f9f)
                                                                       : value.remoteUserInfo[0].chatroomId.indexWhere((element) => element == value.filter_groupteamlist![index].id) != -1
-                                                                          ? Color(0xff3b9fff)
+                                                                          ? Color(0xffffbbbb)
                                                                           : Color(0xff9f9f9f),
                                                                   borderRadius: BorderRadius.circular(10)),
                                                               margin: EdgeInsets
@@ -1177,7 +1178,8 @@ class _GroupteamState extends State<Groupteam> {
                                 ? SmartRefresher(
                                     enablePullDown: true,
                                     enablePullUp: true,
-                                    header: WaterDropMaterialHeader(),
+                                    header: WaterDropMaterialHeader(
+                                        backgroundColor: Color(0xffffbbbb)),
                                     // footer: CustomFooter(
                                     //   builder: (BuildContext context,
                                     //       LoadStatus? mode) {
@@ -1405,7 +1407,7 @@ class _GroupteamState extends State<Groupteam> {
                                                                   color: value.remoteUserInfo[0].chatroomId == null
                                                                       ? Color(0xff9f9f9f)
                                                                       : value.remoteUserInfo[0].chatroomId.indexWhere((element) => element == value.groupteamlist![index].id) != -1
-                                                                          ? Color(0xff3b9fff)
+                                                                          ? Color(0xffffbbbb)
                                                                           : Color(0xff9f9f9f),
                                                                   borderRadius: BorderRadius.circular(10)),
                                                               margin: EdgeInsets
@@ -1551,11 +1553,6 @@ class _GroupteamState extends State<Groupteam> {
         Container(
           height: 10,
         ),
-        Platform.isIOS
-            ? Container(
-                height: 168,
-              )
-            : Container()
       ],
     );
   }

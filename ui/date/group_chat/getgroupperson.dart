@@ -278,6 +278,7 @@ class _GetPersonState extends State<GetPerson> {
                   },
                 );
               }),
+              //建立房間
               Padding(
                 padding: const EdgeInsets.only(top: 3.0),
                 child: GestureDetector(
@@ -1375,11 +1376,7 @@ class _GroupPersonState extends State<GroupPerson> {
         Container(
           height: 10,
         ),
-        Platform.isIOS
-            ? Container(
-                height: 168,
-              )
-            : Container()
+
       ],
     );
   }

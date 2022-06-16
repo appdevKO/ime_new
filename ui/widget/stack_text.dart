@@ -1,34 +1,40 @@
 import 'package:flutter/material.dart';
 
-class StackText extends StatefulWidget {
-  const StackText({Key? key, required this.text, required this.size})
+class StackText extends StatelessWidget {
+  StackText({Key? key, required this.text, required this.size, this.style})
       : super(key: key);
   final String text;
   final double size;
+  TextStyle? style;
 
-  @override
-  _StackTextState createState() => _StackTextState();
-}
-
-class _StackTextState extends State<StackText> {
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Text(
-          '${widget.text}',
-          style: TextStyle(
-            fontSize: widget.size,
-            foreground: Paint()
-              ..style = PaintingStyle.stroke
-                ..strokeWidth = 1.0
-              ..color = Colors.black,
-          ),
+        RichText(
+          overflow: TextOverflow.ellipsis,
+          strutStyle: StrutStyle(fontSize: 12.0),
+          text: TextSpan(
+              style: style != null
+                  ? style
+                  : TextStyle(
+                      fontSize: size,
+                      foreground: Paint()
+                        ..style = PaintingStyle.stroke
+                        ..strokeWidth = 1.0
+                        ..color = Colors.black,
+                    ),
+              text: '$text'),
         ),
-        Text(
-          '${widget.text}',
-          style: TextStyle(fontSize: widget.size, color: Colors.white),
-        )
+        RichText(
+          overflow: TextOverflow.ellipsis,
+          strutStyle: StrutStyle(fontSize: 12.0),
+          text: TextSpan(
+              style: style != null
+                  ? style
+                  : TextStyle(fontSize: size, color: Colors.white),
+              text: '$text'),
+        ),
       ],
     );
   }

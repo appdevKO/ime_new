@@ -185,6 +185,24 @@ class MongoDB {
     }
   }
 
+  Future count(
+    collection,
+    con_field,
+    con_value,
+  ) async {
+    print('mongo db count');
+    var coll = db.collection(collection);
+    try {
+      var count = await coll.count(
+        mongo.where.eq(con_field, con_value),
+      );
+      print('mongo db count');
+      return count;
+    } catch (e) {
+      print('mongo deleteall exception :: $e');
+    }
+  }
+
   ///update  addToSet 如果array 裡面沒有這筆資料就新增
   Future updateData_addSet(
       collection, con_field, con_value, target_field, data) async {

@@ -133,7 +133,7 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
                     colors: widget.chattype == 1
                         ? colorlist[1]
                         : widget.chattype == 2
-                            ? colorlist[2]
+                            ? colorlist[1]
                             : [Colors.grey]),
               ),
               child: Row(
@@ -629,16 +629,22 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
                                   style: ElevatedButton.styleFrom(
                                       primary: Colors.grey,
                                       shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(8.0),)),
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                      )),
                                 )
                               : Container()),
-                      Column(mainAxisAlignment: MainAxisAlignment.center,
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(recorderTxt,style: TextStyle(fontSize: 18),),
+                          Text(
+                            recorderTxt,
+                            style: TextStyle(fontSize: 18),
+                          ),
                           GestureDetector(
                             child: Container(
-                              height: 130,width: 130,
+                              height: 130,
+                              width: 130,
                               margin: EdgeInsets.all(10),
                               padding: EdgeInsets.all(15),
                               decoration: BoxDecoration(

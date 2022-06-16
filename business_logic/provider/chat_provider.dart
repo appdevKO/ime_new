@@ -77,6 +77,7 @@ class ChatProvider with ChangeNotifier {
 
   final mqttclient = MqttServerClient(mqttbroker, clientID);
   int pagesize = 5;
+  int msgpagesize = 1000;
 
   Future mqtt_connect() async {
     print('登入mqtt');
@@ -1123,6 +1124,7 @@ class ChatProvider with ChangeNotifier {
           "memberid": remoteUserInfo[0].memberid,
           "nickname": remoteUserInfo[0].nickname,
           'avatar': remoteUserInfo[0].avatar,
+          'msg_count':0,
         },
       );
     } catch (e) {
@@ -1154,29 +1156,56 @@ class ChatProvider with ChangeNotifier {
   }
 
   int action_msg_value = 1;
+
   Future get_action_msg(action_id) async {
+    action_msg_value = 1;
     print("get_action_msg $action_id");
     actionmsglist = await readremotemongodb(
         ActionMsgModel.fromJson, 'action_msg',
         field: mongo.where
             .eq('action_id', action_id)
-            .limit(pagesize)
+            .limit(msgpagesize)
             .sortBy('time', descending: false));
     print("get_action_msg $actionmsglist");
     notifyListeners();
   }
 
+  int action_count = 0;
+
+  Future get_action_msg_count(id) async {
+    print('獲得動態留言數量 $id');
+    var result = await getcount(
+      'action_msg',
+      'action_id',
+      id,
+    );
+
+    if (result is int) {
+      action_count = result;
+      print('動態留言.....數量$action_count');
+    }
+    notifyListeners();
+  }
+
   Future addpage_action_msg(action_id) async {
+    print('留言分頁+1');
     var newpage = await readremotemongodb(ActionMsgModel.fromJson, 'action_msg',
         field: mongo.where
             .eq('action_id', action_id)
             .sortBy('time', descending: true)
-            .skip(action_msg_value * pagesize)
-            .limit(pagesize));
-    actionmsglist!.addAll(newpage);
+            .skip(action_msg_value + 1 * msgpagesize)
+            .limit(msgpagesize));
+    if (newpage is List) {
+      if (newpage.isEmpty) {
+      } else {
+        actionmsg_plus();actionmsglist!.addAll(newpage);
+      }
+    }
+
     notifyListeners();
   }
-  void actionmsg_plus(){
+
+  void actionmsg_plus() {
     action_msg_value++;
     notifyListeners();
   }
@@ -1192,6 +1221,12 @@ class ChatProvider with ChangeNotifier {
             .sortBy('time', descending: true)
             .skip(action_newest_value * pagesize)
             .limit(pagesize));
+    if (newpage is List) {
+      if (newpage.isEmpty) {
+      } else {
+        action_plus_page(1);
+      }
+    }
     newest_actionlist!.addAll(newpage);
     notifyListeners();
   }
@@ -1205,6 +1240,30 @@ class ChatProvider with ChangeNotifier {
             .limit(pagesize));
     groupteamlist!.addAll(newpage);
     notifyListeners();
+  }
+
+  /**
+   *  特務直播
+   */
+  Future upload_spy_mission(
+    text,
+  ) async {
+    print('上傳任務到資料庫 $text');
+    try {
+      //傳上db
+      _mongoDB.inserttomongo(
+        "spy_mission",
+        {
+          "text": text,
+          "time": DateTime.now().add(Duration(hours: 8)),
+          "memberid": remoteUserInfo[0].memberid,
+          "nickname": remoteUserInfo[0].nickname,
+          'avatar': remoteUserInfo[0].avatar,
+        },
+      );
+    } catch (e) {
+      print('上傳動態留言失敗  $e');
+    }
   }
 
   /**
@@ -1341,12 +1400,13 @@ class ChatProvider with ChangeNotifier {
   String realm_password = "000000";
   var Userinfo; //本地 sharedpreference 存放的資料
 
-  Future register(account) async {
-
-    print("註冊mongo123 ${account.uid}");
-    account_id = account.uid;
+  set_accountid(id){
+    account_id = id;
     notifyListeners();
-
+  }
+  Future register(account) async {
+    print("註冊mongo123 ${account.uid}");
+    set_accountid(account.uid);
     if (account != null) {
       await createnewperson(
         account,
@@ -1355,10 +1415,11 @@ class ChatProvider with ChangeNotifier {
   }
 
   Future pre_Subscribed() async {
-    ;
-    await getaccountinfo().then((value) async {
+    return await getaccountinfo().then((value) async {
+      print('預先拿資料$value');
       if (value == false) {
         print('預先要資料失敗');
+        return false;
       } else {
         if (remoteUserInfo[0].chatroomId != null) {
           for (var item in remoteUserInfo[0].chatroomId) {
@@ -1376,6 +1437,8 @@ class ChatProvider with ChangeNotifier {
         await createblocklog();
         await getmyfollowlog();
         await getmyblocklog();
+
+        return true;
       }
     });
   }
@@ -1390,23 +1453,29 @@ class ChatProvider with ChangeNotifier {
   String? account_id;
 
   // int fake_sex = 1;
+  bool finishinfo = false;
 
   Future getaccountinfo() async {
-    print('獲得使用者資料');
+    print('獲得使用者資料 id $account_id');
     return Future.delayed(Duration(seconds: 2), () async {
       var readresult = await readremotemongodb(
           DbUserinfoModel.fromJson, 'member',
           field: mongo.where.eq('account', account_id));
       print('獲得使用者資料$readresult');
-      if (readresult == null) {
+
+      remoteUserInfo = readresult;
+      if (remoteUserInfo == null || remoteUserInfo.isEmpty) {
+        print("remoteUserInfo :空");
+        return false;
       } else {
-        remoteUserInfo = readresult;
-        if (remoteUserInfo == null || remoteUserInfo.isEmpty) {
-          print("remoteUserInfo :空");
+        if (remoteUserInfo[0].sex == null) {
+          print('沒有性別');
+          finishinfo = false;
           return false;
         } else {
+          finishinfo = true;
           print("remoteUserInfo$remoteUserInfo");
-          set_profile_pic();
+          // set_profile_pic();
           set_interest();
 
           notifyListeners();
@@ -1605,7 +1674,10 @@ class ChatProvider with ChangeNotifier {
   var filter_grouppersonlist;
   var filter_groupteamlist;
 
-  Future setfilter_chatroom(num, {area,}) async {
+  Future setfilter_chatroom(
+    num, {
+    area,
+  }) async {
     print("filter filter");
     if (num == 2) {
       if (area != null) {
@@ -1631,7 +1703,7 @@ class ChatProvider with ChangeNotifier {
           filter_grouppersonlist = await readremotemongodb(
               ChatRoomModel.fromJson, 'chatroom',
               field: mongo.where
-                  .eq('purpose',purposelist[0])
+                  .eq('purpose', purposelist[0])
                   .and(mongo.where.eq('type', 1))
                   .sortBy('create_time', descending: true));
         } else {
@@ -1892,16 +1964,17 @@ class ChatProvider with ChangeNotifier {
         'create_time': DateTime.now().add(
           Duration(hours: 8),
         ),
-        'sex': Random().nextBool() ? '男' : '女',
-        'age': fakeage == 1
-            ? 18
-            : fakeage == 2
-                ? 28
-                : 38,
+        // 'sex': Random().nextBool() ? '男' : '女',
+        // 'age': fakeage == 1
+        //     ? 18
+        //     : fakeage == 2
+        //         ? 28
+        //         : 38,
         'follow_num': 0,
         'nickname': account.displayName,
         'avatar': account.photoURL,
         'introduction': '',
+        'little_profile_pic': [], 'role': 1,
       });
       // 每次登入都刷新
       print('每次登入都刷新');
@@ -2379,6 +2452,27 @@ class ChatProvider with ChangeNotifier {
     await getaccountinfo();
   }
 
+  Future change_simple_profile(nickname, birthday, sex) async {
+    try {
+      await _mongoDB.updateData_single(
+        "member",
+        "account",
+        account_id,
+        {
+          'nickname': nickname,
+          'birthday': birthday,
+          'sex': sex == 1 ? '男' : '女'
+        },
+      );
+
+      print('change_profile ${nickname}');
+      return true;
+    } catch (e) {
+      print('填寫註冊基本資料時錯誤 error exception  $e');
+      return false;
+    }
+  }
+
   List interestlist = [];
 
   set_interest() {
@@ -2479,11 +2573,11 @@ class ChatProvider with ChangeNotifier {
   int find_recommend_people_value = 1;
 
   List? nearpeoplelist;
-bool locate_permission=false;
+  bool locate_permission = false;
+
   Future find_near_people() async {
     find_near_people_value = 1;
     print('find near people');
-
 
     var location;
     List<Placemark> placemarks = [];
@@ -2493,40 +2587,41 @@ bool locate_permission=false;
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.deniedForever) {
-          locate_permission=false;
+          locate_permission = false;
+          print('使用者不開gps');
           return Future.error('Location Not Available');
         }
       } else {
+        locate_permission = true;
         var result = await Geolocator.getCurrentPosition();
         print('獲得地址 ${result}結果');
         location = result;
         placemarks =
             await placemarkFromCoordinates(result.latitude, result.longitude);
+        print('my location ${location.longitude}/ ${location.latitude}');
+        var _loc = {
+          'type': 'Point',
+          'coordinates': [location.longitude, location.latitude]
+        };
+        nearpeoplelist = await readremotemongodb2(
+            DbUserinfoModel.fromJson,
+            'member',
+            _loc,
+            mongo.where
+                .near('position', _loc)
+                .and(mongo.where
+                    .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
+                .limit(pagesize));
+        //把自己刪掉
+        nearpeoplelist?.removeWhere(
+            (element) => element.memberid == remoteUserInfo[0].memberid);
+
+        notifyListeners();
       }
     } catch (e) {
       print('get device position exception $e');
       location = null;
     }
-
-    print('my location ${location.longitude}/ ${location.latitude}');
-    var _loc = {
-      'type': 'Point',
-      'coordinates': [location.longitude, location.latitude]
-    };
-    nearpeoplelist = await readremotemongodb2(
-        DbUserinfoModel.fromJson,
-        'member',
-        _loc,
-        mongo.where
-            .near('position', _loc)
-            .and(
-                mongo.where.eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
-            .limit(pagesize));
-    //把自己刪掉
-    nearpeoplelist?.removeWhere(
-        (element) => element.memberid == remoteUserInfo[0].memberid);
-
-    notifyListeners();
   }
 
   Future addpage_find_near_people() async {
@@ -2954,5 +3049,19 @@ bool locate_permission=false;
   close_search() {
     search = false;
     notifyListeners();
+  }
+
+  Future getcount(
+    collection,
+    con_field,
+    con_value,
+  ) async {
+    final readresult = await queue.add(() => _mongoDB.count(
+          collection,
+          con_field,
+          con_value,
+        ));
+    print("countcountcount $readresult");
+    return readresult;
   }
 }

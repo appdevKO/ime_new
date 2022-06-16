@@ -143,11 +143,15 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                   Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Padding(
                                         padding:
                                             const EdgeInsets.only(top: 8.0),
                                         child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               '介紹: ',
@@ -158,7 +162,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                             Consumer<ChatProvider>(builder:
                                                 (context, value, child) {
                                               return Container(
-                                                width: 250,
+                                                width: 200,
                                                 child: Text(value
                                                                 .remoteUserInfo[
                                                                     0]
@@ -299,28 +303,28 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                       ],
                                     ),
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 8.0),
-                                    child: Row(
-                                      children: [
-                                        Text(
-                                          '居住地區: ',
-                                          style: TextStyle(color: Colors.brown),
-                                        ),
-                                        Consumer<ChatProvider>(
-                                            builder: (context, value, child) {
-                                          return Container(
-                                            width: 250,
-                                            child: Text(value.remoteUserInfo[0]
-                                                        .area !=
-                                                    null
-                                                ? '${ChineseHelper.convertToTraditionalChinese(value.remoteUserInfo[0].area)}'
-                                                : '不詳'),
-                                          );
-                                        })
-                                      ],
-                                    ),
-                                  ),
+                                  // Padding(
+                                  //   padding: const EdgeInsets.only(top: 8.0),
+                                  //   child: Row(
+                                  //     children: [
+                                  //       Text(
+                                  //         '居住地區: ',
+                                  //         style: TextStyle(color: Colors.brown),
+                                  //       ),
+                                  //       Consumer<ChatProvider>(
+                                  //           builder: (context, value, child) {
+                                  //         return Container(
+                                  //           width: 250,
+                                  //           child: Text(value.remoteUserInfo[0]
+                                  //                       .area !=
+                                  //                   null
+                                  //               ? '${ChineseHelper.convertToTraditionalChinese(value.remoteUserInfo[0].area)}'
+                                  //               : '不詳'),
+                                  //         );
+                                  //       })
+                                  //     ],
+                                  //   ),
+                                  // ),
                                   Padding(
                                     padding: const EdgeInsets.only(top: 8.0),
                                     child: Row(
@@ -334,7 +338,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                         Consumer<ChatProvider>(
                                             builder: (context, value, child) {
                                           return Container(
-                                            width: 250,
+                                            width: 200,
                                             child: Text(value.remoteUserInfo[0]
                                                         .date !=
                                                     null
@@ -507,7 +511,6 @@ class _MyProfilePageState extends State<MyProfilePage> {
                       //     ))
                     ],
                   ),
-
                 ],
               ),
             ),

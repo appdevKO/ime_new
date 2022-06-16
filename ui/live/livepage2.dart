@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:ime_new/ui/live/spylive.dart';
+import 'package:ime_new/ui/live/spylive/spylivepage.dart';
+import 'package:ime_new/ui/live/sweetlive/start_stream.dart';
 import 'package:ime_new/ui/live/sweetlivepage.dart';
-import 'package:ime_new/ui/live/truth_or_dare/truth_or_dare_page.dart';
 
 class LivePage2 extends StatefulWidget {
   const LivePage2({Key? key}) : super(key: key);
@@ -14,8 +14,9 @@ class _LivePage2State extends State<LivePage2> {
   int pageIndex = 0;
 
   final pages = [
-    const SweetLivePage(),
-    const SpyLivePage(),
+    SweetLivePage(),
+    StartStream(),
+    SpyLivePage(),
   ];
 
   @override
@@ -44,7 +45,14 @@ class _LivePage2State extends State<LivePage2> {
                     ),
               label: '甜心直播'),
           BottomNavigationBarItem(
-              icon: pageIndex == 1
+              icon: const Icon(
+                Icons.video_call_sharp,
+                color: Colors.pink,
+                size:60,
+              ),
+              label: ''),
+          BottomNavigationBarItem(
+              icon: pageIndex == 2
                   ? const Icon(
                       Icons.home_filled,
                       color: Colors.red,

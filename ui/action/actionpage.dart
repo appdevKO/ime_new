@@ -43,21 +43,16 @@ class _ActionPageState extends State<ActionPage> {
             appBar: PreferredSize(
               preferredSize: new Size(MediaQuery.of(context).size.width, 50),
               child: Container(
-                decoration: new BoxDecoration(
-                  gradient: new LinearGradient(
-                    colors: [Color(0xff228b22), Color(0xffFFFF6F)],
-                  ),
-                ),
+                height: 30,
+                decoration: new BoxDecoration(color: Colors.white),
                 child: TabBar(
-                  isScrollable: true,
-                  // onTap: setcolorindex,
                   controller: _tabController,
-                  unselectedLabelColor: Colors.white.withOpacity(.7),
-                  labelStyle: TextStyle(fontSize: 18),
-                  unselectedLabelStyle: TextStyle(fontSize: 14),
-                  indicator: BoxDecoration(
-                    borderRadius: new BorderRadius.circular(30.0),
-                  ),
+                  unselectedLabelColor: Colors.grey,
+                  labelColor: Colors.red,
+                  labelStyle: TextStyle(fontSize: 12),
+                  unselectedLabelStyle: TextStyle(fontSize: 10),
+                  indicatorColor: Colors.red,
+                  indicatorSize: TabBarIndicatorSize.label,
                   tabs: [
                     Tab(
                       child: Text(

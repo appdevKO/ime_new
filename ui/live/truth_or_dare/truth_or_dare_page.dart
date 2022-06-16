@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:ime_new/business_logic/provider/mqtt_client.dart';
+import 'package:ime_new/business_logic/provider/TD_game.dart';
 import 'package:ime_new/ui/live/truth_or_dare/roomListTable.dart';
 
 import 'package:provider/provider.dart';
@@ -18,7 +18,7 @@ class _TurthOrDareState extends State<TurthOrDare> {
 
   @override
   void initState() {
-    initdata();
+
     super.initState();
   }
 
@@ -174,6 +174,7 @@ class _TurthOrDareState extends State<TurthOrDare> {
                               borderRadius: BorderRadius.circular(8.0))),
                     ),
                   ),
+                  Platform.isIOS ? Container(height: 168) : Container()
                 ],
               ),
             ),
@@ -183,13 +184,5 @@ class _TurthOrDareState extends State<TurthOrDare> {
     );
   }
 
-  Future initdata() async {
-    Provider.of<MqttListen>(context, listen: false).connect();
-    // print('init 111 index data');
-    // await Provider.of<ChatProvider>(context, listen: false)
-    //     .register()
-    //     .whenComplete(() async {
-    //   await Provider.of<ChatProvider>(context, listen: false).pre_Subscribed();
-    // });
-  }
+
 }

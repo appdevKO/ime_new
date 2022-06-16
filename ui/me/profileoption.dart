@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,13 +6,12 @@ import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:ime_new/business_logic/model/settingitem_model.dart';
 import 'package:ime_new/business_logic/provider/chat_provider.dart';
+import 'package:ime_new/ui/loginpage/loginpage.dart';
 import 'package:ime_new/ui/me/profilepage.dart';
 import 'package:ime_new/ui/me/profilesetting.dart';
 import 'package:ime_new/ui/date/user_profile/setting/date_setting.dart';
 import 'package:ime_new/ui/date/user_profile/setting/edit_hello.dart';
 import 'package:provider/provider.dart';
-
-import '../../main.dart';
 import '../date/square/upgrade_vip.dart';
 import '../date/user_profile/list/likeme_list.dart';
 
