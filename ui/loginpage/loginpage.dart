@@ -22,7 +22,6 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-
         body: Stack(
           children: [
             Container(
@@ -33,187 +32,120 @@ class _LoginPageState extends State<LoginPage> {
                 fit: BoxFit.fill,
               ),
             ),
-            Column(
-              children: [
-                // Row(
-                //   children: [
-                //     Text('test登入1 大鵝'),
-                //     Padding(
-                //       padding: const EdgeInsets.only(left: 8.0),
-                //       child: ElevatedButton(
-                //           onPressed: () {
-                //             Provider.of<ChatProvider>(context, listen: false)
-                //                 .account_id = '10028';
-                //             Navigator.pushAndRemoveUntil(
-                //                 context,
-                //                 MaterialPageRoute(builder: (context) => HomePage()),
-                //                 (route) => route == null);
-                //           },
-                //           child: Text('test登入1 大鵝')),
-                //     )
-                //   ],
-                // ),
-                // Row(
-                //   children: [
-                //     Text('test登入2 木木'),
-                //     Padding(
-                //       padding: const EdgeInsets.only(left: 8.0),
-                //       child: ElevatedButton(
-                //           onPressed: () {
-                //             Provider.of<ChatProvider>(context, listen: false)
-                //                 .account_id = '10103';
-                //             Navigator.pushAndRemoveUntil(
-                //                 context,
-                //                 MaterialPageRoute(builder: (context) => HomePage()),
-                //                 (route) => route == null);
-                //           },
-                //           child: Text('test登入2 木木')),
-                //     )
-                //   ],
-                // ),
-                // Container(
-                //   height: 120,
-                // ),
-                // Row(
-                //   children: [
-                //     Text('google 登出'),
-                //     Padding(
-                //       padding: const EdgeInsets.only(left: 8.0),
-                //       child: ElevatedButton(
-                //           onPressed: () {
-                //             FirebaseAuth.instance.signOut();
-                //             GoogleSignIn().signOut();
-                //           },
-                //           child: Text('google 登出')),
-                //     )
-                //   ],
-                // ),
-                Container(
-                  height: 540,
-                ),
-                SignInButton(
-                  Buttons.Google,
-                  text: "Google 登入",
-                  onPressed: () async {
-                    var result = await signInWithGoogle();
-                    if (result is UserCredential) {
-                      print('是');
-                      print('google user :${result.user?.uid}');
-                      //跳轉
-                      await Provider.of<ChatProvider>(context, listen: false)
-                          .register(result.user)
-                          .whenComplete(() =>
+            Positioned(
+              bottom: MediaQuery.of(context).size.height * .1,
+              right: MediaQuery.of(context).size.width * .5 - 110,
+              child: Container(
+                child: Column(
+                  children: [
+                    Container(
+                      width: 220,
+                      child: SignInButton(
+                        Buttons.Google,
+                        text: "Google 登入",
+                        onPressed: () async {
+                          var result = await signInWithGoogle();
+                          if (result is UserCredential) {
+                            print('是');
+                            print('google user :${result.user?.uid}');
+                            //跳轉
+                            await Provider.of<ChatProvider>(context,
+                                    listen: false)
+                                .register(result.user)
+                                .whenComplete(() =>
 
-                              // Navigator.pushAndRemoveUntil(
-                              //     context,
-                              //     MaterialPageRoute(builder: (context) => IndexPage2()),
-                              //     (route) => route == null)
-                              Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => WaitingPage()),
-                                  (route) => route == null));
-                    } else
-                      print('不是');
-                  },
-                ),
-                Container(
-                  height: 20,
-                ),
-                // Row(
-                //   children: [
-                //     Text('google 登入4'),
-                //     Padding(
-                //       padding: const EdgeInsets.only(left: 8.0),
-                //       child: ElevatedButton(
-                //           onPressed: () async {
-                //             var result = await signInWithGoogle();
-                //             if (result is UserCredential) {
-                //               print('是');
-                //               print('google user :${result.user?.uid}');
-                //               //跳轉
-                //               await Provider.of<ChatProvider>(context,
-                //                       listen: false)
-                //                   .register(result.user)
-                //                   .whenComplete(() => Navigator.pushAndRemoveUntil(
-                //                       context,
-                //                       MaterialPageRoute(
-                //                           builder: (context) => HomePage()),
-                //                       (route) => route == null));
-                //             } else
-                //               print('不是');
-                //             print('google 登入結果 ${result}');
-                //           },
-                //           child: Text('google 登入')),
-                //     )
-                //   ],
-                // ),
-                SignInButton(
-                  Buttons.Facebook,
-                  text: "Facebook 登入",
-                  mini: false,
-                  onPressed: () async {
-                    var result = await signInWithFacebook();
-                    if (result is UserCredential) {
-                      print('是');
-                      print('facebook user :${result.user?.uid}');
-                      //跳轉
-                      await Provider.of<ChatProvider>(context, listen: false)
-                          .register(result.user)
-                          .whenComplete(
-                              () => Future.delayed(Duration(seconds: 2), () {
+                                    // Navigator.pushAndRemoveUntil(
+                                    //     context,
+                                    //     MaterialPageRoute(builder: (context) => IndexPage2()),
+                                    //     (route) => route == null)
                                     Navigator.pushAndRemoveUntil(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (context) => IndexPage2()),
-                                        (route) => route == null);
-                                  }));
-                    } else
-                      print('不是');
-                  },
+                                            builder: (context) =>
+                                                WaitingPage()),
+                                        (route) => route == null));
+                          } else
+                            print('不是');
+                        },
+                      ),
+                    ),
+                    Container(
+                      height: 20,
+                    ),
+
+                    Container(
+                      width: 220,
+                      child: SignInButton(
+                        Buttons.Facebook,
+                        text: "Facebook 登入",
+                        mini: false,
+                        onPressed: () async {
+                          var result = await signInWithFacebook();
+                          if (result is UserCredential) {
+                            print('是');
+                            print('facebook user :${result.user?.uid}');
+                            //跳轉
+                            await Provider.of<ChatProvider>(context,
+                                    listen: false)
+                                .register(result.user)
+                                .whenComplete(() =>
+                                    Future.delayed(Duration(seconds: 2), () {
+                                      Navigator.pushAndRemoveUntil(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  IndexPage2()),
+                                          (route) => route == null);
+                                    }));
+                          } else
+                            print('不是');
+                        },
+                      ),
+                    ),
+                    // Row(
+                    //   children: [
+                    //     Text('facebook 登入'),
+                    //     Padding(
+                    //       padding: const EdgeInsets.only(left: 8.0),
+                    //       child: ElevatedButton(
+                    //           onPressed: () async {
+                    //             var result = await signInWithFacebook();
+                    //             if (result is UserCredential) {
+                    //               print('是');
+                    //               print('facebook user :${result.user?.uid}');
+                    //               //跳轉
+                    //               await Provider.of<ChatProvider>(context,
+                    //                       listen: false)
+                    //                   .register(result.user)
+                    //                   .whenComplete(() => Navigator.pushAndRemoveUntil(
+                    //                       context,
+                    //                       MaterialPageRoute(
+                    //                           builder: (context) => HomePage()),
+                    //                       (route) => route == null));
+                    //             } else
+                    //               print('不是');
+                    //           },
+                    //           child: Text('facebook 登入')),
+                    //     )
+                    //   ],
+                    // ),
+                    // Row(
+                    //   children: [
+                    //     Text('facebook 登出'),
+                    //     Padding(
+                    //       padding: const EdgeInsets.only(left: 8.0),
+                    //       child: ElevatedButton(
+                    //           onPressed: () {
+                    //             // FirebaseAuth.instance.signOut();
+                    //             FacebookAuth.instance.logOut();
+                    //           },
+                    //           child: Text('faccebook 登出')),
+                    //     )
+                    //   ],
+                    // ),
+                  ],
                 ),
-                // Row(
-                //   children: [
-                //     Text('facebook 登入'),
-                //     Padding(
-                //       padding: const EdgeInsets.only(left: 8.0),
-                //       child: ElevatedButton(
-                //           onPressed: () async {
-                //             var result = await signInWithFacebook();
-                //             if (result is UserCredential) {
-                //               print('是');
-                //               print('facebook user :${result.user?.uid}');
-                //               //跳轉
-                //               await Provider.of<ChatProvider>(context,
-                //                       listen: false)
-                //                   .register(result.user)
-                //                   .whenComplete(() => Navigator.pushAndRemoveUntil(
-                //                       context,
-                //                       MaterialPageRoute(
-                //                           builder: (context) => HomePage()),
-                //                       (route) => route == null));
-                //             } else
-                //               print('不是');
-                //           },
-                //           child: Text('facebook 登入')),
-                //     )
-                //   ],
-                // ),
-                // Row(
-                //   children: [
-                //     Text('facebook 登出'),
-                //     Padding(
-                //       padding: const EdgeInsets.only(left: 8.0),
-                //       child: ElevatedButton(
-                //           onPressed: () {
-                //             // FirebaseAuth.instance.signOut();
-                //             FacebookAuth.instance.logOut();
-                //           },
-                //           child: Text('faccebook 登出')),
-                //     )
-                //   ],
-                // ),
-              ],
+              ),
             ),
           ],
         ),

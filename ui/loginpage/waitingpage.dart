@@ -14,6 +14,14 @@ class WaitingPage extends StatefulWidget {
 
 class _WaitingPageState extends State<WaitingPage> {
   @override
+  void initState() {
+    // mqtt
+    Provider.of<ChatProvider>(context, listen: false).mqtt_connect();
+    Provider.of<ChatProvider>(context, listen: false).initialGCP();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: FutureBuilder(

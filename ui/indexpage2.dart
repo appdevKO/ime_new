@@ -39,9 +39,9 @@ class _IndexPage2State extends State<IndexPage2> {
     WidgetsBinding.instance?.addPostFrameCallback((_) async {
       initdata();
     });
-    // mqtt
-    Provider.of<ChatProvider>(context, listen: false).mqtt_connect();
-    Provider.of<ChatProvider>(context, listen: false).initialGCP();
+    // // mqtt
+    // Provider.of<ChatProvider>(context, listen: false).mqtt_connect();
+    // Provider.of<ChatProvider>(context, listen: false).initialGCP();
 
     // menuItems = ['123', '456', '777'];
     super.initState();

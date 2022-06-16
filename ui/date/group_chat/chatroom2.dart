@@ -29,10 +29,10 @@ enum recordState {
 class GroupChatRoom2 extends StatefulWidget {
   GroupChatRoom2(
       {Key? key,
-      required this.chatroomid,
-      required this.title,
-      required this.chattype,
-      required this.own})
+        required this.chatroomid,
+        required this.title,
+        required this.chattype,
+        required this.own})
       : super(key: key);
 
   final mongo.ObjectId chatroomid;
@@ -73,7 +73,7 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
   bool iconopen = false;
   late TextEditingController dialogcontroller;
   static const flutterChannel =
-      const MethodChannel('com.example.flutter/flutter');
+  const MethodChannel('com.example.flutter/flutter');
 
   @override
   void initState() {
@@ -133,8 +133,8 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
                     colors: widget.chattype == 1
                         ? colorlist[1]
                         : widget.chattype == 2
-                            ? colorlist[1]
-                            : [Colors.grey]),
+                        ? colorlist[1]
+                        : [Colors.grey]),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -193,9 +193,9 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
                           context,
                           MaterialPageRoute(
                               builder: (context) => ChatroomSetting(
-                                    chatroomId: widget.chatroomid,
-                                    own: widget.own,
-                                  )));
+                                chatroomId: widget.chatroomid,
+                                own: widget.own,
+                              )));
                     },
                   ),
                 ],
@@ -218,157 +218,157 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
 
                         return topicindex == -1
                             ? Center(
-                                child: Container(
-                                  child: Text('聊天室加載中 01'),
-                                ),
-                              )
+                          child: Container(
+                            child: Text('聊天室加載中 01'),
+                          ),
+                        )
                             : value.historymsg != null
-                                ? value.historymsg!.isEmpty &&
-                                        value.msglist![topicindex!].msg!.isEmpty
-                                    ? Center(
-                                        child: Container(
-                                          child: Text('此聊天室沒有聊天記錄'),
-                                        ),
-                                      )
-                                    : Container(
-                                        child: ListView.builder(
-                                          itemBuilder: (context, index) {
-                                            int correctindex;
-                                            if (value.historymsg!.isNotEmpty) {
-                                              //歷史訊息回傳[xx]-有歷史
-                                              if (topicindex == -1) {
-                                                //沒當前 -純歷史
-                                                correctindex = index;
-                                                return bubble(
-                                                  value.historymsg![
-                                                      correctindex],
-                                                );
-                                              } else {
-                                                // 是當前聊天室收到當前訊息 歷史+當前
-                                                correctindex = index <
-                                                        value
-                                                            .msglist![
-                                                                topicindex!]
-                                                            .msg!
-                                                            .length
-                                                    ? index
-                                                    : index -
-                                                        value
-                                                            .msglist![
-                                                                topicindex!]
-                                                            .msg!
-                                                            .length;
+                            ? value.historymsg!.isEmpty &&
+                            value.msglist![topicindex!].msg!.isEmpty
+                            ? Center(
+                          child: Container(
+                            child: Text('此聊天室沒有聊天記錄'),
+                          ),
+                        )
+                            : Container(
+                          child: ListView.builder(
+                            itemBuilder: (context, index) {
+                              int correctindex;
+                              if (value.historymsg!.isNotEmpty) {
+                                //歷史訊息回傳[xx]-有歷史
+                                if (topicindex == -1) {
+                                  //沒當前 -純歷史
+                                  correctindex = index;
+                                  return bubble(
+                                    value.historymsg![
+                                    correctindex],
+                                  );
+                                } else {
+                                  // 是當前聊天室收到當前訊息 歷史+當前
+                                  correctindex = index <
+                                      value
+                                          .msglist![
+                                      topicindex!]
+                                          .msg!
+                                          .length
+                                      ? index
+                                      : index -
+                                      value
+                                          .msglist![
+                                      topicindex!]
+                                          .msg!
+                                          .length;
 
-                                                return index <
-                                                        value
-                                                            .msglist![
-                                                                topicindex!]
-                                                            .msg!
-                                                            .length
-                                                    ? bubble(
-                                                        value
-                                                            .msglist![
-                                                                topicindex!]
-                                                            .msg![correctindex],
-                                                      )
-                                                    : index ==
-                                                            value
-                                                                .msglist![
-                                                                    topicindex!]
-                                                                .msg!
-                                                                .length
-                                                        ? Column(
-                                                            children: [
-                                                              bubble(
-                                                                value.historymsg![
-                                                                    correctindex],
-                                                              ),
-                                                              Container(
-                                                                child: Text(
-                                                                    '---以上為歷史紀錄---'),
-                                                              ),
-                                                            ],
-                                                          )
-                                                        : bubble(
-                                                            value.historymsg![
-                                                                correctindex],
-                                                          );
-                                              }
-                                            } else {
-                                              //歷史訊息回傳[]-沒有歷史訊息
-                                              if (topicindex == -1) {
-                                                return Center(
-                                                  child: Container(
-                                                    child: Text('沒有聊天記錄'),
-                                                  ),
-                                                );
-                                              } else if (value
-                                                  .msglist![topicindex!]
-                                                  .msg!
-                                                  .isEmpty) {
-                                                // 沒歷史 沒當前
-                                                // 收到當前聊天室訊息
-                                                return Center(
-                                                  child: Container(
-                                                    child: Text('此聊天室沒有聊天記錄'),
-                                                  ),
-                                                );
-                                              } else {
-                                                // 沒歷史 有當前
-                                                correctindex = index <
-                                                        value
-                                                            .msglist![
-                                                                topicindex!]
-                                                            .msg!
-                                                            .length
-                                                    ? index
-                                                    : index -
-                                                        value
-                                                            .msglist![
-                                                                topicindex!]
-                                                            .msg!
-                                                            .length;
-
-                                                return bubble(
-                                                  value.msglist![topicindex!]
-                                                      .msg![correctindex],
-                                                );
-                                              }
-                                            }
-                                          },
-                                          reverse: true,
-                                          itemCount: value.historymsg != null
-                                              ? value.historymsg!.isEmpty
-                                                  ? value.msglist![topicindex!]
-                                                          .msg!.isEmpty
-                                                      ? 1
-                                                      : value
-                                                          .msglist![topicindex!]
-                                                          .msg!
-                                                          .length
-                                                  : value.msglist![topicindex!]
-                                                          .msg!.isEmpty
-                                                      ? value.historymsg!.length
-                                                      : value
-                                                              .msglist![
-                                                                  topicindex!]
-                                                              .msg!
-                                                              .length +
-                                                          value.historymsg!
-                                                              .length
-                                              : value.msglist![topicindex!].msg!
-                                                      .isEmpty
-                                                  ? 1
-                                                  : value.msglist![topicindex!]
-                                                      .msg!.length,
-                                          controller: scrollController,
-                                        ),
-                                      )
-                                : Center(
+                                  return index <
+                                      value
+                                          .msglist![
+                                      topicindex!]
+                                          .msg!
+                                          .length
+                                      ? bubble(
+                                    value
+                                        .msglist![
+                                    topicindex!]
+                                        .msg![correctindex],
+                                  )
+                                      : index ==
+                                      value
+                                          .msglist![
+                                      topicindex!]
+                                          .msg!
+                                          .length
+                                      ? Column(
+                                    children: [
+                                      bubble(
+                                        value.historymsg![
+                                        correctindex],
+                                      ),
+                                      Container(
+                                        child: Text(
+                                            '---以上為歷史紀錄---'),
+                                      ),
+                                    ],
+                                  )
+                                      : bubble(
+                                    value.historymsg![
+                                    correctindex],
+                                  );
+                                }
+                              } else {
+                                //歷史訊息回傳[]-沒有歷史訊息
+                                if (topicindex == -1) {
+                                  return Center(
                                     child: Container(
-                                      child: Text('沒有歷史訊息'),
+                                      child: Text('沒有聊天記錄'),
                                     ),
                                   );
+                                } else if (value
+                                    .msglist![topicindex!]
+                                    .msg!
+                                    .isEmpty) {
+                                  // 沒歷史 沒當前
+                                  // 收到當前聊天室訊息
+                                  return Center(
+                                    child: Container(
+                                      child: Text('此聊天室沒有聊天記錄'),
+                                    ),
+                                  );
+                                } else {
+                                  // 沒歷史 有當前
+                                  correctindex = index <
+                                      value
+                                          .msglist![
+                                      topicindex!]
+                                          .msg!
+                                          .length
+                                      ? index
+                                      : index -
+                                      value
+                                          .msglist![
+                                      topicindex!]
+                                          .msg!
+                                          .length;
+
+                                  return bubble(
+                                    value.msglist![topicindex!]
+                                        .msg![correctindex],
+                                  );
+                                }
+                              }
+                            },
+                            reverse: true,
+                            itemCount: value.historymsg != null
+                                ? value.historymsg!.isEmpty
+                                ? value.msglist![topicindex!]
+                                .msg!.isEmpty
+                                ? 1
+                                : value
+                                .msglist![topicindex!]
+                                .msg!
+                                .length
+                                : value.msglist![topicindex!]
+                                .msg!.isEmpty
+                                ? value.historymsg!.length
+                                : value
+                                .msglist![
+                            topicindex!]
+                                .msg!
+                                .length +
+                                value.historymsg!
+                                    .length
+                                : value.msglist![topicindex!].msg!
+                                .isEmpty
+                                ? 1
+                                : value.msglist![topicindex!]
+                                .msg!.length,
+                            controller: scrollController,
+                          ),
+                        )
+                            : Center(
+                          child: Container(
+                            child: Text('沒有歷史訊息'),
+                          ),
+                        );
                       },
                     )),
                     bottomEnter(),
@@ -389,51 +389,51 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
                     children: [
                       iconopen
                           ? Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Container(
-                                // height: 80,
-                                decoration: BoxDecoration(
-                                    color: Colors.grey,
-                                    borderRadius: BorderRadius.circular(30)),
-                                child: Row(
-                                  children: [
-                                    IconButton(
-                                      icon: Icon(Icons.photo),
-                                      onPressed: () async {
-                                        await Provider.of<ChatProvider>(context,
-                                                listen: false)
-                                            .sendimg_group(widget.chatroomid,
-                                                'ime_group_chat');
-                                      },
-                                    ),
-                                    IconButton(
-                                      icon: Icon(Icons.camera_alt),
-                                      onPressed: () {
-                                        Provider.of<ChatProvider>(context,
-                                                listen: false)
-                                            .sendimgwithcamera_group(
-                                                widget.chatroomid,
-                                                'ime_group_chat');
-                                      },
-                                    ),
-                                    //打開下方貼圖按鈕
-                                    IconButton(
-                                      icon: Icon(Icons.face),
-                                      onPressed: () {
-                                        stickerautoopen();
-                                      },
-                                    ),
-                                    //打開下方錄音按鈕
-                                    IconButton(
-                                      icon: Icon(Icons.mic),
-                                      onPressed: () {
-                                        audioautoopen();
-                                      },
-                                    ),
-                                  ],
-                                ),
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                          // height: 80,
+                          decoration: BoxDecoration(
+                              color: Colors.grey,
+                              borderRadius: BorderRadius.circular(30)),
+                          child: Row(
+                            children: [
+                              IconButton(
+                                icon: Icon(Icons.photo),
+                                onPressed: () async {
+                                  await Provider.of<ChatProvider>(context,
+                                      listen: false)
+                                      .sendimg_group(widget.chatroomid,
+                                      'ime_group_chat');
+                                },
                               ),
-                            )
+                              IconButton(
+                                icon: Icon(Icons.camera_alt),
+                                onPressed: () {
+                                  Provider.of<ChatProvider>(context,
+                                      listen: false)
+                                      .sendimgwithcamera_group(
+                                      widget.chatroomid,
+                                      'ime_group_chat');
+                                },
+                              ),
+                              //打開下方貼圖按鈕
+                              IconButton(
+                                icon: Icon(Icons.face),
+                                onPressed: () {
+                                  stickerautoopen();
+                                },
+                              ),
+                              //打開下方錄音按鈕
+                              IconButton(
+                                icon: Icon(Icons.mic),
+                                onPressed: () {
+                                  audioautoopen();
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
                           : Container(),
 
                       // Container(
@@ -558,7 +558,7 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
                     filled: true,
                     hintText: '輸入想說的話',
                     contentPadding:
-                        EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                    EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                   ),
                   style: TextStyle(height: 1),
                 )),
@@ -599,124 +599,124 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
       child: bottomrecordheight == 0
           ? Container()
           : myrecord == recordState.waiting
-              ? Center(
-                  child: SizedBox(
-                    child: CircularProgressIndicator(),
-                    height: 50.0,
-                    width: 50.0,
+          ? Center(
+        child: SizedBox(
+          child: CircularProgressIndicator(),
+          height: 50.0,
+          width: 50.0,
+        ),
+      )
+          : Container(
+        height: bottomrecordheight,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+                margin: EdgeInsets.all(20),
+                child: myrecord == recordState.recordnotsend
+                    ? ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      myrecord = recordState.notrecord;
+                      recorderTxt = '未開始錄音';
+                    });
+                  },
+                  child: Text(
+                    '取消',
+                    style: TextStyle(color: Colors.white),
                   ),
+                  style: ElevatedButton.styleFrom(
+                      primary: Colors.grey,
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                        BorderRadius.circular(8.0),
+                      )),
                 )
-              : Container(
-                  height: bottomrecordheight,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
-                          margin: EdgeInsets.all(20),
-                          child: myrecord == recordState.recordnotsend
-                              ? ElevatedButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      myrecord = recordState.notrecord;
-                                      recorderTxt = '未開始錄音';
-                                    });
-                                  },
-                                  child: Text(
-                                    '取消',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                  style: ElevatedButton.styleFrom(
-                                      primary: Colors.grey,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
-                                      )),
-                                )
-                              : Container()),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            recorderTxt,
-                            style: TextStyle(fontSize: 18),
-                          ),
-                          GestureDetector(
-                            child: Container(
-                              height: 130,
-                              width: 130,
-                              margin: EdgeInsets.all(10),
-                              padding: EdgeInsets.all(15),
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                      width: 1,
-                                      color: myrecord == recordState.recording
-                                          ? Colors.red
-                                          : myrecord ==
-                                                  recordState.recordnotsend
-                                              ? Colors.blue
-                                              : Colors.black)),
-                              child: Center(
-                                  child: myrecord == recordState.recordnotsend
-                                      ? Text(
-                                          '已錄音',
-                                          style: TextStyle(
-                                              color: Colors.blue, fontSize: 18),
-                                        )
-                                      : Icon(
-                                          myrecord == recordState.recording
-                                              ? Icons.stop
-                                              : Icons.mic,
-                                          color:
-                                              myrecord == recordState.recording
-                                                  ? Colors.red
-                                                  : Colors.black,
-                                          size: 35,
-                                        )),
-                            ),
-                            onTap: () {
-                              if (myrecord == recordState.recording) {
-                                stopmic(widget.chatroomid);
-                                setState(() {
-                                  myrecord = recordState.recordnotsend;
-                                });
-                              } else if (myrecord ==
-                                  recordState.recordnotsend) {
-                              } else {
-                                startmic();
-                                setState(() {
-                                  myrecord = recordState.recording;
-                                });
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                      Container(
-                          margin: EdgeInsets.all(20),
-                          child: myrecord == recordState.recordnotsend
-                              ? ElevatedButton(
-                                  onPressed: () {
-                                    send_record_to_mqtt(widget.chatroomid);
-                                    setState(() {
-                                      recorderTxt = '未開始錄音';
-                                    });
-                                  },
-                                  child: Text(
-                                    '傳送',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                  style: ElevatedButton.styleFrom(
-                                      primary: Colors.blue,
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(8.0))),
-                                )
-                              : Container()),
-                    ],
-                  ),
+                    : Container()),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  recorderTxt,
+                  style: TextStyle(fontSize: 18),
                 ),
+                GestureDetector(
+                  child: Container(
+                    height: 130,
+                    width: 130,
+                    margin: EdgeInsets.all(10),
+                    padding: EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                            width: 1,
+                            color: myrecord == recordState.recording
+                                ? Colors.red
+                                : myrecord ==
+                                recordState.recordnotsend
+                                ? Colors.blue
+                                : Colors.black)),
+                    child: Center(
+                        child: myrecord == recordState.recordnotsend
+                            ? Text(
+                          '已錄音',
+                          style: TextStyle(
+                              color: Colors.blue, fontSize: 18),
+                        )
+                            : Icon(
+                          myrecord == recordState.recording
+                              ? Icons.stop
+                              : Icons.mic,
+                          color:
+                          myrecord == recordState.recording
+                              ? Colors.red
+                              : Colors.black,
+                          size: 35,
+                        )),
+                  ),
+                  onTap: () {
+                    if (myrecord == recordState.recording) {
+                      stopmic(widget.chatroomid);
+                      setState(() {
+                        myrecord = recordState.recordnotsend;
+                      });
+                    } else if (myrecord ==
+                        recordState.recordnotsend) {
+                    } else {
+                      startmic();
+                      setState(() {
+                        myrecord = recordState.recording;
+                      });
+                    }
+                  },
+                ),
+              ],
+            ),
+            Container(
+                margin: EdgeInsets.all(20),
+                child: myrecord == recordState.recordnotsend
+                    ? ElevatedButton(
+                  onPressed: () {
+                    send_record_to_mqtt(widget.chatroomid);
+                    setState(() {
+                      recorderTxt = '未開始錄音';
+                    });
+                  },
+                  child: Text(
+                    '傳送',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                      primary: Colors.blue,
+                      shape: RoundedRectangleBorder(
+                          borderRadius:
+                          BorderRadius.circular(8.0))),
+                )
+                    : Container()),
+          ],
+        ),
+      ),
     );
   }
 
@@ -729,34 +729,34 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
       child: bottomstickerheight == 0
           ? Container()
           : Padding(
-              padding: const EdgeInsets.only(top: 20.0),
-              child: GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 4,
-                  crossAxisSpacing: 5.0,
-                  childAspectRatio: .9, //子元素在横轴长度和主轴长度的比例
+          padding: const EdgeInsets.only(top: 20.0),
+          child: GridView.builder(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 4,
+              crossAxisSpacing: 5.0,
+              childAspectRatio: .9, //子元素在横轴长度和主轴长度的比例
+            ),
+            itemBuilder: (BuildContext context, int index) {
+              return GestureDetector(
+                child: Container(
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                        image: AssetImage('${stickers_list[index]}')),
+                  ),
                 ),
-                itemBuilder: (BuildContext context, int index) {
-                  return GestureDetector(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                            image: AssetImage('${stickers_list[index]}')),
-                      ),
-                    ),
-                    onTap: () {
-                      print('sticker :$index');
-                      Provider.of<ChatProvider>(context, listen: false)
-                          .groupchat(
-                        index.toString(),
-                        widget.chatroomid,
-                        3,
-                      );
-                    },
+                onTap: () {
+                  print('sticker :$index');
+                  Provider.of<ChatProvider>(context, listen: false)
+                      .groupchat(
+                    index.toString(),
+                    widget.chatroomid,
+                    3,
                   );
                 },
-                itemCount: stickers_list.length,
-              )),
+              );
+            },
+            itemCount: stickers_list.length,
+          )),
     );
   }
 
@@ -781,60 +781,60 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
           builder: (context, value, child) {
             return value.memberlist != null
                 ? value.memberlist!.isEmpty
-                    ? Container(
-                        child: Center(child: Text('成員加載中')),
-                      )
-                    : ListView.separated(
-                        itemBuilder: (context, index) {
-                          return GestureDetector(
-                            child: CircleAvatar(
-                              backgroundColor: Colors.blue,
-                              backgroundImage: value
-                                              .memberlist![index].avatar_sub !=
-                                          null &&
-                                      value.memberlist![index].avatar_sub != ''
-                                  ? NetworkImage(
-                                      value.memberlist![index].avatar_sub)
-                                  : AssetImage(
-                                          value.memberlist![index]
-                                                          .sex ==
-                                                      null ||
-                                                  value.memberlist![index]
-                                                          .sex ==
-                                                      '男'
-                                              ? 'assets/default/sex_man.png'
-                                              : 'assets/default/sex_woman.png')
-                                      as ImageProvider,
-                            ),
-                            onTap: () {
-                              if (value.memberlist![index].account !=
-                                  value.remoteUserInfo[0].account) {
-                                //成員橫排 點 單一頭像
-                                // 改成先進簡介
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => OtherProfilePage(
-                                              chatroomid: value
-                                                  .memberlist![index].memberid,
-                                            )));
-                              } else {
-                                print('同一人');
-                              }
-                            },
-                          );
-                        },
-                        itemCount: value.memberlist!.length,
-                        separatorBuilder: (context, index) {
-                          return Container(
-                            width: 10,
-                          );
-                        },
-                        scrollDirection: Axis.horizontal,
-                      )
+                ? Container(
+              child: Center(child: Text('成員加載中')),
+            )
+                : ListView.separated(
+              itemBuilder: (context, index) {
+                return GestureDetector(
+                  child: CircleAvatar(
+                    backgroundColor: Colors.blue,
+                    backgroundImage: value
+                        .memberlist![index].avatar_sub !=
+                        null &&
+                        value.memberlist![index].avatar_sub != ''
+                        ? NetworkImage(
+                        value.memberlist![index].avatar_sub)
+                        : AssetImage(
+                        value.memberlist![index]
+                            .sex ==
+                            null ||
+                            value.memberlist![index]
+                                .sex ==
+                                '男'
+                            ? 'assets/default/sex_man.png'
+                            : 'assets/default/sex_woman.png')
+                    as ImageProvider,
+                  ),
+                  onTap: () {
+                    if (value.memberlist![index].account !=
+                        value.remoteUserInfo[0].account) {
+                      //成員橫排 點 單一頭像
+                      // 改成先進簡介
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => OtherProfilePage(
+                                chatroomid: value
+                                    .memberlist![index].memberid,
+                              )));
+                    } else {
+                      print('同一人');
+                    }
+                  },
+                );
+              },
+              itemCount: value.memberlist!.length,
+              separatorBuilder: (context, index) {
+                return Container(
+                  width: 10,
+                );
+              },
+              scrollDirection: Axis.horizontal,
+            )
                 : Container(
-                    child: Center(child: Text('沒有參與成員')),
-                  );
+              child: Center(child: Text('沒有參與成員')),
+            );
           },
         ),
       ),
@@ -843,8 +843,8 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
 
   //泡泡樣式
   Widget bubble(
-    MqttMsg msg,
-  ) {
+      MqttMsg msg,
+      ) {
     //type  1 文字 / 2 圖片 / 3 貼圖 / 4 音頻 / 6 通知
     double text_radius = 20.0;
     // type檢查樣式
@@ -855,389 +855,389 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
     return memberindex == -1
         ? Container()
         : Container(
-            margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-            child: msg.fromid ==
-                    Provider.of<ChatProvider>(context, listen: false).account_id
-                // 檢查左右 我發出的
-                ? Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      // 泡泡
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          msg.type == 3
-                              ? Container(
-                                  padding: EdgeInsets.only(
-                                    top: 10,
-                                    bottom: 10,
-                                  ),
-                                  constraints: BoxConstraints(
-                                    maxWidth:
-                                        MediaQuery.of(context).size.width * .6,
-                                  ),
-                                  child: Image.asset(
-                                      '${stickers_list[int.parse(msg.text!)]}'),
-                                )
-                              : Container(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 15.0, vertical: 10.0),
-                                  //控制泡泡裡面的大小
-                                  //大小
-                                  constraints: BoxConstraints(
-                                    maxWidth:
-                                        MediaQuery.of(context).size.width * .6,
-                                  ),
-                                  //泡泡顏色
-                                  decoration: BoxDecoration(
-                                    color: Color(0xffEAEFF6),
-                                    // gradient: LinearGradient(
-                                    //     colors: [Color(0xfffd669a), Color(0xffff836a)]),
-                                    borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(text_radius),
-                                      bottomRight: Radius.circular(text_radius),
-                                      bottomLeft: Radius.circular(text_radius),
-                                    ),
-                                  ),
-                                  // 泡泡內容
-                                  // 判斷type
-                                  //type  1 文字 / 2 圖片 / 3 貼圖 / 4 音頻 / 6 通知
-                                  child: msg.type == 1
-                                      ? Container(child: Text('${msg.text}'))
-                                      : msg.type == 2
-                                          ? msg.text != '' && msg.text != null
-                                              ? GestureDetector(
-                                                  child: Container(
-                                                    child: Image.network(
-                                                        '${msg.text}'),
-                                                  ),
-                                                  onTap: () {
-                                                    print(
-                                                        '${msg.text}//////${msg.note}');
-                                                    Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                            builder:
-                                                                (context) =>
-                                                                    ShowImage(
-                                                                      img: msg
-                                                                          .note!,
-                                                                    )));
-                                                  },
-                                                )
-                                              : Container(
-                                                  child: Text('圖片損毀'),
-                                                )
-                                          // : msg.type == 3
-                                          //     ? Image.asset(
-                                          //         '${stickers_list[int.parse(msg.text!)]}')
-                                          : msg.type == 4
-                                              ? Container(
-                                                  child: Column(
-                                                    children: [
-                                                      Text('已傳送錄音'),
-                                                      Padding(
-                                                        padding:
-                                                            EdgeInsets.only(
-                                                                top: 10),
-                                                        child: msg.recordtime ==
-                                                                    '' ||
-                                                                msg.recordtime ==
-                                                                    null
-                                                            ? Text(
-                                                                '00:00:00 / 00:00:00',
-                                                                style: TextStyle(
-                                                                    color: Colors
-                                                                        .transparent),
-                                                              )
-                                                            : Text(
-                                                                '${msg.recordtime} / ${msg.current_play_position}'),
-                                                      ),
-                                                      IconButton(
-                                                          icon: msg.play ==
-                                                                  false
-                                                              ? Icon(Icons
-                                                                  .play_arrow)
-                                                              : Icon(
-                                                                  Icons.pause),
-                                                          onPressed: () {
-                                                            startplay(msg,
-                                                                topicindex);
-                                                          })
-                                                    ],
-                                                  ),
-                                                )
-                                              : msg.type == 6
-                                                  ? Container(
-                                                      child: Text(
-                                                          '通知:${msg.text}'),
-                                                    )
-                                                  : Container(),
-                                ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 4),
-                            child: Text(
-                              //時間
-                              msg.time == null
-                                  ? ''
-                                  : " ${DateFormat('yyyy/MM/dd  KK:mm a').format(msg.time!)}",
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 8,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        width: 5.0,
-                      ),
-                      //時間-已讀
-
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          CircleAvatar(
-                            backgroundColor: Colors.grey,
-                            backgroundImage: Provider.of<ChatProvider>(context,
-                                                listen: false)
-                                            .remoteUserInfo[0]
-                                            .avatar_sub !=
-                                        null &&
-                                    Provider.of<ChatProvider>(context, listen: false)
-                                            .remoteUserInfo[0]
-                                            .avatar_sub !=
-                                        ''
-                                ? NetworkImage(
-                                    '${Provider.of<ChatProvider>(context, listen: false).remoteUserInfo[0].avatar_sub}')
-                                : AssetImage(Provider.of<ChatProvider>(context,
-                                                    listen: false)
-                                                .remoteUserInfo[0]
-                                                .sex ==
-                                            null ||
-                                        Provider.of<ChatProvider>(context,
-                                                    listen: false)
-                                                .remoteUserInfo[0]
-                                                .sex ==
-                                            '男'
-                                    ? 'assets/default/sex_man.png'
-                                    : 'assets/default/sex_woman.png') as ImageProvider,
-                          ),
-                          Text(
-                            '地區',
-                            style: TextStyle(
-                                // color: Color(0xffa6aFa3),
-                                color: Colors.transparent,
-                                fontSize: 10),
-                          )
-                        ],
-                      ),
-                    ],
-                  )
-                //  對方
-                : Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          //頭像
-                          GestureDetector(
-                            child: CircleAvatar(
-                              backgroundColor: Colors.white,
-                              backgroundImage: memberindex != -1 &&
-                                      Provider.of<ChatProvider>(context, listen: false)
-                                              .memberlist![memberindex]
-                                              .avatar_sub !=
-                                          null &&
-                                      Provider.of<ChatProvider>(context, listen: false)
-                                              .memberlist![memberindex]
-                                              .avatar_sub !=
-                                          ''
-                                  ? NetworkImage(
-                                      '${Provider.of<ChatProvider>(context, listen: false).memberlist![memberindex].avatar_sub}')
-                                  : AssetImage(Provider.of<ChatProvider>(
-                                                          context,
-                                                          listen: false)
-                                                      .memberlist![memberindex]
-                                                      .sex ==
-                                                  null ||
-                                              Provider.of<ChatProvider>(context,
-                                                          listen: false)
-                                                      .memberlist![memberindex]
-                                                      .sex ==
-                                                  '男'
-                                          ? 'assets/default/sex_man.png'
-                                          : 'assets/default/sex_woman.png')
-                                      as ImageProvider,
-                            ),
-                            onTap: () {
-                              //私聊簡易泡泡
-                              // 改掉
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => OtherProfilePage(
-                                            chatroomid:
-                                                Provider.of<ChatProvider>(
-                                                        context,
-                                                        listen: false)
-                                                    .memberlist![memberindex]
-                                                    .memberid,
-                                          )));
-                            },
-                          ),
-                          Text(
-                            '地區',
-                            style: TextStyle(
-                                // color: Color(0xffa6aFa3),
-                                color: Colors.transparent,
-                                fontSize: 10),
-                          )
-                        ],
-                      ),
-                      // 泡泡
+      margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+      child: msg.fromid ==
+          Provider.of<ChatProvider>(context, listen: false).account_id
+      // 檢查左右 我發出的
+          ? Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          // 泡泡
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              msg.type == 3
+                  ? Container(
+                padding: EdgeInsets.only(
+                  top: 10,
+                  bottom: 10,
+                ),
+                constraints: BoxConstraints(
+                  maxWidth:
+                  MediaQuery.of(context).size.width * .6,
+                ),
+                child: Image.asset(
+                    '${stickers_list[int.parse(msg.text!)]}'),
+              )
+                  : Container(
+                padding: EdgeInsets.symmetric(
+                    horizontal: 15.0, vertical: 10.0),
+                //控制泡泡裡面的大小
+                //大小
+                constraints: BoxConstraints(
+                  maxWidth:
+                  MediaQuery.of(context).size.width * .6,
+                ),
+                //泡泡顏色
+                decoration: BoxDecoration(
+                  color: Color(0xffEAEFF6),
+                  // gradient: LinearGradient(
+                  //     colors: [Color(0xfffd669a), Color(0xffff836a)]),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(text_radius),
+                    bottomRight: Radius.circular(text_radius),
+                    bottomLeft: Radius.circular(text_radius),
+                  ),
+                ),
+                // 泡泡內容
+                // 判斷type
+                //type  1 文字 / 2 圖片 / 3 貼圖 / 4 音頻 / 6 通知
+                child: msg.type == 1
+                    ? Container(child: Text('${msg.text}'))
+                    : msg.type == 2
+                    ? msg.text != '' && msg.text != null
+                    ? GestureDetector(
+                  child: Container(
+                    child: Image.network(
+                        '${msg.text}'),
+                  ),
+                  onTap: () {
+                    print(
+                        '${msg.text}//////${msg.note}');
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder:
+                                (context) =>
+                                ShowImage(
+                                  img: msg
+                                      .note!,
+                                )));
+                  },
+                )
+                    : Container(
+                  child: Text('圖片損毀'),
+                )
+                // : msg.type == 3
+                //     ? Image.asset(
+                //         '${stickers_list[int.parse(msg.text!)]}')
+                    : msg.type == 4
+                    ? Container(
+                  child: Column(
+                    children: [
+                      Text('已傳送錄音'),
                       Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 4),
-                              child: Text('${msg.fromid} '),
-                            ),
-                            msg.type == 3
-                                ? Container(
-                                    padding: EdgeInsets.only(
-                                      top: 10,
-                                      bottom: 10,
-                                    ),
-                                    constraints: BoxConstraints(
-                                      maxWidth:
-                                          MediaQuery.of(context).size.width *
-                                              .6,
-                                    ),
-                                    child: Image.asset(
-                                        '${stickers_list[int.parse(msg.text!)]}'),
-                                  )
-                                : Container(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 15.0, vertical: 10.0),
-                                    //控制泡泡裡面的大小
-                                    //大小
-                                    constraints: BoxConstraints(
-                                      maxWidth:
-                                          MediaQuery.of(context).size.width *
-                                              .6,
-                                    ),
-                                    //泡泡顏色
-                                    decoration: BoxDecoration(
-                                      color: Color(0xffEAEFF6),
-                                      // gradient: LinearGradient(
-                                      //     colors: [Color(0xfffd669a), Color(0xffff836a)]),
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(text_radius),
-                                        bottomRight:
-                                            Radius.circular(text_radius),
-                                        bottomLeft:
-                                            Radius.circular(text_radius),
-                                      ),
-                                    ),
-                                    // 泡泡內容
-                                    // 判斷type
-                                    //type  1 文字 / 2 圖片 / 3 貼圖 / 4 音頻 / 6 通知
-                                    child: msg.type == 1
-                                        ? Container(child: Text('${msg.text}'))
-                                        : msg.type == 2
-                                            ? msg.text != '' && msg.text != null
-                                                ? GestureDetector(
-                                                    child: Container(
-                                                      child: Image.network(
-                                                          '${msg.text}'),
-                                                    ),
-                                                    onTap: () {
-                                                      print(
-                                                          '${msg.text}//////${msg.note}');
-                                                      Navigator.push(
-                                                          context,
-                                                          MaterialPageRoute(
-                                                              builder:
-                                                                  (context) =>
-                                                                      ShowImage(
-                                                                        img: msg
-                                                                            .note!,
-                                                                      )));
-                                                    },
-                                                  )
-                                                : Container(
-                                                    child: Text('圖片損毀'),
-                                                  )
-                                            // : msg.type == 3
-                                            //     ? Image.asset(
-                                            //         '${stickers_list[int.parse(msg.text!)]}')
-                                            : msg.type == 4
-                                                ? Container(
-                                                    child: Column(
-                                                      children: [
-                                                        Text('已傳送錄音'),
-                                                        Padding(
-                                                          padding:
-                                                              EdgeInsets.only(
-                                                                  top: 10),
-                                                          child: msg.recordtime ==
-                                                                      '' ||
-                                                                  msg.recordtime ==
-                                                                      null
-                                                              ? Text(
-                                                                  '00:00:00 / 00:00:00',
-                                                                  style: TextStyle(
-                                                                      color: Colors
-                                                                          .transparent),
-                                                                )
-                                                              : Text(
-                                                                  '${msg.recordtime} / ${msg.current_play_position}'),
-                                                        ),
-                                                        IconButton(
-                                                            icon: msg.play ==
-                                                                    false
-                                                                ? Icon(Icons
-                                                                    .play_arrow)
-                                                                : Icon(Icons
-                                                                    .pause),
-                                                            onPressed: () {
-                                                              startplay(msg,
-                                                                  topicindex);
-                                                            })
-                                                      ],
-                                                    ),
-                                                  )
-                                                : msg.type == 6
-                                                    ? Container(
-                                                        child: Text(
-                                                            '通知:${msg.text}'),
-                                                      )
-                                                    : Container(),
-                                  ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 4),
-                              child: Text(
-                                //時間
-                                msg.time == null
-                                    ? ''
-                                    : " ${DateFormat('yyyy/MM/dd  KK:mm a').format(msg.time!)}",
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 8,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                        padding:
+                        EdgeInsets.only(
+                            top: 10),
+                        child: msg.recordtime ==
+                            '' ||
+                            msg.recordtime ==
+                                null
+                            ? Text(
+                          '00:00:00 / 00:00:00',
+                          style: TextStyle(
+                              color: Colors
+                                  .transparent),
+                        )
+                            : Text(
+                            '${msg.recordtime} / ${msg.current_play_position}'),
                       ),
+                      IconButton(
+                          icon: msg.play ==
+                              false
+                              ? Icon(Icons
+                              .play_arrow)
+                              : Icon(
+                              Icons.pause),
+                          onPressed: () {
+                            startplay(msg,
+                                topicindex);
+                          })
                     ],
                   ),
-          );
+                )
+                    : msg.type == 6
+                    ? Container(
+                  child: Text(
+                      '通知:${msg.text}'),
+                )
+                    : Container(),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Text(
+                  //時間
+                  msg.time == null
+                      ? ''
+                      : " ${DateFormat('yyyy/MM/dd  KK:mm a').format(msg.time!)}",
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 8,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(
+            width: 5.0,
+          ),
+          //時間-已讀
+
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              CircleAvatar(
+                backgroundColor: Colors.grey,
+                backgroundImage: Provider.of<ChatProvider>(context,
+                    listen: false)
+                    .remoteUserInfo[0]
+                    .avatar_sub !=
+                    null &&
+                    Provider.of<ChatProvider>(context, listen: false)
+                        .remoteUserInfo[0]
+                        .avatar_sub !=
+                        ''
+                    ? NetworkImage(
+                    '${Provider.of<ChatProvider>(context, listen: false).remoteUserInfo[0].avatar_sub}')
+                    : AssetImage(Provider.of<ChatProvider>(context,
+                    listen: false)
+                    .remoteUserInfo[0]
+                    .sex ==
+                    null ||
+                    Provider.of<ChatProvider>(context,
+                        listen: false)
+                        .remoteUserInfo[0]
+                        .sex ==
+                        '男'
+                    ? 'assets/default/sex_man.png'
+                    : 'assets/default/sex_woman.png') as ImageProvider,
+              ),
+              Text(
+                '地區',
+                style: TextStyle(
+                  // color: Color(0xffa6aFa3),
+                    color: Colors.transparent,
+                    fontSize: 10),
+              )
+            ],
+          ),
+        ],
+      )
+      //  對方
+          : Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              //頭像
+              GestureDetector(
+                child: CircleAvatar(
+                  backgroundColor: Colors.white,
+                  backgroundImage: memberindex != -1 &&
+                      Provider.of<ChatProvider>(context, listen: false)
+                          .memberlist![memberindex]
+                          .avatar_sub !=
+                          null &&
+                      Provider.of<ChatProvider>(context, listen: false)
+                          .memberlist![memberindex]
+                          .avatar_sub !=
+                          ''
+                      ? NetworkImage(
+                      '${Provider.of<ChatProvider>(context, listen: false).memberlist![memberindex].avatar_sub}')
+                      : AssetImage(Provider.of<ChatProvider>(
+                      context,
+                      listen: false)
+                      .memberlist![memberindex]
+                      .sex ==
+                      null ||
+                      Provider.of<ChatProvider>(context,
+                          listen: false)
+                          .memberlist![memberindex]
+                          .sex ==
+                          '男'
+                      ? 'assets/default/sex_man.png'
+                      : 'assets/default/sex_woman.png')
+                  as ImageProvider,
+                ),
+                onTap: () {
+                  //私聊簡易泡泡
+                  // 改掉
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => OtherProfilePage(
+                            chatroomid:
+                            Provider.of<ChatProvider>(
+                                context,
+                                listen: false)
+                                .memberlist![memberindex]
+                                .memberid,
+                          )));
+                },
+              ),
+              Text(
+                '地區',
+                style: TextStyle(
+                  // color: Color(0xffa6aFa3),
+                    color: Colors.transparent,
+                    fontSize: 10),
+              )
+            ],
+          ),
+          // 泡泡
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Text('${msg.fromid} '),
+                ),
+                msg.type == 3
+                    ? Container(
+                  padding: EdgeInsets.only(
+                    top: 10,
+                    bottom: 10,
+                  ),
+                  constraints: BoxConstraints(
+                    maxWidth:
+                    MediaQuery.of(context).size.width *
+                        .6,
+                  ),
+                  child: Image.asset(
+                      '${stickers_list[int.parse(msg.text!)]}'),
+                )
+                    : Container(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: 15.0, vertical: 10.0),
+                  //控制泡泡裡面的大小
+                  //大小
+                  constraints: BoxConstraints(
+                    maxWidth:
+                    MediaQuery.of(context).size.width *
+                        .6,
+                  ),
+                  //泡泡顏色
+                  decoration: BoxDecoration(
+                    color: Color(0xffEAEFF6),
+                    // gradient: LinearGradient(
+                    //     colors: [Color(0xfffd669a), Color(0xffff836a)]),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(text_radius),
+                      bottomRight:
+                      Radius.circular(text_radius),
+                      bottomLeft:
+                      Radius.circular(text_radius),
+                    ),
+                  ),
+                  // 泡泡內容
+                  // 判斷type
+                  //type  1 文字 / 2 圖片 / 3 貼圖 / 4 音頻 / 6 通知
+                  child: msg.type == 1
+                      ? Container(child: Text('${msg.text}'))
+                      : msg.type == 2
+                      ? msg.text != '' && msg.text != null
+                      ? GestureDetector(
+                    child: Container(
+                      child: Image.network(
+                          '${msg.text}'),
+                    ),
+                    onTap: () {
+                      print(
+                          '${msg.text}//////${msg.note}');
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                  ShowImage(
+                                    img: msg
+                                        .note!,
+                                  )));
+                    },
+                  )
+                      : Container(
+                    child: Text('圖片損毀'),
+                  )
+                  // : msg.type == 3
+                  //     ? Image.asset(
+                  //         '${stickers_list[int.parse(msg.text!)]}')
+                      : msg.type == 4
+                      ? Container(
+                    child: Column(
+                      children: [
+                        Text('已傳送錄音'),
+                        Padding(
+                          padding:
+                          EdgeInsets.only(
+                              top: 10),
+                          child: msg.recordtime ==
+                              '' ||
+                              msg.recordtime ==
+                                  null
+                              ? Text(
+                            '00:00:00 / 00:00:00',
+                            style: TextStyle(
+                                color: Colors
+                                    .transparent),
+                          )
+                              : Text(
+                              '${msg.recordtime} / ${msg.current_play_position}'),
+                        ),
+                        IconButton(
+                            icon: msg.play ==
+                                false
+                                ? Icon(Icons
+                                .play_arrow)
+                                : Icon(Icons
+                                .pause),
+                            onPressed: () {
+                              startplay(msg,
+                                  topicindex);
+                            })
+                      ],
+                    ),
+                  )
+                      : msg.type == 6
+                      ? Container(
+                    child: Text(
+                        '通知:${msg.text}'),
+                  )
+                      : Container(),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Text(
+                    //時間
+                    msg.time == null
+                        ? ''
+                        : " ${DateFormat('yyyy/MM/dd  KK:mm a').format(msg.time!)}",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 8,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   //下方錄音 區塊 自動開關
@@ -1305,10 +1305,10 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
     await Provider.of<ChatProvider>(context, listen: false)
         .gethismsg(widget.chatroomid)
         .whenComplete(() => topicindex =
-            Provider.of<ChatProvider>(context, listen: false)
-                .msglist
-                ?.indexWhere((element) =>
-                    element.topicid == widget.chatroomid.toHexString()));
+        Provider.of<ChatProvider>(context, listen: false)
+            .msglist
+            ?.indexWhere((element) =>
+        element.topicid == widget.chatroomid.toHexString()));
     //要等 不然資料流會亂跑
     await Provider.of<ChatProvider>(context, listen: false)
         .getchatroommember(widget.chatroomid);
@@ -1395,12 +1395,12 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
       } else {
         await _audioPlayer
             .startPlayer(
-                fromURI: msg.text,
-                whenFinished: () {
-                  Provider.of<ChatProvider>(context, listen: false)
-                      .playaudiomsg(msg);
-                  _playerSubscription.cancel();
-                })
+            fromURI: msg.text,
+            whenFinished: () {
+              Provider.of<ChatProvider>(context, listen: false)
+                  .playaudiomsg(msg);
+              _playerSubscription.cancel();
+            })
             .then((value) {
           _audioPlayer.setSubscriptionDuration(Duration(microseconds: 50000));
           _playerSubscription = _audioPlayer.onProgress!.listen((event) {
@@ -1466,8 +1466,8 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
       await Provider.of<ChatProvider>(context, listen: false)
           .groupsendrecord(topic, recordpath, 'ime_group_chat')
           .whenComplete(() => setState(() {
-                myrecord = recordState.notrecord;
-              }));
+        myrecord = recordState.notrecord;
+      }));
       audioautoopen();
     }
   }
