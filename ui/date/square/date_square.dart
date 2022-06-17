@@ -21,6 +21,7 @@ class _DateSquareState extends State<DateSquare>
     _tabController = TabController(length: 4, vsync: this, initialIndex: 0);
     super.initState();
   }
+
   @override
   void dispose() {
     _tabController.dispose();
@@ -42,7 +43,6 @@ class _DateSquareState extends State<DateSquare>
               labelStyle: TextStyle(fontSize: 12),
               unselectedLabelStyle: TextStyle(fontSize: 10),
               indicatorColor: Colors.red,
-              indicatorSize: TabBarIndicatorSize.label,
               tabs: [
                 Tab(
                   text: '推薦會員',

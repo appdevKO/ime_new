@@ -48,7 +48,7 @@ class ActionModel {
         msg_num: json["msg_num"],
         share_num: json["share_num"],
         nickname: json["nickname"].toString(),
-        area: json["area"].toString(),
+        area: json["area"],
       );
 
   Map<String, dynamic> toJson() => {

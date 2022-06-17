@@ -2,7 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:ime_new/business_logic/provider/chat_provider.dart';
-import 'package:ime_new/ui/date/user_profile/other_profile_page.dart';
+import 'package:ime_new/ui/user_profile/other_profile_page.dart';
+
 import 'package:ime_new/ui/widget/stack_text.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';

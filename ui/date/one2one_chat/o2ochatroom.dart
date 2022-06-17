@@ -14,6 +14,7 @@ import 'package:intl/intl.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:uuid/uuid.dart';
 
 enum recordState {
@@ -69,6 +70,8 @@ class _O2OChatroomState extends State<O2OChatroom> {
   bool iconopen = false;
   late List menuItems;
   late CustomPopupMenuController _controller;
+  RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
 
   @override
   void initState() {
@@ -244,7 +247,13 @@ class _O2OChatroomState extends State<O2OChatroom> {
                                           child: Text('此聊天室沒有聊天記錄05'),
                                         ),
                                       )
-                                    : Container(
+                                    : SmartRefresher(
+                                        enablePullDown: false,
+                                        enablePullUp: true,
+                                        controller: _refreshController,
+                                        header: WaterDropMaterialHeader(
+                                            backgroundColor: Color(0xffaCEA00)),
+                                        onLoading: _onLoading,
                                         child: ListView.builder(
                                           itemBuilder: (context, index) {
                                             int correctindex;
@@ -553,6 +562,18 @@ class _O2OChatroomState extends State<O2OChatroom> {
     );
   }
 
+  void _onLoading() async {
+    print('loading');
+    // monitor network fetch
+    await Future.delayed(Duration(milliseconds: 1000));
+    // if failed,use loadFailed(),if no data return,use LoadNodata()
+
+    if (mounted) setState(() {});
+    _refreshController.loadComplete();
+    await Provider.of<ChatProvider>(context, listen: false)
+        .add_o2o_his_page(mongo.ObjectId.fromHexString(widget.chatroomid));
+  }
+
   void _onFocusChange() {
     debugPrint("Focus:111111111 ${_focus.hasFocus.toString()}");
     if (_focus.hasFocus) {
@@ -814,7 +835,8 @@ class _O2OChatroomState extends State<O2OChatroom> {
                           ),
                           GestureDetector(
                             child: Container(
-                              height: 130,width: 130,
+                              height: 130,
+                              width: 130,
                               margin: EdgeInsets.all(10),
                               padding: EdgeInsets.all(15),
                               decoration: BoxDecoration(
@@ -1324,6 +1346,27 @@ class _O2OChatroomState extends State<O2OChatroom> {
     //要求對方的member 資料
     await Provider.of<ChatProvider>(context, listen: false)
         .getmemberinfo(widget.chatroomid);
+    if (topicindex == -1 &&
+        Provider.of<ChatProvider>(context, listen: false).o2ohistorymsg !=
+            null &&
+        Provider.of<ChatProvider>(context, listen: false)
+            .o2ohistorymsg!
+            .isEmpty) {
+    } else if (topicindex != -1 &&
+        Provider.of<ChatProvider>(context, listen: false).o2ohistorymsg !=
+            null &&
+        Provider.of<ChatProvider>(context, listen: false)
+            .o2ohistorymsg!
+            .isEmpty &&
+        Provider.of<ChatProvider>(context, listen: false)
+            .o2o_msglist![topicindex!]
+            .msg!
+            .isEmpty) {
+      //04 狀況
+      _textController.text = Provider.of<ChatProvider>(context, listen: false)
+          .remoteUserInfo[0]
+          .default_chat_text;
+    }
   }
 
   Future initmic() async {

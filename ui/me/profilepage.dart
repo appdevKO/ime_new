@@ -135,7 +135,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                                           .nickname !=
                                                       null
                                               ? '${value.remoteUserInfo[0].nickname}'
-                                              : '尚無設定暱稱'),
+                                              : '不詳'),
                                         );
                                       })
                                     ],
@@ -172,7 +172,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                                                 .introduction !=
                                                             ''
                                                     ? '${value.remoteUserInfo[0].introduction}'
-                                                    : '尚無介紹'),
+                                                    : '不詳'),
                                               );
                                             }),
                                           ],

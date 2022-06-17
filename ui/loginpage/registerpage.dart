@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:ime_new/business_logic/provider/chat_provider.dart';
 import 'package:ime_new/ui/loginpage/waitingpage.dart';
+import 'package:ime_new/ui/me/profileoption.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -25,8 +26,8 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     _nicknamecontroller.dispose();
+    super.dispose();
   }
 
   @override
@@ -306,6 +307,19 @@ class _RegisterPageState extends State<RegisterPage> {
                       ],
                     ),
                   ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: GestureDetector(
+                      child: Container(
+                        child: Text('測試用'),
+                        color: Colors.green,
+                      ),
+                      onTap: () {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context)=>ProfileOption()));
+                      },
+                    ),
+                  )
                 ],
               ),
             ),

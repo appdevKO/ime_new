@@ -62,14 +62,10 @@ class _ActionDetailPageState extends State<ActionDetailPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      height: 60
-                    ),
+                    Container(height: 60),
                     Divider(
                       height: 1,
                     ),
-
-
 
                     Consumer<ChatProvider>(
                       builder: (context, value, child) {
@@ -87,7 +83,7 @@ class _ActionDetailPageState extends State<ActionDetailPage> {
                                       backgroundColor: Colors.grey,
                                       radius: 30,
                                       backgroundImage: NetworkImage(
-                                          '${value.remoteUserInfo[0].avatar_sub}')),
+                                          '${widget.TheAction.avatar}')),
                                   Padding(
                                     padding: const EdgeInsets.only(left: 10),
                                     child: Column(
@@ -99,7 +95,7 @@ class _ActionDetailPageState extends State<ActionDetailPage> {
                                                   widget.TheAction.nickname !=
                                                       null
                                               ? '${widget.TheAction.nickname}'
-                                              : '尚無設定暱稱',
+                                              : '不詳',
                                           style: TextStyle(
                                               fontWeight: FontWeight.w700,
                                               fontSize: 16),
@@ -116,7 +112,7 @@ class _ActionDetailPageState extends State<ActionDetailPage> {
                                                       widget.TheAction.area !=
                                                           null
                                                   ? '${widget.TheAction.area}'
-                                                  : '尚無設定位置',
+                                                  : '不詳',
                                               style: TextStyle(
                                                 color: Colors.grey,
                                               ),
@@ -137,7 +133,7 @@ class _ActionDetailPageState extends State<ActionDetailPage> {
                     // 三個icon
                     Container(
                       padding:
-                      const EdgeInsets.only(top: 8.0, right: 5, left: 5),
+                          const EdgeInsets.only(top: 8.0, right: 5, left: 5),
                       height: 40,
                       color: Colors.white,
                       child: Row(
@@ -157,7 +153,7 @@ class _ActionDetailPageState extends State<ActionDetailPage> {
                                 padding: const EdgeInsets.only(left: 3.0),
                                 child: Text(
                                   widget.TheAction.like_num != '' &&
-                                      widget.TheAction.like_num != null
+                                          widget.TheAction.like_num != null
                                       ? '${widget.TheAction.like_num}'
                                       : '-',
                                   style: TextStyle(fontSize: 12),
@@ -178,9 +174,9 @@ class _ActionDetailPageState extends State<ActionDetailPage> {
                                   ),
                                   onPressed: () async {
                                     await Provider.of<ChatProvider>(context,
-                                        listen: false)
+                                            listen: false)
                                         .get_action_msg_count(
-                                        widget.TheAction.id);
+                                            widget.TheAction.id);
                                     showModalBottomSheet<void>(
                                       isScrollControlled: true,
                                       context: context,
@@ -197,13 +193,13 @@ class _ActionDetailPageState extends State<ActionDetailPage> {
                                               child: SingleChildScrollView(
                                                 child: Column(
                                                   crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                                                      CrossAxisAlignment.start,
                                                   children: [
                                                     //標題
                                                     Row(
                                                       mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
                                                       children: [
                                                         Container(
                                                           width: 35,
@@ -212,7 +208,7 @@ class _ActionDetailPageState extends State<ActionDetailPage> {
                                                                 Icons.close,
                                                                 size: 30,
                                                                 color:
-                                                                Colors.red),
+                                                                    Colors.red),
                                                             onPressed: () {
                                                               Navigator.pop(
                                                                   context);
@@ -224,8 +220,8 @@ class _ActionDetailPageState extends State<ActionDetailPage> {
                                                           style: TextStyle(
                                                               fontSize: 20,
                                                               fontWeight:
-                                                              FontWeight
-                                                                  .w700,
+                                                                  FontWeight
+                                                                      .w700,
                                                               height: 1),
                                                         ),
                                                         GestureDetector(
@@ -249,7 +245,7 @@ class _ActionDetailPageState extends State<ActionDetailPage> {
                                                     Container(
                                                         height: 300,
                                                         width: MediaQuery.of(
-                                                            context)
+                                                                context)
                                                             .size
                                                             .width,
                                                         child: Consumer<
@@ -257,74 +253,74 @@ class _ActionDetailPageState extends State<ActionDetailPage> {
                                                           builder: (context,
                                                               value, child) {
                                                             return value.actionmsglist !=
-                                                                null
+                                                                    null
                                                                 ? value.actionmsglist!
-                                                                .isNotEmpty
-                                                                ?
-                                                            // SmartRefresher(
-                                                            //             enablePullDown:
-                                                            //                 true,
-                                                            //             enablePullUp:
-                                                            //                 true,
-                                                            //             header:
-                                                            //                 WaterDropMaterialHeader(),
-                                                            //             controller:
-                                                            //                 _refreshController,
-                                                            //             onRefresh:
-                                                            //                 _onRefresh,
-                                                            //             onLoading:
-                                                            //                 _onLoading,
-                                                            //             child: )
-                                                            ListView
-                                                                .separated(
-                                                              controller:
-                                                              scrollController,
-                                                              itemBuilder:
-                                                                  (context,
-                                                                  index) {
-                                                                return SingleActionMsg(
-                                                                  index:
-                                                                  index,
-                                                                  isme: value.actionmsglist![index].memberid == value.remoteUserInfo[0].memberid
-                                                                      ? true
-                                                                      : false,
-                                                                );
-                                                              },
-                                                              separatorBuilder:
-                                                                  (context,
-                                                                  index) {
-                                                                return Padding(
-                                                                  padding:
-                                                                  EdgeInsets.symmetric(vertical: 5),
-                                                                );
-                                                              },
-                                                              itemCount: value
-                                                                  .actionmsglist!
-                                                                  .length,
-                                                            )
+                                                                        .isNotEmpty
+                                                                    ?
+                                                                    // SmartRefresher(
+                                                                    //             enablePullDown:
+                                                                    //                 true,
+                                                                    //             enablePullUp:
+                                                                    //                 true,
+                                                                    //             header:
+                                                                    //                 WaterDropMaterialHeader(),
+                                                                    //             controller:
+                                                                    //                 _refreshController,
+                                                                    //             onRefresh:
+                                                                    //                 _onRefresh,
+                                                                    //             onLoading:
+                                                                    //                 _onLoading,
+                                                                    //             child: )
+                                                                    ListView
+                                                                        .separated(
+                                                                        controller:
+                                                                            scrollController,
+                                                                        itemBuilder:
+                                                                            (context,
+                                                                                index) {
+                                                                          return SingleActionMsg(
+                                                                            index:
+                                                                                index,
+                                                                            isme: value.actionmsglist![index].memberid == value.remoteUserInfo[0].memberid
+                                                                                ? true
+                                                                                : false,
+                                                                          );
+                                                                        },
+                                                                        separatorBuilder:
+                                                                            (context,
+                                                                                index) {
+                                                                          return Padding(
+                                                                            padding:
+                                                                                EdgeInsets.symmetric(vertical: 5),
+                                                                          );
+                                                                        },
+                                                                        itemCount: value
+                                                                            .actionmsglist!
+                                                                            .length,
+                                                                      )
+                                                                    : Center(
+                                                                        child: Text(
+                                                                            '此動態尚無留言'))
                                                                 : Center(
-                                                                child: Text(
-                                                                    '此動態尚無留言'))
-                                                                : Center(
-                                                                child: Text(
-                                                                    '此動態尚無留言'));
+                                                                    child: Text(
+                                                                        '此動態尚無留言'));
                                                           },
                                                         )),
                                                     // 輸入匡
                                                     Container(
                                                       height: 70,
                                                       width:
-                                                      MediaQuery.of(context)
-                                                          .size
-                                                          .width,
+                                                          MediaQuery.of(context)
+                                                              .size
+                                                              .width,
                                                       decoration: BoxDecoration(
                                                         color:
-                                                        Color(0xffF9F9F9),
+                                                            Color(0xffF9F9F9),
                                                         boxShadow: [
                                                           BoxShadow(
                                                             color: Colors.grey
                                                                 .withOpacity(
-                                                                0.5),
+                                                                    0.5),
                                                             spreadRadius: 1,
                                                             blurRadius: 7,
                                                             offset: Offset(0,
@@ -337,36 +333,36 @@ class _ActionDetailPageState extends State<ActionDetailPage> {
                                                           Flexible(
                                                             child: Container(
                                                                 constraints:
-                                                                BoxConstraints(
-                                                                    minHeight:
-                                                                    60.0,
-                                                                    maxHeight:
-                                                                    150.0),
+                                                                    BoxConstraints(
+                                                                        minHeight:
+                                                                            60.0,
+                                                                        maxHeight:
+                                                                            150.0),
                                                                 padding:
-                                                                const EdgeInsets
-                                                                    .only(
-                                                                    top: 10,
-                                                                    bottom:
-                                                                    10,
-                                                                    right:
-                                                                    2,
-                                                                    left:
-                                                                    15),
+                                                                    const EdgeInsets
+                                                                            .only(
+                                                                        top: 10,
+                                                                        bottom:
+                                                                            10,
+                                                                        right:
+                                                                            2,
+                                                                        left:
+                                                                            15),
                                                                 child:
-                                                                TextField(
+                                                                    TextField(
                                                                   focusNode:
-                                                                  _focus,
+                                                                      _focus,
                                                                   //限制輸入文字多長
                                                                   // maxLength: 75,
                                                                   //換行
                                                                   // maxLines: null,
                                                                   keyboardType:
-                                                                  TextInputType
-                                                                      .text,
+                                                                      TextInputType
+                                                                          .text,
                                                                   onSubmitted:
                                                                       (val) async {
                                                                     if (_textController
-                                                                        .text !=
+                                                                            .text !=
                                                                         '') {
                                                                       await Provider.of<ChatProvider>(context, listen: false).upload_action_msg(
                                                                           widget
@@ -378,46 +374,46 @@ class _ActionDetailPageState extends State<ActionDetailPage> {
                                                                           .clear();
 
                                                                       await Provider.of<ChatProvider>(
-                                                                          context,
-                                                                          listen:
-                                                                          false)
+                                                                              context,
+                                                                              listen:
+                                                                                  false)
                                                                           .get_action_msg(widget
-                                                                          .TheAction
-                                                                          .id);
+                                                                              .TheAction
+                                                                              .id);
                                                                     }
                                                                     _focus
                                                                         .unfocus();
                                                                   },
                                                                   textInputAction:
-                                                                  TextInputAction
-                                                                      .done,
+                                                                      TextInputAction
+                                                                          .done,
                                                                   controller:
-                                                                  _textController,
+                                                                      _textController,
                                                                   decoration:
-                                                                  InputDecoration(
+                                                                      InputDecoration(
                                                                     border: OutlineInputBorder(
                                                                         borderSide:
-                                                                        BorderSide
-                                                                            .none,
+                                                                            BorderSide
+                                                                                .none,
                                                                         borderRadius:
-                                                                        BorderRadius.circular(20)),
+                                                                            BorderRadius.circular(20)),
                                                                     fillColor:
-                                                                    Colors
-                                                                        .white,
+                                                                        Colors
+                                                                            .white,
                                                                     filled:
-                                                                    true,
+                                                                        true,
                                                                     hintText:
-                                                                    '輸入留言',
+                                                                        '輸入留言',
                                                                     contentPadding: EdgeInsets.symmetric(
                                                                         horizontal:
-                                                                        12,
+                                                                            12,
                                                                         vertical:
-                                                                        5),
+                                                                            5),
                                                                   ),
                                                                   style:
-                                                                  TextStyle(
-                                                                      height:
-                                                                      1),
+                                                                      TextStyle(
+                                                                          height:
+                                                                              1),
                                                                 )),
                                                           ),
                                                           //傳送 發送 文字 箭頭 送出
@@ -427,61 +423,61 @@ class _ActionDetailPageState extends State<ActionDetailPage> {
                                                             onPressed:
                                                                 () async {
                                                               if (_textController
-                                                                  .text !=
+                                                                      .text !=
                                                                   '') {
                                                                 await Provider.of<
-                                                                    ChatProvider>(
-                                                                    context,
-                                                                    listen:
-                                                                    false)
+                                                                            ChatProvider>(
+                                                                        context,
+                                                                        listen:
+                                                                            false)
                                                                     .upload_action_msg(
-                                                                    widget
-                                                                        .TheAction
-                                                                        .id,
-                                                                    _textController
-                                                                        .text);
+                                                                        widget
+                                                                            .TheAction
+                                                                            .id,
+                                                                        _textController
+                                                                            .text);
                                                                 _textController
                                                                     .clear();
                                                                 Timer(
                                                                     Duration(
                                                                         milliseconds:
-                                                                        500),
-                                                                        () {
-                                                                      print(
-                                                                          'maxamx${scrollController.position.maxScrollExtent}');
-                                                                      //滾動到最下面
-                                                                      scrollController
-                                                                          .animateTo(
-                                                                        scrollController
-                                                                            .position
-                                                                            .maxScrollExtent,
-                                                                        duration: Duration(
-                                                                            seconds:
+                                                                            500),
+                                                                    () {
+                                                                  print(
+                                                                      'maxamx${scrollController.position.maxScrollExtent}');
+                                                                  //滾動到最下面
+                                                                  scrollController
+                                                                      .animateTo(
+                                                                    scrollController
+                                                                        .position
+                                                                        .maxScrollExtent,
+                                                                    duration: Duration(
+                                                                        seconds:
                                                                             2),
-                                                                        curve: Curves
-                                                                            .fastOutSlowIn,
-                                                                      );
-                                                                    });
+                                                                    curve: Curves
+                                                                        .fastOutSlowIn,
+                                                                  );
+                                                                });
 
                                                                 await Provider.of<
-                                                                    ChatProvider>(
-                                                                    context,
-                                                                    listen:
-                                                                    false)
+                                                                            ChatProvider>(
+                                                                        context,
+                                                                        listen:
+                                                                            false)
                                                                     .get_action_msg(
-                                                                    widget
-                                                                        .TheAction
-                                                                        .id);
+                                                                        widget
+                                                                            .TheAction
+                                                                            .id);
 
                                                                 await Provider.of<
-                                                                    ChatProvider>(
-                                                                    context,
-                                                                    listen:
-                                                                    false)
+                                                                            ChatProvider>(
+                                                                        context,
+                                                                        listen:
+                                                                            false)
                                                                     .get_action_msg_count(
-                                                                    widget
-                                                                        .TheAction
-                                                                        .id);
+                                                                        widget
+                                                                            .TheAction
+                                                                            .id);
                                                               } else {
                                                                 print('空空');
                                                               }
@@ -782,18 +778,15 @@ class _ActionDetailPageState extends State<ActionDetailPage> {
                       // ],
                     ),
                     child: Padding(
-                      padding:
-                      const EdgeInsets.symmetric(horizontal: 15),
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
                       child: Row(
-                        mainAxisAlignment:
-                        MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           // 出去
                           IconButton(
                             onPressed: () {
                               Navigator.pop(context);
-                              Provider.of<ChatProvider>(context,
-                                  listen: false)
+                              Provider.of<ChatProvider>(context, listen: false)
                                   .action_msg_value = 0;
                             },
                             icon: Icon(

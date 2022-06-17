@@ -94,7 +94,7 @@ class _NewestActionListState extends State<NewestActionList> {
     items.add((items.length + 1).toString());
     if (mounted) setState(() {});
     _refreshController.loadComplete();
-    
+
     await Provider.of<ChatProvider>(context, listen: false)
         .addpage_newest_action();
   }
@@ -170,7 +170,7 @@ class _SingleActionState extends State<SingleAction> {
                                                       widget.index!]
                                                   .nickname ==
                                               ''
-                                      ? '尚無暱稱'
+                                      ? '不詳'
                                       : '${value.newest_actionlist![widget.index!].nickname}',
                                   style: TextStyle(
                                       color: Colors.black,
@@ -197,7 +197,7 @@ class _SingleActionState extends State<SingleAction> {
                                                             widget.index!]
                                                         .area ==
                                                     ''
-                                            ? '尚無地區'
+                                            ? '不詳'
                                             : '${value.newest_actionlist![widget.index!].area}',
                                         style: TextStyle(
                                             color: Colors.grey,

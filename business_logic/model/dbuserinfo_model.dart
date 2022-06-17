@@ -42,7 +42,8 @@ class DbUserinfoModel {
       this.voice_introduction,
       this.profilepic_list,
       this.little_profilepic_list,
-      this.followme_num});
+      this.followme_num,
+      this.default_chat_text});
 
   ObjectId? memberid;
   String? account;
@@ -70,6 +71,7 @@ class DbUserinfoModel {
   String? smoke;
   String? drink;
   String? voice_introduction;
+  String? default_chat_text;
   List? profilepic_list;
   List? little_profilepic_list;
   List? interest_list;
@@ -78,6 +80,7 @@ class DbUserinfoModel {
       DbUserinfoModel(
         memberid: json["_id"],
         nickname: json["nickname"] == null ? null : json["nickname"],
+        default_chat_text: json["default_chat"],
         account: json["account"],
         chatroomId: json["chatroomid"],
         avatar: json["avatar"],
@@ -119,6 +122,7 @@ class DbUserinfoModel {
         "_id": memberid,
         "account": account,
         "nickname": nickname,
+        "default_chat": default_chat_text,
         "chatroomid": chatroomId,
         "follow_num": followme_num,
         "avatar": avatar,

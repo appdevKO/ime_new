@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:ime_new/business_logic/model/mqtt_model.dart';
 import 'package:ime_new/business_logic/provider/chat_provider.dart';
-import 'package:ime_new/ui/date/user_profile/other_profile_page.dart';
+import 'package:ime_new/ui/user_profile/other_profile_page.dart';
 import 'package:ime_new/ui/widget/showimage.dart';
 import 'package:ime_new/utils/sticker_address.dart';
 import 'package:ime_new/utils/viewconfig.dart';
@@ -15,6 +15,7 @@ import 'package:intl/intl.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:uuid/uuid.dart';
 
 import 'chatroomsetting.dart';
@@ -74,14 +75,14 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
   late TextEditingController dialogcontroller;
   static const flutterChannel =
   const MethodChannel('com.example.flutter/flutter');
+  RefreshController _refreshController =
+  RefreshController(initialRefresh: false);
 
   @override
   void initState() {
     _textController = TextEditingController();
     dialogcontroller = TextEditingController();
-    // //監聽
-    // Provider.of<ChatProvider>(context, listen: false)
-    //     .mqttlistener(widget.chatroomid.toHexString());
+
     initdata();
     _focus.addListener(_onFocusChange);
     initmic();
@@ -230,140 +231,285 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
                             child: Text('此聊天室沒有聊天記錄'),
                           ),
                         )
-                            : Container(
-                          child: ListView.builder(
-                            itemBuilder: (context, index) {
-                              int correctindex;
-                              if (value.historymsg!.isNotEmpty) {
-                                //歷史訊息回傳[xx]-有歷史
-                                if (topicindex == -1) {
-                                  //沒當前 -純歷史
-                                  correctindex = index;
-                                  return bubble(
-                                    value.historymsg![
-                                    correctindex],
-                                  );
-                                } else {
-                                  // 是當前聊天室收到當前訊息 歷史+當前
-                                  correctindex = index <
-                                      value
-                                          .msglist![
-                                      topicindex!]
-                                          .msg!
-                                          .length
-                                      ? index
-                                      : index -
-                                      value
-                                          .msglist![
-                                      topicindex!]
-                                          .msg!
-                                          .length;
+                            :
+                        SmartRefresher(
+                                        enablePullDown: false,
+                                        enablePullUp: true,
+                                        controller: _refreshController,
+                                        header: WaterDropMaterialHeader(
+                                            backgroundColor: Color(0xffaCEA00)),
 
-                                  return index <
-                                      value
-                                          .msglist![
-                                      topicindex!]
-                                          .msg!
-                                          .length
-                                      ? bubble(
-                                    value
-                                        .msglist![
-                                    topicindex!]
-                                        .msg![correctindex],
-                                  )
-                                      : index ==
-                                      value
-                                          .msglist![
-                                      topicindex!]
-                                          .msg!
-                                          .length
-                                      ? Column(
-                                    children: [
-                                      bubble(
-                                        value.historymsg![
-                                        correctindex],
-                                      ),
-                                      Container(
-                                        child: Text(
-                                            '---以上為歷史紀錄---'),
-                                      ),
-                                    ],
-                                  )
-                                      : bubble(
-                                    value.historymsg![
-                                    correctindex],
-                                  );
-                                }
-                              } else {
-                                //歷史訊息回傳[]-沒有歷史訊息
-                                if (topicindex == -1) {
-                                  return Center(
-                                    child: Container(
-                                      child: Text('沒有聊天記錄'),
-                                    ),
-                                  );
-                                } else if (value
-                                    .msglist![topicindex!]
-                                    .msg!
-                                    .isEmpty) {
-                                  // 沒歷史 沒當前
-                                  // 收到當前聊天室訊息
-                                  return Center(
-                                    child: Container(
-                                      child: Text('此聊天室沒有聊天記錄'),
-                                    ),
-                                  );
-                                } else {
-                                  // 沒歷史 有當前
-                                  correctindex = index <
-                                      value
-                                          .msglist![
-                                      topicindex!]
-                                          .msg!
-                                          .length
-                                      ? index
-                                      : index -
-                                      value
-                                          .msglist![
-                                      topicindex!]
-                                          .msg!
-                                          .length;
+                                        onLoading:  _onLoading,
+                                        child: ListView.builder(
+                                          itemBuilder: (context, index) {
+                                            print('index 數量$index');
+                                            int correctindex;
+                                            if (value.historymsg!.isNotEmpty) {
+                                              //歷史訊息回傳[xx]-有歷史
+                                              if (topicindex == -1) {
+                                                //沒當前 -純歷史
+                                                correctindex = index;
+                                                return bubble(
+                                                  value.historymsg![
+                                                      correctindex],
+                                                );
+                                              } else {
+                                                print('收到當前訊息');
+                                                // 是當前聊天室收到當前訊息 歷史+當前
+                                                correctindex = index <
+                                                        value
+                                                            .msglist![
+                                                                topicindex!]
+                                                            .msg!
+                                                            .length
+                                                    ? index
+                                                    : index -
+                                                        value
+                                                            .msglist![
+                                                                topicindex!]
+                                                            .msg!
+                                                            .length;
 
-                                  return bubble(
-                                    value.msglist![topicindex!]
-                                        .msg![correctindex],
-                                  );
-                                }
-                              }
-                            },
-                            reverse: true,
-                            itemCount: value.historymsg != null
-                                ? value.historymsg!.isEmpty
-                                ? value.msglist![topicindex!]
-                                .msg!.isEmpty
-                                ? 1
-                                : value
-                                .msglist![topicindex!]
-                                .msg!
-                                .length
-                                : value.msglist![topicindex!]
-                                .msg!.isEmpty
-                                ? value.historymsg!.length
-                                : value
-                                .msglist![
-                            topicindex!]
-                                .msg!
-                                .length +
-                                value.historymsg!
-                                    .length
-                                : value.msglist![topicindex!].msg!
-                                .isEmpty
-                                ? 1
-                                : value.msglist![topicindex!]
-                                .msg!.length,
-                            controller: scrollController,
-                          ),
-                        )
+                                                return index <
+                                                        value
+                                                            .msglist![
+                                                                topicindex!]
+                                                            .msg!
+                                                            .length
+                                                    ? bubble(
+                                                        value
+                                                            .msglist![
+                                                                topicindex!]
+                                                            .msg![correctindex],
+                                                      )
+                                                    : index ==
+                                                            value
+                                                                .msglist![
+                                                                    topicindex!]
+                                                                .msg!
+                                                                .length
+                                                        ? Column(
+                                                            children: [
+                                                              bubble(
+                                                                value.historymsg![
+                                                                    correctindex],
+                                                              ),
+                                                              Container(
+                                                                child: Text(
+                                                                    '---以上為歷史紀錄---'),
+                                                              ),
+                                                            ],
+                                                          )
+                                                        : bubble(
+                                                            value.historymsg![
+                                                                correctindex],
+                                                          );
+                                              }
+                                            } else {
+                                              //歷史訊息回傳[]-沒有歷史訊息
+                                              if (topicindex == -1) {
+                                                return Center(
+                                                  child: Container(
+                                                    child: Text('沒有聊天記錄'),
+                                                  ),
+                                                );
+                                              } else if (value
+                                                  .msglist![topicindex!]
+                                                  .msg!
+                                                  .isEmpty) {
+                                                // 沒歷史 沒當前
+                                                // 收到當前聊天室訊息
+                                                return Center(
+                                                  child: Container(
+                                                    child: Text('此聊天室沒有聊天記錄'),
+                                                  ),
+                                                );
+                                              } else {
+                                                // 沒歷史 有當前
+                                                correctindex = index <
+                                                        value
+                                                            .msglist![
+                                                                topicindex!]
+                                                            .msg!
+                                                            .length
+                                                    ? index
+                                                    : index -
+                                                        value
+                                                            .msglist![
+                                                                topicindex!]
+                                                            .msg!
+                                                            .length;
+
+                                                return bubble(
+                                                  value.msglist![topicindex!]
+                                                      .msg![correctindex],
+                                                );
+                                              }
+                                            }
+                                          },
+                                          reverse: true,
+                                          itemCount: value.historymsg != null
+                                              ? value.historymsg!.isEmpty
+                                                  ? value.msglist![topicindex!]
+                                                          .msg!.isEmpty
+                                                      ? 1
+                                                      : value
+                                                          .msglist![topicindex!]
+                                                          .msg!
+                                                          .length
+                                                  : value.msglist![topicindex!]
+                                                          .msg!.isEmpty
+                                                      ? value.historymsg!.length
+                                                      : value
+                                                              .msglist![
+                                                                  topicindex!]
+                                                              .msg!
+                                                              .length +
+                                                          value.historymsg!
+                                                              .length
+                                              : value.msglist![topicindex!].msg!
+                                                      .isEmpty
+                                                  ? 1
+                                                  : value.msglist![topicindex!]
+                                                      .msg!.length,
+                                          controller: scrollController,
+                                        ),
+                                      )
+
+                        // Container(
+                        //   child: ListView.builder(
+                        //     itemBuilder: (context, index) {
+                        //       int correctindex;
+                        //       if (value.historymsg!.isNotEmpty) {
+                        //         //歷史訊息回傳[xx]-有歷史
+                        //         if (topicindex == -1) {
+                        //           //沒當前 -純歷史
+                        //           correctindex = index;
+                        //           return bubble(
+                        //             value.historymsg![
+                        //             correctindex],
+                        //           );
+                        //         } else {
+                        //           // 是當前聊天室收到當前訊息 歷史+當前
+                        //           correctindex = index <
+                        //               value
+                        //                   .msglist![
+                        //               topicindex!]
+                        //                   .msg!
+                        //                   .length
+                        //               ? index
+                        //               : index -
+                        //               value
+                        //                   .msglist![
+                        //               topicindex!]
+                        //                   .msg!
+                        //                   .length;
+                        //
+                        //           return index <
+                        //               value
+                        //                   .msglist![
+                        //               topicindex!]
+                        //                   .msg!
+                        //                   .length
+                        //               ? bubble(
+                        //             value
+                        //                 .msglist![
+                        //             topicindex!]
+                        //                 .msg![correctindex],
+                        //           )
+                        //               : index ==
+                        //               value
+                        //                   .msglist![
+                        //               topicindex!]
+                        //                   .msg!
+                        //                   .length
+                        //               ? Column(
+                        //             children: [
+                        //               bubble(
+                        //                 value.historymsg![
+                        //                 correctindex],
+                        //               ),
+                        //               Container(
+                        //                 child: Text(
+                        //                     '---以上為歷史紀錄---'),
+                        //               ),
+                        //             ],
+                        //           )
+                        //               : bubble(
+                        //             value.historymsg![
+                        //             correctindex],
+                        //           );
+                        //         }
+                        //       } else {
+                        //         //歷史訊息回傳[]-沒有歷史訊息
+                        //         if (topicindex == -1) {
+                        //           return Center(
+                        //             child: Container(
+                        //               child: Text('沒有聊天記錄'),
+                        //             ),
+                        //           );
+                        //         } else if (value
+                        //             .msglist![topicindex!]
+                        //             .msg!
+                        //             .isEmpty) {
+                        //           // 沒歷史 沒當前
+                        //           // 收到當前聊天室訊息
+                        //           return Center(
+                        //             child: Container(
+                        //               child: Text('此聊天室沒有聊天記錄'),
+                        //             ),
+                        //           );
+                        //         } else {
+                        //           // 沒歷史 有當前
+                        //           correctindex = index <
+                        //               value
+                        //                   .msglist![
+                        //               topicindex!]
+                        //                   .msg!
+                        //                   .length
+                        //               ? index
+                        //               : index -
+                        //               value
+                        //                   .msglist![
+                        //               topicindex!]
+                        //                   .msg!
+                        //                   .length;
+                        //
+                        //           return bubble(
+                        //             value.msglist![topicindex!]
+                        //                 .msg![correctindex],
+                        //           );
+                        //         }
+                        //       }
+                        //     },
+                        //     reverse: true,
+                        //     itemCount: value.historymsg != null
+                        //         ? value.historymsg!.isEmpty
+                        //         ? value.msglist![topicindex!]
+                        //         .msg!.isEmpty
+                        //         ? 1
+                        //         : value
+                        //         .msglist![topicindex!]
+                        //         .msg!
+                        //         .length
+                        //         : value.msglist![topicindex!]
+                        //         .msg!.isEmpty
+                        //         ? value.historymsg!.length
+                        //         : value
+                        //         .msglist![
+                        //     topicindex!]
+                        //         .msg!
+                        //         .length +
+                        //         value.historymsg!
+                        //             .length
+                        //         : value.msglist![topicindex!].msg!
+                        //         .isEmpty
+                        //         ? 1
+                        //         : value.msglist![topicindex!]
+                        //         .msg!.length,
+                        //     controller: scrollController,
+                        //   ),
+                        // )
                             : Center(
                           child: Container(
                             child: Text('沒有歷史訊息'),
@@ -466,6 +612,18 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
         return true;
       },
     );
+  }
+
+  void _onLoading() async {
+    print('loading');
+    // monitor network fetch
+    await Future.delayed(Duration(milliseconds: 1000));
+    // if failed,use loadFailed(),if no data return,use LoadNodata()
+
+    if (mounted) setState(() {});
+    _refreshController.loadComplete();
+    await Provider.of<ChatProvider>(context, listen: false)
+        .add_group_his_page(widget.chatroomid);
   }
 
   void _onFocusChange() {
@@ -1472,3 +1630,4 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
     }
   }
 }
+

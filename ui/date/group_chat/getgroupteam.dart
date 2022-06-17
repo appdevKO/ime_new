@@ -161,20 +161,20 @@ class _GetTeamState extends State<GetTeam> {
               //     Navigator.push(context, MaterialPageRoute(builder: (context)=>ChatTestPage()));
               //   },
               // ),
-              // GestureDetector(
-              //   child: Container(
-              //       width: 50,
-              //       height: 30,
-              //       decoration: BoxDecoration(
-              //           gradient: LinearGradient(
-              //               colors: [Colors.blue, Colors.tealAccent]),
-              //           borderRadius: BorderRadius.circular(15)),
-              //       child: Center(child: Text('delete all'))),
-              //   onTap: () {
-              //     Provider.of<ChatProvider>(context, listen: false)
-              //         .deleteAllRoom();
-              //   },
-              // ),
+              GestureDetector(
+                child: Container(
+                    width: 50,
+                    height: 30,
+                    decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            colors: [Colors.blue, Colors.tealAccent]),
+                        borderRadius: BorderRadius.circular(15)),
+                    child: Center(child: Text('delete all'))),
+                onTap: () {
+                  Provider.of<ChatProvider>(context, listen: false)
+                      .deleteAllRoom();
+                },
+              ),
             ],
           ),
         ),

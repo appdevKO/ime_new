@@ -1,7 +1,6 @@
 // import 'dart:io';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
@@ -15,20 +14,17 @@ import 'package:ime_new/business_logic/model/action_model.dart';
 import 'package:ime_new/business_logic/model/action_msg_model.dart';
 import 'package:ime_new/business_logic/model/chatroom_model.dart';
 import 'package:ime_new/business_logic/model/chatroomsetting_model.dart';
+import 'package:ime_new/business_logic/model/dbuserinfo_model.dart';
 import 'package:ime_new/business_logic/model/follow_log_model.dart';
-import 'package:ime_new/business_logic/model/localuserinfo_model.dart';
-import 'package:ime_new/business_logic/model/localuserinfo_model_ios.dart';
 import 'package:ime_new/business_logic/model/mqtt_model.dart';
 import 'package:ime_new/business_logic/model/o2ochatroom_model.dart';
-import 'package:ime_new/business_logic/model/userinfo_model.dart';
+
 import 'package:ime_new/utils/cloud_api.dart';
 import 'package:ime_new/utils/mqtt_config.dart';
 import 'package:ime_new/utils/mymongo.dart';
-
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
-
 import 'package:queue/queue.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
@@ -62,7 +58,7 @@ class ChatProvider with ChangeNotifier {
   late var prefs;
 
   /***
-   *    mqtt
+   * mqtt
    */
 
   //mqtt
@@ -77,7 +73,8 @@ class ChatProvider with ChangeNotifier {
 
   final mqttclient = MqttServerClient(mqttbroker, clientID);
   int pagesize = 5;
-  int msgpagesize = 1000;
+  int actionmsgpagesize = 1000;
+  int chatpagesize = 200;
 
   Future mqtt_connect() async {
     print('登入mqtt');
@@ -141,7 +138,7 @@ class ChatProvider with ChangeNotifier {
           .listen((List<MqttReceivedMessage<MqttMessage?>>? c) {
         final recMess = c![0].payload as MqttPublishMessage;
         final payload =
-        MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
+            MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
 
         print(
             'EXAMPLE::Change notification:: topic is <${c[0].topic}>, payload is <-- $payload -->');
@@ -172,14 +169,14 @@ class ChatProvider with ChangeNotifier {
             //msg不是空的
             //要找topic 的位置 = 在這個msg中是否有此 topic
             switch (json.decode(utf8.decode(payload.codeUnits))["mqtt_type"]) {
-            //判斷mqtt type 獲得訊息的型態 類型 分類 辨別
+              //判斷mqtt type 獲得訊息的型態 類型 分類 辨別
               case "sys_notify":
                 print("系統通知");
                 if (json.decode(utf8.decode(payload.codeUnits))["note"] == 1) {
                   print('加入房間');
                   getchatroommember(mongo.ObjectId.fromHexString(topic));
                 } else if (json
-                    .decode(utf8.decode(payload.codeUnits))["note"] ==
+                        .decode(utf8.decode(payload.codeUnits))["note"] ==
                     2) {
                   print('退出房間');
                   getchatroommember(mongo.ObjectId.fromHexString(topic));
@@ -227,25 +224,25 @@ class ChatProvider with ChangeNotifier {
                       0,
                       MqttMsg(
                         fromid:
-                        json.decode(utf8.decode(payload.codeUnits))["from"],
+                            json.decode(utf8.decode(payload.codeUnits))["from"],
                         text:
-                        json.decode(utf8.decode(payload.codeUnits))["text"],
+                            json.decode(utf8.decode(payload.codeUnits))["text"],
                         type:
-                        json.decode(utf8.decode(payload.codeUnits))["type"],
+                            json.decode(utf8.decode(payload.codeUnits))["type"],
                         id: json.decode(utf8.decode(payload.codeUnits))["id"],
                         play: false,
                         time: json.decode(
-                            utf8.decode(payload.codeUnits))["time"] ==
-                            null
+                                    utf8.decode(payload.codeUnits))["time"] ==
+                                null
                             ? null
                             : DateTime.parse(json.decode(
-                            utf8.decode(payload.codeUnits))["time"]),
+                                utf8.decode(payload.codeUnits))["time"]),
                         topicid: json
                             .decode(utf8.decode(payload.codeUnits))["topic_id"],
                         sendtopicid: json
                             .decode(utf8.decode(payload.codeUnits))["memberid"],
                         note:
-                        json.decode(utf8.decode(payload.codeUnits))["note"],
+                            json.decode(utf8.decode(payload.codeUnits))["note"],
                       ));
 
                   if (lasttopicindex != -1) {
@@ -253,17 +250,17 @@ class ChatProvider with ChangeNotifier {
                     lastmsglist?.removeAt(lasttopicindex);
                     lastmsglist?.add(MqttMsg(
                       fromid:
-                      json.decode(utf8.decode(payload.codeUnits))["from"],
+                          json.decode(utf8.decode(payload.codeUnits))["from"],
                       text: json.decode(utf8.decode(payload.codeUnits))["text"],
                       type: json.decode(utf8.decode(payload.codeUnits))["type"],
                       id: json.decode(utf8.decode(payload.codeUnits))["id"],
                       play: false,
                       time:
-                      json.decode(utf8.decode(payload.codeUnits))["time"] ==
-                          null
-                          ? null
-                          : DateTime.parse(json.decode(
-                          utf8.decode(payload.codeUnits))["time"]),
+                          json.decode(utf8.decode(payload.codeUnits))["time"] ==
+                                  null
+                              ? null
+                              : DateTime.parse(json.decode(
+                                  utf8.decode(payload.codeUnits))["time"]),
                       topicid: json
                           .decode(utf8.decode(payload.codeUnits))["topic_id"],
                       sendtopicid: json
@@ -276,17 +273,17 @@ class ChatProvider with ChangeNotifier {
                     print('這個topic沒看過 直接新增2');
                     lastmsglist?.add(MqttMsg(
                       fromid:
-                      json.decode(utf8.decode(payload.codeUnits))["from"],
+                          json.decode(utf8.decode(payload.codeUnits))["from"],
                       text: json.decode(utf8.decode(payload.codeUnits))["text"],
                       type: json.decode(utf8.decode(payload.codeUnits))["type"],
                       id: json.decode(utf8.decode(payload.codeUnits))["id"],
                       play: false,
                       time:
-                      json.decode(utf8.decode(payload.codeUnits))["time"] ==
-                          null
-                          ? null
-                          : DateTime.parse(json.decode(
-                          utf8.decode(payload.codeUnits))["time"]),
+                          json.decode(utf8.decode(payload.codeUnits))["time"] ==
+                                  null
+                              ? null
+                              : DateTime.parse(json.decode(
+                                  utf8.decode(payload.codeUnits))["time"]),
                       topicid: json
                           .decode(utf8.decode(payload.codeUnits))["topic_id"],
                       sendtopicid: json
@@ -299,16 +296,16 @@ class ChatProvider with ChangeNotifier {
                 }
                 break;
               case "ime_o2o_chat":
-              //收到私聊
+                //收到私聊
                 print(
-                  // "ime_o2o_chat::${mqttMsgFromJson(utf8.decode(payload.codeUnits))}"
+                    // "ime_o2o_chat::${mqttMsgFromJson(utf8.decode(payload.codeUnits))}"
                     "收到私聊....:${json.decode(utf8.decode(payload.codeUnits))["topic_id"]}"
-                        "....${json.decode(utf8.decode(payload.codeUnits))}");
+                    "....${json.decode(utf8.decode(payload.codeUnits))}");
 
                 if (myblocklog?.indexWhere((element) =>
-                element.memberid ==
-                    json.decode(
-                        utf8.decode(payload.codeUnits))["memberid"]) !=
+                        element.memberid ==
+                        json.decode(
+                            utf8.decode(payload.codeUnits))["memberid"]) !=
                     -1) {
                   print('在黑名單');
                 } else {
@@ -336,11 +333,11 @@ class ChatProvider with ChangeNotifier {
                                 .decode(utf8.decode(payload.codeUnits))["id"],
                             play: false,
                             time: json.decode(utf8.decode(payload.codeUnits))[
-                            "time"] ==
-                                null
+                                        "time"] ==
+                                    null
                                 ? null
                                 : DateTime.parse(json.decode(
-                                utf8.decode(payload.codeUnits))["time"]),
+                                    utf8.decode(payload.codeUnits))["time"]),
                             //我的
                             topicid: json.decode(
                                 utf8.decode(payload.codeUnits))["topic_id"],
@@ -353,7 +350,7 @@ class ChatProvider with ChangeNotifier {
                           )
                         ],
                         from:
-                        json.decode(utf8.decode(payload.codeUnits))["from"],
+                            json.decode(utf8.decode(payload.codeUnits))["from"],
                         mqtt_tyype: mqtttype,
                         topicid: json
                             .decode(utf8.decode(payload.codeUnits))["topic_id"],
@@ -365,32 +362,32 @@ class ChatProvider with ChangeNotifier {
                   } else {
                     print('這個人曾經私訊過有存過::$topicindex ');
                     o2o_msglist?[topicindex].msg!.insert(
-                      0,
-                      MqttMsg(
-                        fromid: json
-                            .decode(utf8.decode(payload.codeUnits))["from"],
-                        text: json
-                            .decode(utf8.decode(payload.codeUnits))["text"],
-                        type: json
-                            .decode(utf8.decode(payload.codeUnits))["type"],
-                        id: json
-                            .decode(utf8.decode(payload.codeUnits))["id"],
-                        play: false,
-                        time: json.decode(utf8.decode(payload.codeUnits))[
-                        "time"] ==
-                            null
-                            ? null
-                            : DateTime.parse(json.decode(
-                            utf8.decode(payload.codeUnits))["time"]),
-                        topicid: json.decode(
-                            utf8.decode(payload.codeUnits))["topic_id"],
-                        sendtopicid: json.decode(
-                            utf8.decode(payload.codeUnits))["memberid"],
-                        recordtime: '',
-                        note: json
-                            .decode(utf8.decode(payload.codeUnits))["note"],
-                      ),
-                    );
+                          0,
+                          MqttMsg(
+                            fromid: json
+                                .decode(utf8.decode(payload.codeUnits))["from"],
+                            text: json
+                                .decode(utf8.decode(payload.codeUnits))["text"],
+                            type: json
+                                .decode(utf8.decode(payload.codeUnits))["type"],
+                            id: json
+                                .decode(utf8.decode(payload.codeUnits))["id"],
+                            play: false,
+                            time: json.decode(utf8.decode(payload.codeUnits))[
+                                        "time"] ==
+                                    null
+                                ? null
+                                : DateTime.parse(json.decode(
+                                    utf8.decode(payload.codeUnits))["time"]),
+                            topicid: json.decode(
+                                utf8.decode(payload.codeUnits))["topic_id"],
+                            sendtopicid: json.decode(
+                                utf8.decode(payload.codeUnits))["memberid"],
+                            recordtime: '',
+                            note: json
+                                .decode(utf8.decode(payload.codeUnits))["note"],
+                          ),
+                        );
                   }
                 }
                 break;
@@ -1050,6 +1047,7 @@ class ChatProvider with ChangeNotifier {
               'like_num': 0,
               'msg_num': 0,
               'share_num': 0,
+              'like_id_list': [],
               'area': remoteUserInfo[0].area,
               'avatar': remoteUserInfo[0].avatar,
             },
@@ -1075,6 +1073,7 @@ class ChatProvider with ChangeNotifier {
             'like_num': 0,
             'msg_num': 0,
             'share_num': 0,
+            'like_id_list': [],
             'area': remoteUserInfo[0].area,
             'avatar': remoteUserInfo[0].avatar,
           },
@@ -1099,6 +1098,7 @@ class ChatProvider with ChangeNotifier {
             'like_num': 0,
             'msg_num': 0,
             'share_num': 0,
+            'like_id_list': [],
             'area': remoteUserInfo[0].area,
             'avatar': remoteUserInfo[0].avatar,
           },
@@ -1124,7 +1124,6 @@ class ChatProvider with ChangeNotifier {
           "memberid": remoteUserInfo[0].memberid,
           "nickname": remoteUserInfo[0].nickname,
           'avatar': remoteUserInfo[0].avatar,
-          'msg_count':0,
         },
       );
     } catch (e) {
@@ -1164,7 +1163,7 @@ class ChatProvider with ChangeNotifier {
         ActionMsgModel.fromJson, 'action_msg',
         field: mongo.where
             .eq('action_id', action_id)
-            .limit(msgpagesize)
+            .limit(actionmsgpagesize)
             .sortBy('time', descending: false));
     print("get_action_msg $actionmsglist");
     notifyListeners();
@@ -1193,12 +1192,13 @@ class ChatProvider with ChangeNotifier {
         field: mongo.where
             .eq('action_id', action_id)
             .sortBy('time', descending: true)
-            .skip(action_msg_value + 1 * msgpagesize)
-            .limit(msgpagesize));
+            .skip(action_msg_value + 1 * actionmsgpagesize)
+            .limit(actionmsgpagesize));
     if (newpage is List) {
       if (newpage.isEmpty) {
       } else {
-        actionmsg_plus();actionmsglist!.addAll(newpage);
+        actionmsg_plus();
+        actionmsglist!.addAll(newpage);
       }
     }
 
@@ -1225,9 +1225,10 @@ class ChatProvider with ChangeNotifier {
       if (newpage.isEmpty) {
       } else {
         action_plus_page(1);
+        newest_actionlist!.addAll(newpage);
       }
     }
-    newest_actionlist!.addAll(newpage);
+
     notifyListeners();
   }
 
@@ -1246,8 +1247,8 @@ class ChatProvider with ChangeNotifier {
    *  特務直播
    */
   Future upload_spy_mission(
-      text,
-      ) async {
+    text,
+  ) async {
     print('上傳任務到資料庫 $text');
     try {
       //傳上db
@@ -1400,10 +1401,11 @@ class ChatProvider with ChangeNotifier {
   String realm_password = "000000";
   var Userinfo; //本地 sharedpreference 存放的資料
 
-  set_accountid(id){
+  set_accountid(id) {
     account_id = id;
     notifyListeners();
   }
+
   Future register(account) async {
     print("註冊mongo123 ${account.uid}");
     set_accountid(account.uid);
@@ -1539,7 +1541,7 @@ class ChatProvider with ChangeNotifier {
     print('獲得揪團列表');
     groupteamlist = await readremotemongodb(ChatRoomModel.fromJson, 'chatroom',
         field:
-        mongo.where.eq('type', 0).sortBy('create_time', descending: true));
+            mongo.where.eq('type', 0).sortBy('create_time', descending: true));
     print('揪團$groupteamlist');
 
     notifyListeners();
@@ -1563,7 +1565,7 @@ class ChatProvider with ChangeNotifier {
     grouppersonlist = await readremotemongodb(
         ChatRoomModel.fromJson, 'chatroom',
         field:
-        mongo.where.eq('type', 1).sortBy('create_time', descending: true));
+            mongo.where.eq('type', 1).sortBy('create_time', descending: true));
     notifyListeners();
   }
 
@@ -1600,7 +1602,7 @@ class ChatProvider with ChangeNotifier {
       //用黑名單列表 將私聊列表篩選出來
       print('黑名單篩選');
       o2ochatroomlist?.removeWhere(
-              (element) => myblocklog[0].list_id.contains(element.chatto_id));
+          (element) => myblocklog[0].list_id.contains(element.chatto_id));
     }
 
     // o2ochatroomlist?.forEach((element) {
@@ -1675,9 +1677,9 @@ class ChatProvider with ChangeNotifier {
   var filter_groupteamlist;
 
   Future setfilter_chatroom(
-      num, {
-        area,
-      }) async {
+    num, {
+    area,
+  }) async {
     print("filter filter");
     if (num == 2) {
       if (area != null) {
@@ -1746,11 +1748,11 @@ class ChatProvider with ChangeNotifier {
 
   //獲得聊天記錄 歷史訊息
   Future gethismsg(topic) async {
+    grouphis_value = 1;
     print("get history $topic");
     historymsg = null;
-
     historymsg = await readremotemongodb(MqttMsg.fromJson, 'groupchatmsg',
-        field: mongo.where.eq('topic_id', topic));
+        field: mongo.where.eq('topic_id', topic).limit(chatpagesize));
     // .whenComplete(() => mqttlistener(topic.toHexString()));
     if (historymsg != null) {
       historymsg = historymsg!.reversed.toList();
@@ -1763,7 +1765,40 @@ class ChatProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  int grouphis_value = 1;
+
+  groupp_his_value_plus() {
+    grouphis_value++;
+    notifyListeners();
+  }
+
+  Future add_group_his_page(topic) async {
+    var newpage = await readremotemongodb(MqttMsg.fromJson, 'groupchatmsg',
+        field: mongo.where
+            .eq('topic_id', topic)
+            .skip(grouphis_value * chatpagesize)
+            .limit(chatpagesize));
+    if (newpage is List) {
+      if (newpage.isEmpty) {
+      } else {
+        if (newpage != null) {
+          newpage = newpage!.reversed.toList();
+          historymsg!.addAll(newpage);
+        }
+        groupp_his_value_plus();
+      }
+    }
+  }
+
+  int o2ohis_value = 1;
+
+  o2o_his_value_plus() {
+    o2ohis_value++;
+    notifyListeners();
+  }
+
   Future geto2ohismsg(topic) async {
+    o2ohis_value = 1;
     print("get 444 o2ohistory $topic ");
     o2ohistorymsg = null;
     o2ohistorymsg = await readremotemongodb(MqttMsg.fromJson, 'o2ochatmsg',
@@ -1771,9 +1806,10 @@ class ChatProvider with ChangeNotifier {
             .eq('topic_id', topic)
             .eq('memberid', remoteUserInfo[0].memberid)
             .or(mongo.where
-            .eq('topic_id', remoteUserInfo[0].memberid)
-            .eq('memberid', topic))
-            .sortBy('time'));
+                .eq('topic_id', remoteUserInfo[0].memberid)
+                .eq('memberid', topic))
+            .sortBy('time')
+            .limit(chatpagesize));
     // .whenComplete(() => mqttlistener(topic.toHexString()));
     if (o2ohistorymsg != null) {
       o2ohistorymsg = o2ohistorymsg!.reversed.toList();
@@ -1786,6 +1822,29 @@ class ChatProvider with ChangeNotifier {
       o2o_msglist![index].msg = [];
     }
     notifyListeners();
+  }
+
+  Future add_o2o_his_page(topic) async {
+    var newpage = await readremotemongodb(MqttMsg.fromJson, 'o2ochatmsg',
+        field: mongo.where
+            .eq('topic_id', topic)
+            .eq('memberid', remoteUserInfo[0].memberid)
+            .or(mongo.where
+                .eq('topic_id', remoteUserInfo[0].memberid)
+                .eq('memberid', topic))
+            .sortBy('time')
+            .skip(o2ohis_value * chatpagesize)
+            .limit(chatpagesize));
+    if (newpage is List) {
+      if (newpage.isEmpty) {
+      } else {
+        if (newpage != null) {
+          newpage = newpage!.reversed.toList();
+          o2ohistorymsg!.addAll(newpage);
+        }
+        o2o_his_value_plus();
+      }
+    }
   }
 
   List? memberlist = [];
@@ -1811,7 +1870,7 @@ class ChatProvider with ChangeNotifier {
   Future readremotemongodb(func, table, {field}) async {
     print('provider read mongo ::table name $func $table ');
     final readresult =
-    await queue.add(() => _mongoDB.readdb(func, table, field: field));
+        await queue.add(() => _mongoDB.readdb(func, table, field: field));
     print("readreadread $readresult");
     return readresult;
   }
@@ -1871,12 +1930,14 @@ class ChatProvider with ChangeNotifier {
   Future deleteAllRoom() async {
     print('all delete');
     // await _mongoDB.deletealltable('chatmsg');
-    // await _mongoDB.deletealltable('action');
-    await _mongoDB.deletealltable('groupchatmsg');
+    await _mongoDB.deletealltable('action');
+    await _mongoDB.deletealltable('action_msg');
+    // await _mongoDB.deletealltable('groupchatmsg');
     // await _mongoDB.deletealltable('o2ochatmsg');
     // await _mongoDB.deletealltable('o2olog');
     // await _mongoDB.deletealltable('block_log');
-    await _mongoDB.deletealltable('chatroom');
+    // await _mongoDB.deletealltable('follow_log');
+    // await _mongoDB.deletealltable('chatroom');
     // await _mongoDB.deletealltable('member');
   }
 
@@ -1916,7 +1977,7 @@ class ChatProvider with ChangeNotifier {
       var result = await Geolocator.getCurrentPosition();
       print('地址1$result');
       List<Placemark> placemarks =
-      await placemarkFromCoordinates(result.latitude, result.longitude);
+          await placemarkFromCoordinates(result.latitude, result.longitude);
 
       print('地址2${placemarks[0].administrativeArea}');
     } catch (e) {
@@ -1958,8 +2019,9 @@ class ChatProvider with ChangeNotifier {
       // await _mongoDB.create_locationindex("member");
 
       /// !!!!!!! 預設都是男的 需要在找性別 !!帶改 第三方登入要求資料
+      /// role 1 玩家 2直播主
       // 存在即不更新
-      int fakeage = Random().nextInt(3);
+
       await _mongoDB.updateData_single2("member", 'account', account.uid, {
         'create_time': DateTime.now().add(
           Duration(hours: 8),
@@ -1973,8 +2035,11 @@ class ChatProvider with ChangeNotifier {
         'follow_num': 0,
         'nickname': account.displayName,
         'avatar': account.photoURL,
+        'avatar_sub': account.photoURL,
         'introduction': '',
-        'little_profile_pic': [], 'role': 1,
+        'little_profile_pic': [],
+        'role': 1,
+        'default_chat': '',
       });
       // 每次登入都刷新
       print('每次登入都刷新');
@@ -2030,16 +2095,16 @@ class ChatProvider with ChangeNotifier {
     //紀錄 我的對象訊
     await _mongoDB.upsertData("o2olog", 'member_id', remoteUserInfo[0].memberid,
         'chatto_id', chatto_id, {
-          'nickname': chatto_nickname,
-          'avatar': chatto_avatar,
-        });
+      'nickname': chatto_nickname,
+      'avatar': chatto_avatar,
+    });
     //我的對象要看的 我的資訊
     await _mongoDB.upsertData("o2olog", 'chatto_id', remoteUserInfo[0].memberid,
         'member_id', chatto_id, {
-          'nickname': remoteUserInfo[0].nickname,
-          'avatar': remoteUserInfo[0].avatar,
-          'avatar_sub': remoteUserInfo[0].avatar_sub,
-        });
+      'nickname': remoteUserInfo[0].nickname,
+      'avatar': remoteUserInfo[0].avatar,
+      'avatar_sub': remoteUserInfo[0].avatar_sub,
+    });
   }
 
   Future createfollowlog() async {
@@ -2329,8 +2394,8 @@ class ChatProvider with ChangeNotifier {
     if (remoteUserInfo[0].little_profilepic_list != null &&
         remoteUserInfo[0].little_profilepic_list != null) {
       for (int i = 0;
-      i < remoteUserInfo[0].little_profilepic_list.length;
-      i++) {
+          i < remoteUserInfo[0].little_profilepic_list.length;
+          i++) {
         profile_pic[i] = remoteUserInfo[0].profilepic_list[i];
         little_profile_pic[i] = remoteUserInfo[0].profilepic_list[i];
       }
@@ -2541,7 +2606,7 @@ class ChatProvider with ChangeNotifier {
         "account",
         account_id,
         {
-          'hello': sentence,
+          'default_chat': sentence,
         },
       );
       print('change_hello ${sentence}');
@@ -2597,7 +2662,7 @@ class ChatProvider with ChangeNotifier {
         print('獲得地址 ${result}結果');
         location = result;
         placemarks =
-        await placemarkFromCoordinates(result.latitude, result.longitude);
+            await placemarkFromCoordinates(result.latitude, result.longitude);
         print('my location ${location.longitude}/ ${location.latitude}');
         var _loc = {
           'type': 'Point',
@@ -2610,11 +2675,11 @@ class ChatProvider with ChangeNotifier {
             mongo.where
                 .near('position', _loc)
                 .and(mongo.where
-                .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
+                    .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
                 .limit(pagesize));
         //把自己刪掉
         nearpeoplelist?.removeWhere(
-                (element) => element.memberid == remoteUserInfo[0].memberid);
+            (element) => element.memberid == remoteUserInfo[0].memberid);
 
         notifyListeners();
       }
@@ -2639,12 +2704,12 @@ class ChatProvider with ChangeNotifier {
         mongo.where
             .near('position', _loc)
             .and(
-            mongo.where.eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
+                mongo.where.eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
             .skip(find_near_people_value * pagesize)
             .limit(pagesize));
     //把自己刪掉
     newpage?.removeWhere(
-            (element) => element.memberid == remoteUserInfo[0].memberid);
+        (element) => element.memberid == remoteUserInfo[0].memberid);
     nearpeoplelist!.addAll(newpage);
     notifyListeners();
   }
@@ -2662,7 +2727,7 @@ class ChatProvider with ChangeNotifier {
     print("find_last_login $last_login_memberlist");
     //把自己刪掉
     last_login_memberlist?.removeWhere(
-            (element) => element.memberid == remoteUserInfo[0].memberid);
+        (element) => element.memberid == remoteUserInfo[0].memberid);
     notifyListeners();
   }
 
@@ -2674,7 +2739,7 @@ class ChatProvider with ChangeNotifier {
             .limit(pagesize)
             .sortBy('lastlogin', descending: true));
     newpage?.removeWhere(
-            (element) => element.memberid == remoteUserInfo[0].memberid);
+        (element) => element.memberid == remoteUserInfo[0].memberid);
     last_login_memberlist!.addAll(newpage);
     notifyListeners();
   }
@@ -2713,7 +2778,7 @@ class ChatProvider with ChangeNotifier {
     print("newest_register $memberlist 多少$find_newest_register_value");
     //把自己刪掉
     newest_register_memberlist?.removeWhere(
-            (element) => element.memberid == remoteUserInfo[0].memberid);
+        (element) => element.memberid == remoteUserInfo[0].memberid);
     notifyListeners();
   }
 
@@ -2726,7 +2791,7 @@ class ChatProvider with ChangeNotifier {
             .sortBy('create_time', descending: true));
     print('newpage $newpage value $find_newest_register_value');
     newpage?.removeWhere(
-            (element) => element.memberid == remoteUserInfo[0].memberid);
+        (element) => element.memberid == remoteUserInfo[0].memberid);
     newest_register_memberlist!.addAll(newpage);
     notifyListeners();
   }
@@ -2744,15 +2809,15 @@ class ChatProvider with ChangeNotifier {
           recommend_memberlist = await readremotemongodb(
               DbUserinfoModel.fromJson, 'member',
               field: mongo.where
-              // .oneFrom('interest_list', remoteUserInfo[0].interest_list)
-              // .and(mongo.where
-              //     .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
+                  // .oneFrom('interest_list', remoteUserInfo[0].interest_list)
+                  // .and(mongo.where
+                  //     .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
 
                   .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女')
                   .sortBy('follow_num')
                   .limit(pagesize));
           recommend_memberlist?.removeWhere(
-                  (element) => element.memberid == remoteUserInfo[0].memberid);
+              (element) => element.memberid == remoteUserInfo[0].memberid);
         } else {
           print('mongo db沒有 年齡 沒有性別');
           recommend_memberlist = null;
@@ -2766,7 +2831,7 @@ class ChatProvider with ChangeNotifier {
                 .sortBy('follow_num', descending: true)
                 .limit(pagesize));
         recommend_memberlist?.removeWhere(
-                (element) => element.memberid == remoteUserInfo[0].memberid);
+            (element) => element.memberid == remoteUserInfo[0].memberid);
         // field:
         // mongo.where
         //     .oneFrom('interest_list', remoteUserInfo[0].interest_list)
@@ -2793,32 +2858,32 @@ class ChatProvider with ChangeNotifier {
         var newpage = await readremotemongodb(
             DbUserinfoModel.fromJson, 'member',
             field: mongo.where
-            // .oneFrom('interest_list', remoteUserInfo[0].interest_list)
-            // .and(mongo.where.gte('age', remoteUserInfo[0].age - 5))
-            // .and(mongo.where.lte('age', remoteUserInfo[0].age + 5))
-            // .and(mongo.where
-            //     .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
+                // .oneFrom('interest_list', remoteUserInfo[0].interest_list)
+                // .and(mongo.where.gte('age', remoteUserInfo[0].age - 5))
+                // .and(mongo.where.lte('age', remoteUserInfo[0].age + 5))
+                // .and(mongo.where
+                //     .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
                 .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女')
                 .sortBy('follow_num', descending: true)
                 .skip(find_recommend_people_value * pagesize)
                 .limit(pagesize));
         newpage?.removeWhere(
-                (element) => element.memberid == remoteUserInfo[0].memberid);
+            (element) => element.memberid == remoteUserInfo[0].memberid);
         recommend_memberlist!.addAll(newpage);
       } else {
         print('mongo db沒有 年齡');
         var newpage = await readremotemongodb(
             DbUserinfoModel.fromJson, 'member',
             field: mongo.where
-            // .oneFrom('interest_list', remoteUserInfo[0].interest_list)
-            // .and(mongo.where
-            //     .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
+                // .oneFrom('interest_list', remoteUserInfo[0].interest_list)
+                // .and(mongo.where
+                //     .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
                 .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女')
                 .sortBy('follow_num', descending: true)
                 .skip(find_recommend_people_value * pagesize)
                 .limit(pagesize));
         newpage?.removeWhere(
-                (element) => element.memberid == remoteUserInfo[0].memberid);
+            (element) => element.memberid == remoteUserInfo[0].memberid);
         recommend_memberlist!.addAll(newpage);
       }
     } else {
@@ -2871,7 +2936,7 @@ class ChatProvider with ChangeNotifier {
                 field: mongo.where
                     .gte('height', 200)
                     .and(mongo.where
-                    .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
+                        .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
                     .sortBy('lastlogin', descending: true));
           } else {
             a = int.parse(height.split('-')[0]);
@@ -2884,7 +2949,7 @@ class ChatProvider with ChangeNotifier {
                     .gte('height', a)
                     .and(mongo.where.lte('height', b))
                     .and(mongo.where
-                    .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
+                        .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
                     .sortBy('lastlogin', descending: true));
           }
         }
@@ -2903,7 +2968,7 @@ class ChatProvider with ChangeNotifier {
                   .gte('age', c)
                   .and(mongo.where.lte('age', d))
                   .and(mongo.where
-                  .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
+                      .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
                   .sortBy('lastlogin', descending: true));
         } else {
           //年齡跟身高
@@ -2920,7 +2985,7 @@ class ChatProvider with ChangeNotifier {
                     .and(mongo.where.lte('age', d))
                     .and(mongo.where.gte('height', 200))
                     .and(mongo.where
-                    .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
+                        .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
                     .sortBy('lastlogin', descending: true));
           } else {
             a = int.parse(height.split('-')[0]);
@@ -2933,11 +2998,11 @@ class ChatProvider with ChangeNotifier {
                     .and(mongo.where.lte('age', d))
                     .and(mongo.where.gte('height', a))
                     .and(mongo.where.lte('height', b))
-              // .and(mongo.where
-              //     .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
-              // .sortBy('lastlogin', descending: true)
+                // .and(mongo.where
+                //     .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
+                // .sortBy('lastlogin', descending: true)
 
-            );
+                );
           }
         }
       }
@@ -2951,7 +3016,7 @@ class ChatProvider with ChangeNotifier {
               field: mongo.where
                   .eq('area', area)
                   .and(mongo.where
-                  .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
+                      .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
                   .sortBy('lastlogin', descending: true));
         } else {
           // 地區跟身高
@@ -2963,7 +3028,7 @@ class ChatProvider with ChangeNotifier {
                     .gte('height', 200)
                     .and(mongo.where.eq('area', area))
                     .and(mongo.where
-                    .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
+                        .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
                     .sortBy('lastlogin', descending: true));
           } else {
             a = int.parse(height.split('-')[0]);
@@ -2977,7 +3042,7 @@ class ChatProvider with ChangeNotifier {
                     .and(mongo.where.lte('height', b))
                     .and(mongo.where.eq('area', area))
                     .and(mongo.where
-                    .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
+                        .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
                     .sortBy('lastlogin', descending: true));
           }
         }
@@ -2997,7 +3062,7 @@ class ChatProvider with ChangeNotifier {
                   .and(mongo.where.lte('age', d))
                   .and(mongo.where.eq('area', area))
                   .and(mongo.where
-                  .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
+                      .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
                   .sortBy('lastlogin', descending: true));
         } else {
           // 地區年齡身高都有
@@ -3016,7 +3081,7 @@ class ChatProvider with ChangeNotifier {
                     .and(mongo.where.gte('height', 200))
                     .and(mongo.where.eq('area', area))
                     .and(mongo.where
-                    .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
+                        .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
                     .sortBy('lastlogin', descending: true));
           } else {
             a = int.parse(height.split('-')[0]);
@@ -3030,7 +3095,7 @@ class ChatProvider with ChangeNotifier {
                     .and(mongo.where.lte('height', b))
                     .and(mongo.where.eq('area', area))
                     .and(mongo.where
-                    .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
+                        .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女'))
                     .sortBy('lastlogin', descending: true));
           }
         }
@@ -3052,16 +3117,27 @@ class ChatProvider with ChangeNotifier {
   }
 
   Future getcount(
-      collection,
-      con_field,
-      con_value,
-      ) async {
+    collection,
+    con_field,
+    con_value,
+  ) async {
     final readresult = await queue.add(() => _mongoDB.count(
-      collection,
-      con_field,
-      con_value,
-    ));
+          collection,
+          con_field,
+          con_value,
+        ));
     print("countcountcount $readresult");
     return readresult;
+  }
+
+  /**.
+   *  設定
+   */
+
+  void set_o2ochat_text(text) {
+    _mongoDB.updateData_single(
+        "member", "account", account_id, {'default_chat': text});
+
+    notifyListeners();
   }
 }

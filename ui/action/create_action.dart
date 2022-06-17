@@ -68,7 +68,7 @@ class _NewActionState extends State<NewAction> {
                                                       .nickname !=
                                                   null
                                           ? '${value.remoteUserInfo[0].nickname}'
-                                          : '尚無設定暱稱',
+                                          : '不詳',
                                       style: TextStyle(
                                           fontWeight: FontWeight.w700,
                                           fontSize: 16),

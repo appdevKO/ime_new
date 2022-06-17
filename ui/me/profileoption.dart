@@ -9,11 +9,12 @@ import 'package:ime_new/business_logic/provider/chat_provider.dart';
 import 'package:ime_new/ui/loginpage/loginpage.dart';
 import 'package:ime_new/ui/me/profilepage.dart';
 import 'package:ime_new/ui/me/profilesetting.dart';
-import 'package:ime_new/ui/date/user_profile/setting/date_setting.dart';
-import 'package:ime_new/ui/date/user_profile/setting/edit_hello.dart';
+import 'package:ime_new/ui/me/setting/date_setting.dart';
+import 'package:ime_new/ui/me/setting/edit_hello.dart';
 import 'package:provider/provider.dart';
 import '../date/square/upgrade_vip.dart';
-import '../date/user_profile/list/likeme_list.dart';
+import 'list/likeme_list.dart';
+
 
 /**
  *

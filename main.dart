@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:ime_new/business_logic/provider/TD_game.dart';
 import 'package:ime_new/ui/loginpage/loginpage.dart';
@@ -15,6 +16,10 @@ Future<void> main() async {
     print('fire base 初始');
     await Firebase.initializeApp();
   }
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown
+  ]);
   runApp(MyApp());
 }
 

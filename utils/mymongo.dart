@@ -232,6 +232,7 @@ class MongoDB {
   }
 
   //存在即不更新
+  //註冊用
   Future updateData_single2(
     collection,
     con_field,

@@ -14,18 +14,18 @@ class _SpyPlayerLiveState extends State<SpyPlayerLive> {
         body: Column(
       children: [
         Text('player live'),
-        // Container(
-        //   height: MediaQuery.of(context).size.height - 10 - 210,
-        //   child: ListView.builder(
-        //     itemBuilder: (context, index) {
-        //       return Container(
-        //         color: Colors.red,
-        //         child: Text('456'),
-        //       );
-        //     },
-        //     itemCount: 5,
-        //   ),
-        // )
+        Container(
+          height: MediaQuery.of(context).size.height - 10 - 240 ,
+          child: ListView.builder(
+            itemBuilder: (context, index) {
+              return Container(
+                color: Colors.red,
+                child: Text('456'),
+              );
+            },
+            itemCount: 5,
+          ),
+        )
       ],
     ));
   }

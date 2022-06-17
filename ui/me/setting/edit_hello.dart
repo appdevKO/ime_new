@@ -25,7 +25,10 @@ class _EditHelloState extends State<EditHello> {
   }
 
   void initdata() {
-    _textEditingController = TextEditingController();
+    _textEditingController = TextEditingController(
+        text: Provider.of<ChatProvider>(context, listen: false)
+            .remoteUserInfo[0]
+            .default_chat_text);
   }
 
   @override
@@ -61,9 +64,12 @@ class _EditHelloState extends State<EditHello> {
                     child: IconButton(
                       icon: Icon(
                         Icons.send,
-                        color: Colors.transparent,
+                        color: Colors.white,
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        print(
+                            'default_chat_text:${Provider.of<ChatProvider>(context, listen: false).remoteUserInfo[0].default_chat_text}');
+                      },
                     ),
                   ),
                 ],

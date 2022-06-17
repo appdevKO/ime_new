@@ -52,7 +52,7 @@ class _ActionPageState extends State<ActionPage> {
                   labelStyle: TextStyle(fontSize: 12),
                   unselectedLabelStyle: TextStyle(fontSize: 10),
                   indicatorColor: Colors.red,
-                  indicatorSize: TabBarIndicatorSize.label,
+
                   tabs: [
                     Tab(
                       child: Text(
@@ -117,7 +117,7 @@ class _ActionPageState extends State<ActionPage> {
                                                                     .nickname !=
                                                                 null
                                                         ? '${value.remoteUserInfo[0].nickname}'
-                                                        : '尚無設定暱稱',
+                                                        : '不詳',
                                                     style: TextStyle(
                                                         fontWeight:
                                                             FontWeight.w700,
@@ -138,7 +138,7 @@ class _ActionPageState extends State<ActionPage> {
                                                                         .area !=
                                                                     null
                                                             ? '${value.remoteUserInfo[0].area}'
-                                                            : '尚無設定位置',
+                                                            : '不詳',
                                                         style: TextStyle(
                                                           color: Colors.grey,
                                                         ),

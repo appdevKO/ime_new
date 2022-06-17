@@ -34,11 +34,14 @@ class _SpyLivePageState extends State<SpyLivePage> {
       body: Column(
         children: [
           Container(
+            height: 30,
             color: Colors.white,
             child: TabBar(
               controller: _tabController,
-              indicatorColor: Colors.pink,
-              labelColor: Colors.pink,
+              indicatorColor: Colors.red,
+              labelColor: Colors.red,
+              labelStyle: TextStyle(fontSize: 12),
+              unselectedLabelStyle: TextStyle(fontSize: 10),
               unselectedLabelColor: Colors.grey,
               tabs: [
                 Tab(
