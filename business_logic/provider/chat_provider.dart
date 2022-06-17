@@ -1126,6 +1126,8 @@ class ChatProvider with ChangeNotifier {
           'avatar': remoteUserInfo[0].avatar,
         },
       );
+      // 留言+1
+      await _mongoDB.plus_num('action', "_id", action_id, 'msg_num', 1);
     } catch (e) {
       print('上傳動態留言失敗  $e');
     }
@@ -1210,9 +1212,10 @@ class ChatProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future delete_action_msg(msg_id) async {
+  Future delete_action_msg(action_id,msg_id) async {
     print("delete_action_msg ${msg_id}");
     await delete_one_remotemongodb('action_msg', mongo.where.eq('_id', msg_id));
+    await _mongoDB.plus_num('action', "_id", action_id, 'msg_num',- 1);
   }
 
   Future addpage_newest_action() async {
@@ -1240,6 +1243,45 @@ class ChatProvider with ChangeNotifier {
             .skip(groupteamlist_value * pagesize)
             .limit(pagesize));
     groupteamlist!.addAll(newpage);
+    notifyListeners();
+  }
+
+  Future like_to_action(action_id, index, islike) async {
+    print('action id $action_id,${remoteUserInfo[0].memberid}');
+    if (islike) {
+      print(" 要做的動作->取消喜歡 動態");
+      // 取消
+      _mongoDB.deleteData(
+        "action",
+        '_id',
+        action_id,
+        'like_id_list',
+        remoteUserInfo[0].memberid,
+      );
+      // like 數-1
+      await _mongoDB.plus_num('action', "_id", action_id, 'like_num', -1);
+      newest_actionlist![index!].like_list.remove(
+            remoteUserInfo[0].memberid,
+          );
+      newest_actionlist![index!].like_num--;
+    } else {
+      print("要做的動作->喜歡動態 ");
+      //資料庫更新 member
+      await _mongoDB.updateData_addSet(
+        "action",
+        '_id',
+        action_id,
+        'like_id_list',
+        remoteUserInfo[0].memberid,
+      );
+      // like 數+1
+      await _mongoDB.plus_num('action', "_id", action_id, 'like_num', 1);
+
+      newest_actionlist![index!].like_list.add(
+            remoteUserInfo[0].memberid,
+          );
+      newest_actionlist![index!].like_num++;
+    }
     notifyListeners();
   }
 

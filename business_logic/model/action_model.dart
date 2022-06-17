@@ -8,20 +8,20 @@ ActionModel actionModelFromJson(String str) =>
 String actionModelToJson(ActionModel data) => json.encode(data.toJson());
 
 class ActionModel {
-  ActionModel({
-    this.id,
-    this.text,
-    this.image,
-    this.avatar,
-    this.image_sub,
-    this.createTime,
-    this.memberid,
-    this.nickname,
-    this.area,
-    this.like_num,
-    this.msg_num,
-    this.share_num,
-  });
+  ActionModel(
+      {this.id,
+      this.text,
+      this.image,
+      this.avatar,
+      this.image_sub,
+      this.createTime,
+      this.memberid,
+      this.nickname,
+      this.area,
+      this.like_num,
+      this.msg_num,
+      this.share_num,
+      this.like_list});
 
   ObjectId? id;
   ObjectId? memberid;
@@ -35,6 +35,7 @@ class ActionModel {
   int? like_num;
   int? msg_num;
   int? share_num;
+  List? like_list;
 
   factory ActionModel.fromJson(Map<String, dynamic> json) => ActionModel(
         id: json["_id"],
@@ -48,6 +49,7 @@ class ActionModel {
         msg_num: json["msg_num"],
         share_num: json["share_num"],
         nickname: json["nickname"].toString(),
+        like_list: json["like_id_list"],
         area: json["area"],
       );
 
@@ -59,6 +61,7 @@ class ActionModel {
         "avatar": avatar,
         "time": createTime,
         "memberid": memberid,
+        "like_id_list": like_list,
         "nickname": nickname,
         "area": area,
         "like_num": like_num,

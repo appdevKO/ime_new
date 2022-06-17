@@ -207,7 +207,7 @@ class MongoDB {
   Future updateData_addSet(
       collection, con_field, con_value, target_field, data) async {
     var coll = db.collection(collection);
-    // print("data11111 $data");
+    print("data11111 $target_field, $data");
 
     try {
       await coll.updateOne(mongo.where.eq(con_field, con_value),
@@ -255,6 +255,7 @@ class MongoDB {
     }
   }
 
+  //從 set去掉
   Future deleteData(collection, con_field, con_value, datafield, data) async {
     var coll = db.collection(collection);
     try {

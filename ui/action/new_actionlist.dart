@@ -119,8 +119,8 @@ class _SingleActionState extends State<SingleAction> {
             child: Container(
               height: value.newest_actionlist![widget.index!].image_sub != '' &&
                       value.newest_actionlist![widget.index!].image_sub != null
-                  ? 350
-                  : 200,
+                  ? 360
+                  : 210,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -267,16 +267,46 @@ class _SingleActionState extends State<SingleAction> {
                   Container(
                     padding:
                         const EdgeInsets.only(top: 8.0, right: 15, left: 15),
+                    height: 40,
+                    color: Colors.white,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+                        //愛心
                         Row(
                           children: [
-                            Icon(
-                              Icons.favorite,
-                              size: 18,
-                              color: Colors.red,
-                            ),
+                            IconButton(
+                                icon: Icon(
+                                  Icons.favorite,
+                                  size: 18,
+                                  color: value.newest_actionlist![widget.index!]
+                                          .like_list
+                                          .contains(
+                                              value.remoteUserInfo[0].memberid)
+                                      ? Colors.red
+                                      : Colors.grey,
+                                ),
+                                onPressed: () {
+                                  if (value.newest_actionlist![widget.index!]
+                                      .like_list
+                                      .contains(
+                                          value.remoteUserInfo[0].memberid)) {
+                                    print('有在list ->點擊就是取消喜歡');
+                                    value.like_to_action(
+                                        value.newest_actionlist![widget.index!]
+                                            .id,
+                                        widget.index,
+                                        true);
+                                  } else {
+                                    print('沒有在list ->點擊喜歡');
+
+                                    value.like_to_action(
+                                        value.newest_actionlist![widget.index!]
+                                            .id,
+                                        widget.index,
+                                        false);
+                                  }
+                                }),
                             Padding(
                               padding: const EdgeInsets.only(left: 3.0),
                               child: Text(
@@ -293,14 +323,18 @@ class _SingleActionState extends State<SingleAction> {
                             )
                           ],
                         ),
+                        //留言數
                         Padding(
                           padding: const EdgeInsets.only(left: 38.0),
                           child: Row(
                             children: [
-                              Icon(
-                                Icons.message,
-                                size: 18,
-                                color: Colors.green,
+                              IconButton(
+                                icon: Icon(
+                                  Icons.message,
+                                  size: 18,
+                                  color: Colors.green,
+                                ),
+                                onPressed: () {},
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(left: 3.0),
