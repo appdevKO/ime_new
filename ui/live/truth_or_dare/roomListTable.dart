@@ -7,8 +7,6 @@ import 'package:ime_new/business_logic/provider/chat_provider.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:ime_new/business_logic/model/TD_room.dart';
 import 'dart:convert';
-import 'package:mongo_dart/mongo_dart.dart' as mongo;
-import 'package:ime_new/business_logic/provider/chat_provider.dart';
 import 'package:provider/provider.dart';
 
 class RoomListController extends GetxController {
@@ -53,15 +51,17 @@ class _roomListTableState extends State<roomListTable> {
           key: scaffoldKey,
           body: Stack(children: [
             Consumer<ChatProvider>(builder: (context, ChatProvider1, child) {
-              if (ChatProvider1.remoteUserInfo == null) {
-                if ((ChatProvider1.remoteUserInfo[0].sex) == '男') {
-                  avatar = "https://i.ibb.co/cFFSzdK/sex-man.png";
+              try {
+                if (ChatProvider1.remoteUserInfo == null) {
+                  if ((ChatProvider1.remoteUserInfo[0].sex) == '男') {
+                    avatar = "https://i.ibb.co/cFFSzdK/sex-man.png";
+                  } else {
+                    avatar = "https://i.ibb.co/kJxyvc4/sex-woman.png";
+                  }
                 } else {
-                  avatar = "https://i.ibb.co/kJxyvc4/sex-woman.png";
+                  avatar = ChatProvider1.remoteUserInfo[0].avatar;
                 }
-              } else {
-                avatar = ChatProvider1.remoteUserInfo[0].avatar;
-              }
+              } catch (err) {}
 
               return Stack(children: <Widget>[
                 GestureDetector(

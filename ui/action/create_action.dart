@@ -20,8 +20,6 @@ class _NewActionState extends State<NewAction> {
     super.initState();
   }
 
-
-
   @override
   void dispose() {
     _textEditingController.dispose();
@@ -176,39 +174,60 @@ class _NewActionState extends State<NewAction> {
                           },
                           icon: Icon(Icons.close)),
                       Text('編輯貼文'),
-                      GestureDetector(
-                        child: Container(
-                          padding: EdgeInsets.all(5),
-
-                          decoration: BoxDecoration(
-                              color: Colors.grey,
-                              borderRadius: BorderRadius.circular(7)),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text('發送'),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 3.0),
-                                child: Icon(
-                                  Icons.send,
-                                  size: 15,
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                        onTap: () async {
-                          await Provider.of<ChatProvider>(context,
-                                  listen: false)
-                              .uploadimg_action(
-                                  text: _textEditingController.text);
-                        await  Provider.of<ChatProvider>(context, listen: false)
-                              .get_new_action_list();
-                          Provider.of<ChatProvider>(context, listen: false)
-                              .cancelaction_img();
-                          _textEditingController.clear();
-
-                          Navigator.pop(context);
+                      Consumer<ChatProvider>(
+                        builder: (context, value, child) {
+                          return GestureDetector(
+                            child: Container(
+                              padding: EdgeInsets.all(5),
+                              decoration: BoxDecoration(
+                                  color: Colors.blue,
+                                  borderRadius: BorderRadius.circular(7)),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    '發送',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 3.0),
+                                    child: Icon(Icons.send,
+                                        size: 15, color: Colors.white),
+                                  )
+                                ],
+                              ),
+                            ),
+                            onTap: () async {
+                              if (value.action_imgpath != '' ||
+                                  _textEditingController.text != '') {
+                                print('dialogdialogdialogdialogdialog');
+                                showDialog(
+                                    context: context,
+                                    barrierDismissible: false,
+                                    builder: (_) {
+                                      return AlertDialog(
+                                          title: Text('動態上傳中 請稍候'),
+                                          content: SizedBox(
+                                              height: 50,
+                                              width: 50,
+                                              child: Center(
+                                                  child:
+                                                      CircularProgressIndicator())));
+                                    });
+                                await value
+                                    .uploadimg_action(
+                                        text: _textEditingController.text)
+                                    .whenComplete(() => Future.delayed(
+                                            Duration(seconds: 2), () async {
+                                          await value.get_new_action_list();
+                                          value.cancelaction_img();
+                                          _textEditingController.clear();
+                                          Navigator.pop(context);
+                                          Navigator.pop(context);
+                                        }));
+                              }
+                            },
+                          );
                         },
                       )
                     ],

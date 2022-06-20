@@ -6,6 +6,7 @@ import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:ime_new/business_logic/provider/chat_provider.dart';
+import 'package:ime_new/business_logic/provider/sweetProvider.dart';
 import 'package:ime_new/ui/loginpage/waitingpage.dart';
 import 'package:provider/provider.dart';
 import '../indexpage2.dart';
@@ -18,6 +19,11 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  @override
+  void initState() {
+    Provider.of<sweetProvider>(context, listen: false).connect();
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return SafeArea(

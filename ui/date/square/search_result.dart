@@ -87,7 +87,7 @@ class _SearchResultState extends State<SearchResult> {
                                             value.search_memberlist?[index]
                                                     .introduction ==
                                                 ''
-                                        ? '目前沒有自我介紹'
+                                        ? '不詳'
                                         : '${value.search_memberlist?[index].introduction}',
                                     size: 12,
                                   ),

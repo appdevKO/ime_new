@@ -242,7 +242,7 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
                                         onLoading:  _onLoading,
                                         child: ListView.builder(
                                           itemBuilder: (context, index) {
-                                            print('index 數量$index');
+                                            // print('index 數量$index');
                                             int correctindex;
                                             if (value.historymsg!.isNotEmpty) {
                                               //歷史訊息回傳[xx]-有歷史
@@ -254,7 +254,7 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
                                                       correctindex],
                                                 );
                                               } else {
-                                                print('收到當前訊息');
+                                                // print('收到當前訊息');
                                                 // 是當前聊天室收到當前訊息 歷史+當前
                                                 correctindex = index <
                                                         value
@@ -525,7 +525,7 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
                     // ),
                   ],
                 ),
-                //輸入框的那一排
+                //+號 列表
                 Positioned(
                   bottom: bottomrecordheight != 0 || bottomstickerheight != 0
                       ? 365
@@ -1193,7 +1193,7 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
           ),
         ],
       )
-      //  對方
+      //  對方 對面
           : Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[

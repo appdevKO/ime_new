@@ -1,6 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:ime_new/business_logic/provider/chat_provider.dart';
-import 'package:ime_new/ui/widget/showimage.dart';
+import 'package:ime_new/ui/user_profile/other_profile_page.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -31,7 +33,7 @@ class _NewestActionListState extends State<NewestActionList> {
                 enablePullUp: true,
                 controller: _refreshController,
                 header:
-                    WaterDropMaterialHeader(backgroundColor: Color(0xffaCEA00)),
+                    WaterDropMaterialHeader(backgroundColor: Color(0xffffbbbb)),
                 onRefresh: _onRefresh,
                 onLoading: _onLoading,
                 child: value.newest_actionlist != null
@@ -42,14 +44,9 @@ class _NewestActionListState extends State<NewestActionList> {
                           );
                         },
                         separatorBuilder: (context, index) {
-                          return Padding(
-                            padding: EdgeInsets.symmetric(
-                              vertical: 6,
-                            ),
-                            child: Divider(
-                              color: Colors.grey,
-                              thickness: 5,
-                            ),
+                          return Divider(
+                            color: Colors.grey,
+                            thickness: 5,
                           );
                         },
                         itemCount: value.newest_actionlist!.length,
@@ -109,22 +106,39 @@ class SingleAction extends StatefulWidget {
 }
 
 class _SingleActionState extends State<SingleAction> {
+  final scrollController = ScrollController();
+  late TextEditingController _textController;
+  final FocusNode _focus = FocusNode();
+
+  @override
+  void initState() {
+    _textController = TextEditingController();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _textController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<ChatProvider>(
       builder: (context, value, child) {
         return Container(
           width: MediaQuery.of(context).size.width,
-          child: GestureDetector(
-            child: Container(
-              height: value.newest_actionlist![widget.index!].image_sub != '' &&
-                      value.newest_actionlist![widget.index!].image_sub != null
-                  ? 360
-                  : 210,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
+          child: Container(
+            height: value.newest_actionlist![widget.index!].image_sub != '' &&
+                    value.newest_actionlist![widget.index!].image_sub != null
+                ? 340
+                : 190,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                GestureDetector(
+                  child: Container(
+                    color: Colors.white,
                     padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -221,14 +235,33 @@ class _SingleActionState extends State<SingleAction> {
                       ],
                     ),
                   ),
-                  //內文
-                  Padding(
+                  onTap: () {
+                    if (value.newest_actionlist![widget.index!].account !=
+                        value.remoteUserInfo[0].account) {
+                      //成員橫排 點 單一頭像
+                      // 改成先進簡介
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => OtherProfilePage(
+                                    chatroomid: value
+                                        .newest_actionlist![widget.index!]
+                                        .memberid,
+                                  )));
+                    } else {
+                      print('同一人');
+                    }
+                  },
+                ),
+                //內文
+                GestureDetector(
+                  child: Padding(
                     padding:
                         const EdgeInsets.only(top: 8.0, left: 15, right: 15),
                     child: Container(
                       height: 50,
                       // color: Colors.yellow,
-                      width: MediaQuery.of(context).size.width / 2,
+                      width: MediaQuery.of(context).size.width,
                       child: RichText(
                         overflow: TextOverflow.ellipsis,
                         strutStyle: StrutStyle(fontSize: 12.0),
@@ -245,14 +278,25 @@ class _SingleActionState extends State<SingleAction> {
                       ),
                     ),
                   ),
-                  // //圖片
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: value.newest_actionlist![widget.index!].image_sub !=
-                                '' &&
-                            value.newest_actionlist![widget.index!].image_sub !=
-                                null
-                        ? Container(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ActionDetailPage(
+                                  TheAction:
+                                      value.newest_actionlist![widget.index!],
+                                )));
+                  },
+                ),
+                // //圖片
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: value.newest_actionlist![widget.index!].image_sub !=
+                              '' &&
+                          value.newest_actionlist![widget.index!].image_sub !=
+                              null
+                      ? GestureDetector(
+                          child: Container(
                             height: 150,
                             decoration: BoxDecoration(
                                 color: Colors.grey,
@@ -260,138 +304,455 @@ class _SingleActionState extends State<SingleAction> {
                                     image: NetworkImage(
                                         '${value.newest_actionlist![widget.index!].image_sub}'),
                                     fit: BoxFit.cover)),
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ActionDetailPage(
+                                          TheAction: value.newest_actionlist![
+                                              widget.index!],
+                                        )));
+                          },
+                        )
+                      : Container(),
+                ),
+                //三個icon
+                Container(
+                  padding: const EdgeInsets.only(top: 8.0, right: 15, left: 15),
+                  height: 40,
+                  color: Colors.white,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      //愛心
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          IconButton(
+                              icon: Icon(
+                                Icons.favorite,
+                                size: 18,
+                                color: value.newest_actionlist![widget.index!]
+                                        .like_list
+                                        .contains(
+                                            value.remoteUserInfo[0].memberid)
+                                    ? Colors.red
+                                    : Colors.grey,
+                              ),
+                              onPressed: () {
+                                if (value
+                                    .newest_actionlist![widget.index!].like_list
+                                    .contains(
+                                        value.remoteUserInfo[0].memberid)) {
+                                  print('有在list ->點擊就是取消喜歡');
+                                  value.like_to_action(
+                                      value
+                                          .newest_actionlist![widget.index!].id,
+                                      widget.index,
+                                      true);
+                                } else {
+                                  print('沒有在list ->點擊喜歡');
+
+                                  value.like_to_action(
+                                      value
+                                          .newest_actionlist![widget.index!].id,
+                                      widget.index,
+                                      false);
+                                }
+                              }),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 3.0),
+                            child: Text(
+                              value.newest_actionlist![widget.index!]
+                                              .like_num !=
+                                          '' &&
+                                      value.newest_actionlist![widget.index!]
+                                              .like_num !=
+                                          null
+                                  ? '${value.newest_actionlist![widget.index!].like_num}'
+                                  : '-',
+                              style: TextStyle(fontSize: 12),
+                            ),
                           )
-                        : Container(),
-                  ),
-                  //三個icon
-                  Container(
-                    padding:
-                        const EdgeInsets.only(top: 8.0, right: 15, left: 15),
-                    height: 40,
-                    color: Colors.white,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        //愛心
-                        Row(
+                        ],
+                      ),
+                      //留言數
+                      Padding(
+                        padding: const EdgeInsets.only(left: 38.0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             IconButton(
-                                icon: Icon(
-                                  Icons.favorite,
-                                  size: 18,
-                                  color: value.newest_actionlist![widget.index!]
-                                          .like_list
-                                          .contains(
-                                              value.remoteUserInfo[0].memberid)
-                                      ? Colors.red
-                                      : Colors.grey,
-                                ),
-                                onPressed: () {
-                                  if (value.newest_actionlist![widget.index!]
-                                      .like_list
-                                      .contains(
-                                          value.remoteUserInfo[0].memberid)) {
-                                    print('有在list ->點擊就是取消喜歡');
-                                    value.like_to_action(
-                                        value.newest_actionlist![widget.index!]
-                                            .id,
-                                        widget.index,
-                                        true);
-                                  } else {
-                                    print('沒有在list ->點擊喜歡');
+                              icon: Icon(
+                                Icons.message,
+                                size: 18,
+                                color: Colors.green,
+                              ),
+                              onPressed: () async {
+                                await Provider.of<ChatProvider>(context,
+                                        listen: false)
+                                    .get_action_msg(value
+                                        .newest_actionlist![widget.index!].id);
+                                showModalBottomSheet<void>(
+                                  isScrollControlled: true,
+                                  context: context,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(20),
+                                        topRight: Radius.circular(20)),
+                                  ),
+                                  builder: (BuildContext context) {
+                                    return Padding(
+                                        padding:
+                                            MediaQuery.of(context).viewInsets,
+                                        child: Container(
+                                          child: SingleChildScrollView(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                //標題
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Container(
+                                                      width: 35,
+                                                      child: IconButton(
+                                                        icon: Icon(Icons.close,
+                                                            size: 30,
+                                                            color: Colors.red),
+                                                        onPressed: () {
+                                                          Navigator.pop(
+                                                              context);
+                                                        },
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      "留言",
+                                                      style: TextStyle(
+                                                          fontSize: 20,
+                                                          fontWeight:
+                                                              FontWeight.w700,
+                                                          height: 1),
+                                                    ),
+                                                    GestureDetector(
+                                                      child: Container(
+                                                        width: 35,
+                                                        child: Text(
+                                                          '儲存',
+                                                          style: TextStyle(
+                                                              color: Colors
+                                                                  .transparent),
+                                                        ),
+                                                      ),
+                                                      onTap: () {},
+                                                    )
+                                                  ],
+                                                ),
+                                                Divider(
+                                                  height: 1,
+                                                ),
 
-                                    value.like_to_action(
-                                        value.newest_actionlist![widget.index!]
-                                            .id,
-                                        widget.index,
-                                        false);
-                                  }
-                                }),
+                                                Container(
+                                                    height: 300,
+                                                    width:
+                                                        MediaQuery.of(context)
+                                                            .size
+                                                            .width,
+                                                    child:
+                                                        Consumer<ChatProvider>(
+                                                      builder: (context, value,
+                                                          child) {
+                                                        return value.actionmsglist !=
+                                                                null
+                                                            ? value.actionmsglist!
+                                                                    .isNotEmpty
+                                                                ? ListView
+                                                                    .separated(
+                                                                    controller:
+                                                                        scrollController,
+                                                                    itemBuilder:
+                                                                        (context,
+                                                                            index) {
+                                                                      return SingleActionMsg(
+                                                                        index:
+                                                                            index,
+                                                                        isme: value.actionmsglist![index].memberid ==
+                                                                                value.remoteUserInfo[0].memberid
+                                                                            ? true
+                                                                            : false,
+                                                                        actionid: value
+                                                                            .newest_actionlist![widget.index!]
+                                                                            .id,
+                                                                      );
+                                                                    },
+                                                                    separatorBuilder:
+                                                                        (context,
+                                                                            index) {
+                                                                      return Padding(
+                                                                        padding:
+                                                                            EdgeInsets.symmetric(vertical: 5),
+                                                                      );
+                                                                    },
+                                                                    itemCount: value
+                                                                        .actionmsglist!
+                                                                        .length,
+                                                                  )
+                                                                : Center(
+                                                                    child: Text(
+                                                                        '此動態尚無留言'))
+                                                            : Center(
+                                                                child: Text(
+                                                                    '此動態尚無留言'));
+                                                      },
+                                                    )),
+                                                // 輸入匡
+                                                Container(
+                                                  height: 70,
+                                                  width: MediaQuery.of(context)
+                                                      .size
+                                                      .width,
+                                                  decoration: BoxDecoration(
+                                                    color: Color(0xffF9F9F9),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Colors.grey
+                                                            .withOpacity(0.5),
+                                                        spreadRadius: 1,
+                                                        blurRadius: 7,
+                                                        offset: Offset(0,
+                                                            -2), // changes position of shadow
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  child: Row(
+                                                    children: [
+                                                      Flexible(
+                                                        child: Container(
+                                                            constraints:
+                                                                BoxConstraints(
+                                                                    minHeight:
+                                                                        60.0,
+                                                                    maxHeight:
+                                                                        150.0),
+                                                            padding:
+                                                                const EdgeInsets
+                                                                        .only(
+                                                                    top: 10,
+                                                                    bottom: 10,
+                                                                    right: 2,
+                                                                    left: 15),
+                                                            child: TextField(
+                                                              focusNode: _focus,
+                                                              //限制輸入文字多長
+                                                              // maxLength: 75,
+                                                              //換行
+                                                              // maxLines: null,
+                                                              keyboardType:
+                                                                  TextInputType
+                                                                      .text,
+                                                              onSubmitted:
+                                                                  (val) async {
+                                                                if (_textController
+                                                                        .text !=
+                                                                    '') {
+                                                                  await Provider.of<
+                                                                              ChatProvider>(
+                                                                          context,
+                                                                          listen:
+                                                                              false)
+                                                                      .upload_action_msg(
+                                                                          value
+                                                                              .newest_actionlist![widget.index!]
+                                                                              .id,
+                                                                          _textController.text);
+                                                                  _textController
+                                                                      .clear();
+
+                                                                  await Provider.of<
+                                                                              ChatProvider>(
+                                                                          context,
+                                                                          listen:
+                                                                              false)
+                                                                      .get_action_msg(value
+                                                                          .newest_actionlist![
+                                                                              widget.index!]
+                                                                          .id);
+
+                                                                  await Provider.of<
+                                                                              ChatProvider>(
+                                                                          context,
+                                                                          listen:
+                                                                              false)
+                                                                      .get_action_msg_count(value
+                                                                          .newest_actionlist![
+                                                                              widget.index!]
+                                                                          .id,1);
+                                                                } else {
+                                                                  print('空空');
+                                                                }
+                                                                _focus
+                                                                    .unfocus();
+                                                              },
+                                                              textInputAction:
+                                                                  TextInputAction
+                                                                      .done,
+                                                              controller:
+                                                                  _textController,
+                                                              decoration:
+                                                                  InputDecoration(
+                                                                border: OutlineInputBorder(
+                                                                    borderSide:
+                                                                        BorderSide
+                                                                            .none,
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            20)),
+                                                                fillColor:
+                                                                    Colors
+                                                                        .white,
+                                                                filled: true,
+                                                                hintText:
+                                                                    '輸入留言',
+                                                                contentPadding:
+                                                                    EdgeInsets.symmetric(
+                                                                        horizontal:
+                                                                            12,
+                                                                        vertical:
+                                                                            5),
+                                                              ),
+                                                              style: TextStyle(
+                                                                  height: 1),
+                                                            )),
+                                                      ),
+                                                      //傳送 發送 文字 箭頭 送出
+                                                      IconButton(
+                                                        icon: Icon(Icons.send),
+                                                        onPressed: () async {
+                                                          if (_textController
+                                                                  .text !=
+                                                              '') {
+                                                            await Provider.of<
+                                                                        ChatProvider>(
+                                                                    context,
+                                                                    listen:
+                                                                        false)
+                                                                .upload_action_msg(
+                                                                    value
+                                                                        .newest_actionlist![widget
+                                                                            .index!]
+                                                                        .id,
+                                                                    _textController
+                                                                        .text);
+                                                            _textController
+                                                                .clear();
+                                                            Timer(
+                                                                Duration(
+                                                                    milliseconds:
+                                                                        500),
+                                                                () {
+                                                              print(
+                                                                  'maxamx${scrollController.position.maxScrollExtent}');
+                                                              //滾動到最下面
+                                                              scrollController
+                                                                  .animateTo(
+                                                                scrollController
+                                                                    .position
+                                                                    .maxScrollExtent,
+                                                                duration:
+                                                                    Duration(
+                                                                        seconds:
+                                                                            2),
+                                                                curve: Curves
+                                                                    .fastOutSlowIn,
+                                                              );
+                                                            });
+
+                                                            await Provider.of<
+                                                                        ChatProvider>(
+                                                                    context,
+                                                                    listen:
+                                                                        false)
+                                                                .get_action_msg(value
+                                                                    .newest_actionlist![
+                                                                        widget
+                                                                            .index!]
+                                                                    .id);
+
+                                                            await Provider.of<
+                                                                        ChatProvider>(
+                                                                    context,
+                                                                    listen:
+                                                                        false)
+                                                                .get_action_msg_count(value
+                                                                    .newest_actionlist![
+                                                                        widget
+                                                                            .index!]
+                                                                    .id,1);
+                                                          } else {
+                                                            print('空空');
+                                                          }
+                                                          _focus.unfocus();
+                                                        },
+                                                      )
+                                                    ],
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        ));
+                                  },
+                                );
+                              },
+                            ),
                             Padding(
                               padding: const EdgeInsets.only(left: 3.0),
                               child: Text(
                                 value.newest_actionlist![widget.index!]
-                                                .like_num !=
+                                                .msg_num !=
                                             '' &&
                                         value.newest_actionlist![widget.index!]
-                                                .like_num !=
+                                                .msg_num !=
                                             null
-                                    ? '${value.newest_actionlist![widget.index!].like_num}'
+                                    ? '${value.newest_actionlist![widget.index!].msg_num}'
                                     : '-',
                                 style: TextStyle(fontSize: 12),
                               ),
                             )
                           ],
                         ),
-                        //留言數
-                        Padding(
-                          padding: const EdgeInsets.only(left: 38.0),
-                          child: Row(
-                            children: [
-                              IconButton(
-                                icon: Icon(
-                                  Icons.message,
-                                  size: 18,
-                                  color: Colors.green,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 38.0),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.share,
+                              size: 15,
+                              color: Colors.transparent,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 3.0),
+                              child: Text(
+                                '分享',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.transparent,
                                 ),
-                                onPressed: () {},
                               ),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 3.0),
-                                child: Text(
-                                  value.newest_actionlist![widget.index!]
-                                                  .msg_num !=
-                                              '' &&
-                                          value
-                                                  .newest_actionlist![
-                                                      widget.index!]
-                                                  .msg_num !=
-                                              null
-                                      ? '${value.newest_actionlist![widget.index!].msg_num}'
-                                      : '-',
-                                  style: TextStyle(fontSize: 12),
-                                ),
-                              )
-                            ],
-                          ),
+                            )
+                          ],
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 38.0),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.share,
-                                size: 15,
-                                color: Colors.transparent,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 3.0),
-                                child: Text(
-                                  '分享',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.transparent,
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              color: Colors.white,
+                ),
+              ],
             ),
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ActionDetailPage(
-                            TheAction: value.newest_actionlist![widget.index!],
-                          )));
-            },
           ),
         );
       },

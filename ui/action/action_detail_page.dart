@@ -4,6 +4,7 @@ import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:ime_new/business_logic/model/action_model.dart';
 import 'package:ime_new/business_logic/provider/chat_provider.dart';
+import 'package:ime_new/ui/user_profile/other_profile_page.dart';
 import 'package:ime_new/ui/widget/showimage.dart';
 import 'package:intl/intl.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
@@ -43,7 +44,7 @@ class _ActionDetailPageState extends State<ActionDetailPage> {
         .get_action_msg(widget.TheAction.id);
 
     await Provider.of<ChatProvider>(context, listen: false)
-        .get_action_msg_count(widget.TheAction.id);
+        .get_action_msg_count(widget.TheAction.id, 2);
     setState(() {
       index = Provider.of<ChatProvider>(context, listen: false)
           .newest_actionlist
@@ -229,7 +230,7 @@ class _ActionDetailPageState extends State<ActionDetailPage> {
                                                     context,
                                                     listen: false)
                                                 .get_action_msg_count(
-                                                    widget.TheAction.id);
+                                                    widget.TheAction.id, 2);
                                             showModalBottomSheet<void>(
                                               isScrollControlled: true,
                                               context: context,
@@ -473,9 +474,9 @@ class _ActionDetailPageState extends State<ActionDetailPage> {
                                                                             .TheAction
                                                                             .id);
 
-                                                                        await Provider.of<ChatProvider>(context, listen: false).get_action_msg_count(widget
-                                                                            .TheAction
-                                                                            .id);
+                                                                        await Provider.of<ChatProvider>(context, listen: false).get_action_msg_count(
+                                                                            widget.TheAction.id,
+                                                                            2);
                                                                       } else {
                                                                         print(
                                                                             '空空');
@@ -541,14 +542,15 @@ class _ActionDetailPageState extends State<ActionDetailPage> {
                             padding: const EdgeInsets.only(top: 8),
                             child: GestureDetector(
                               child: Container(
-                                height: 300,
+                                child: Image.network(
+                                    '${widget.TheAction.image_sub}',fit: BoxFit.cover),
                                 width: MediaQuery.of(context).size.width,
-                                decoration: BoxDecoration(
-                                    color: Colors.grey,
-                                    image: DecorationImage(
-                                        image: NetworkImage(
-                                            '${widget.TheAction.image_sub}'),
-                                        fit: BoxFit.cover)),
+                                // decoration: BoxDecoration(
+                                //     color: Colors.grey,
+                                //     image: DecorationImage(
+                                //         image: NetworkImage(
+                                //             '${widget.TheAction.image_sub}'),
+                                //         fit: BoxFit.cover)),
                               ),
                               onTap: () {
                                 print('大圖${widget.TheAction.image}');
@@ -719,7 +721,7 @@ class _SingleActionMsgState extends State<SingleActionMsg> {
   Widget build(BuildContext context) {
     return Consumer<ChatProvider>(
       builder: (context, value, child) {
-        return Padding(
+        return Container(
           padding: const EdgeInsets.symmetric(horizontal: 15.0),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -728,14 +730,36 @@ class _SingleActionMsgState extends State<SingleActionMsg> {
                 padding: EdgeInsets.symmetric(
                   vertical: 10,
                 ),
-                child: CircleAvatar(
-                  backgroundColor: Colors.grey,
-                  backgroundImage: value.actionmsglist![widget.index].avatar ==
-                              '' ||
-                          value.actionmsglist![widget.index].avatar == null
-                      ? AssetImage('assets/default/sex_man.png')
-                          as ImageProvider
-                      : NetworkImage(value.actionmsglist![widget.index].avatar),
+                child: GestureDetector(
+                  child: CircleAvatar(
+                    backgroundColor: Colors.grey,
+                    backgroundImage:
+                        value.actionmsglist![widget.index].avatar == '' ||
+                                value.actionmsglist![widget.index].avatar ==
+                                    null
+                            ? AssetImage('assets/default/sex_man.png')
+                                as ImageProvider
+                            : NetworkImage(
+                                value.actionmsglist![widget.index].avatar),
+                  ),
+                  onTap: () {
+                    print(
+                        '去這個人頁面${value.actionmsglist![widget.index].nickname}');
+                    if (value.actionmsglist![widget.index].account !=
+                        value.remoteUserInfo[0].account) {
+                      //成員橫排 點 單一頭像
+                      // 改成先進簡介
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => OtherProfilePage(
+                                    chatroomid: value
+                                        .actionmsglist![widget.index].memberid,
+                                  )));
+                    } else {
+                      print('同一人');
+                    }
+                  },
                 ),
               ),
               Padding(
@@ -755,11 +779,34 @@ class _SingleActionMsgState extends State<SingleActionMsg> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           //名字
-                          Text(
-                            '${value.actionmsglist![widget.index].nickname}',
-                            style: TextStyle(
-                                fontSize: 15, fontWeight: FontWeight.w700),
-                          ),
+                          GestureDetector(
+                              child: Text(
+                                '${value.actionmsglist![widget.index].nickname}',
+                                style: TextStyle(
+                                    fontSize: 15, fontWeight: FontWeight.w700),
+                              ),
+                              onTap: () {
+                                print(
+                                    '去這個人頁面${value.actionmsglist![widget.index].nickname}');
+                                if (value
+                                        .actionmsglist![widget.index].account !=
+                                    value.remoteUserInfo[0].account) {
+                                  //成員橫排 點 單一頭像
+                                  // 改成先進簡介
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              OtherProfilePage(
+                                                chatroomid: value
+                                                    .actionmsglist![
+                                                        widget.index]
+                                                    .memberid,
+                                              )));
+                                } else {
+                                  print('同一人');
+                                }
+                              }),
                           //內文
                           Padding(
                             padding: const EdgeInsets.only(top: 3.0),

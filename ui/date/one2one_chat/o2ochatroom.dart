@@ -192,27 +192,29 @@ class _O2OChatroomState extends State<O2OChatroom> {
                                   ),
                                 )),
                               ),
-                              Container(
-                                width: 150,
-                                color: Colors.grey,
-                                height: 1,
-                              ),
-                              Container(
-                                color: Colors.white,
-                                child: IntrinsicWidth(
-                                    child: GestureDetector(
-                                  behavior: HitTestBehavior.translucent,
-                                  onTap: () {},
-                                  child: Container(
-                                    width: 150,
-                                    margin: EdgeInsets.all(20),
-                                    child: Text(
-                                      "查看資訊",
-                                      style: TextStyle(fontSize: 15),
-                                    ),
-                                  ),
-                                )),
-                              ),
+                              // Container(
+                              //   width: 150,
+                              //   color: Colors.grey,
+                              //   height: 1,
+                              // ),
+                              // Container(
+                              //   color: Colors.white,
+                              //   child: IntrinsicWidth(
+                              //       child: GestureDetector(
+                              //         behavior: HitTestBehavior
+                              //             .translucent,
+                              //         onTap: () {},
+                              //         child: Container(
+                              //           width: 150,
+                              //           margin: EdgeInsets.all(20),
+                              //           child: Text(
+                              //             "查看資訊",
+                              //             style: TextStyle(
+                              //                 fontSize: 15),
+                              //           ),
+                              //         ),
+                              //       )),
+                              // ),
                             ],
                           ),
                         ),
@@ -229,175 +231,204 @@ class _O2OChatroomState extends State<O2OChatroom> {
           body: GestureDetector(
             child: Stack(
               children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    //對話紀錄
-                    Expanded(child: Consumer<ChatProvider>(
-                      builder: (context, value, child) {
-                        /// 歷史訊息與當前訊息混合
-                        /// 歷史訊息會有null [] [xx]三種狀態
-                        /// 當前訊息會有[] [xx]兩種狀態
-
-                        return topicindex == -1
-                            ? value.o2ohistorymsg != null
-                                ? value.o2ohistorymsg!.isEmpty
-                                    ? Center(
-                                        child: Container(
-                                          child: Text('此聊天室沒有聊天記錄05'),
-                                        ),
-                                      )
-                                    : SmartRefresher(
-                                        enablePullDown: false,
-                                        enablePullUp: true,
-                                        controller: _refreshController,
-                                        header: WaterDropMaterialHeader(
-                                            backgroundColor: Color(0xffaCEA00)),
-                                        onLoading: _onLoading,
-                                        child: ListView.builder(
-                                          itemBuilder: (context, index) {
-                                            int correctindex;
-                                            correctindex = index;
-                                            return bubble(
-                                              value
-                                                  .o2ohistorymsg![correctindex],
-                                            );
-                                          },
-                                          reverse: true,
-                                          itemCount: value.o2ohistorymsg != null
-                                              ? value.o2ohistorymsg!.isEmpty
-                                                  ? 1
-                                                  : value.o2ohistorymsg!.length
-                                              : 1,
-                                          controller: scrollController,
-                                        ),
-                                      )
-                                : Center(
-                                    child: Container(
-                                      child: Text('無聊天記錄'),
-                                    ),
-                                  )
-                            : value.o2ohistorymsg != null
-                                ? value.o2ohistorymsg!.isEmpty &&
-                                        value.o2o_msglist![topicindex!].msg!
-                                            .isEmpty
-                                    ? Center(
-                                        child: Container(
-                                          child: Text('此聊天室沒有聊天記錄04'),
-                                        ),
-                                      )
-                                    : Container(
-                                        child: ListView.builder(
-                                          itemBuilder: (context, index) {
-                                            int correctindex;
-                                            if (value
-                                                .o2ohistorymsg!.isNotEmpty) {
-                                              //歷史訊息回傳[xx]-有歷史
-                                              if (topicindex == -1) {
-                                                //沒當前 -純歷史
+                Consumer<ChatProvider>(
+                  builder: (context, value, child) {
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        //對話紀錄
+                        Expanded(
+                            child: topicindex == -1
+                                ? value.o2ohistorymsg != null
+                                    ? value.o2ohistorymsg!.isEmpty
+                                        ? Center(
+                                            child: Container(
+                                              child: Text('此聊天室沒有聊天記錄05'),
+                                            ),
+                                          )
+                                        : SmartRefresher(
+                                            enablePullDown: false,
+                                            enablePullUp: true,
+                                            controller: _refreshController,
+                                            header: WaterDropMaterialHeader(
+                                                backgroundColor:
+                                                    Color(0xffaCEA00)),
+                                            onLoading: _onLoading,
+                                            child: ListView.builder(
+                                              itemBuilder: (context, index) {
+                                                int correctindex;
                                                 correctindex = index;
                                                 return bubble(
                                                   value.o2ohistorymsg![
                                                       correctindex],
                                                 );
-                                              } else {
-                                                // 是當前聊天室收到當前訊息 歷史+當前
-                                                correctindex = index <
-                                                        value
-                                                            .o2o_msglist![
-                                                                topicindex!]
-                                                            .msg!
-                                                            .length
-                                                    ? index
-                                                    : index -
-                                                        value
-                                                            .o2o_msglist![
-                                                                topicindex!]
-                                                            .msg!
-                                                            .length;
-
-                                                return index <
-                                                        value
-                                                            .o2o_msglist![
-                                                                topicindex!]
-                                                            .msg!
-                                                            .length
-                                                    ? bubble(
-                                                        value
-                                                            .o2o_msglist![
-                                                                topicindex!]
-                                                            .msg![correctindex],
-                                                      )
-                                                    : index ==
+                                              },
+                                              reverse: true,
+                                              itemCount: value.o2ohistorymsg !=
+                                                      null
+                                                  ? value.o2ohistorymsg!.isEmpty
+                                                      ? 1
+                                                      : value
+                                                          .o2ohistorymsg!.length
+                                                  : 1,
+                                              controller: scrollController,
+                                            ),
+                                          )
+                                    : Center(
+                                        child: Container(
+                                          child: Text('無聊天記錄'),
+                                        ),
+                                      )
+                                : value.o2ohistorymsg != null
+                                    ? value.o2ohistorymsg!.isEmpty &&
+                                            value.o2o_msglist![topicindex!].msg!
+                                                .isEmpty
+                                        ? Center(
+                                            child: Container(
+                                              child: Text('此聊天室沒有聊天記錄04'),
+                                            ),
+                                          )
+                                        : Container(
+                                            child: ListView.builder(
+                                              itemBuilder: (context, index) {
+                                                int correctindex;
+                                                if (value.o2ohistorymsg!
+                                                    .isNotEmpty) {
+                                                  //歷史訊息回傳[xx]-有歷史
+                                                  if (topicindex == -1) {
+                                                    //沒當前 -純歷史
+                                                    correctindex = index;
+                                                    return bubble(
+                                                      value.o2ohistorymsg![
+                                                          correctindex],
+                                                    );
+                                                  } else {
+                                                    // 是當前聊天室收到當前訊息 歷史+當前
+                                                    correctindex = index <
                                                             value
                                                                 .o2o_msglist![
                                                                     topicindex!]
                                                                 .msg!
                                                                 .length
-                                                        ? Column(
-                                                            children: [
-                                                              bubble(
+                                                        ? index
+                                                        : index -
+                                                            value
+                                                                .o2o_msglist![
+                                                                    topicindex!]
+                                                                .msg!
+                                                                .length;
+
+                                                    return index <
+                                                            value
+                                                                .o2o_msglist![
+                                                                    topicindex!]
+                                                                .msg!
+                                                                .length
+                                                        ? bubble(
+                                                            value
+                                                                .o2o_msglist![
+                                                                    topicindex!]
+                                                                .msg![correctindex],
+                                                          )
+                                                        : index ==
+                                                                value
+                                                                    .o2o_msglist![
+                                                                        topicindex!]
+                                                                    .msg!
+                                                                    .length
+                                                            ? Column(
+                                                                children: [
+                                                                  bubble(
+                                                                    value.o2ohistorymsg![
+                                                                        correctindex],
+                                                                  ),
+                                                                  Container(
+                                                                    child: Text(
+                                                                        '---以上為歷史紀錄---'),
+                                                                  ),
+                                                                ],
+                                                              )
+                                                            : bubble(
                                                                 value.o2ohistorymsg![
                                                                     correctindex],
-                                                              ),
-                                                              Container(
-                                                                child: Text(
-                                                                    '---以上為歷史紀錄---'),
-                                                              ),
-                                                            ],
-                                                          )
-                                                        : bubble(
-                                                            value.o2ohistorymsg![
-                                                                correctindex],
-                                                          );
-                                              }
-                                            } else {
-                                              //歷史訊息回傳[]-沒有歷史訊息
-                                              if (topicindex == -1) {
-                                                return Center(
-                                                  child: Container(
-                                                    child: Text('沒有聊天記錄'),
-                                                  ),
-                                                );
-                                              } else if (value
-                                                  .o2o_msglist![topicindex!]
-                                                  .msg!
-                                                  .isEmpty) {
-                                                // 沒歷史 沒當前
-                                                // 收到當前聊天室訊息
-                                                return Center(
-                                                  child: Container(
-                                                    child: Text('此聊天室沒有聊天記錄'),
-                                                  ),
-                                                );
-                                              } else {
-                                                // 沒歷史 有當前
-                                                correctindex = index <
-                                                        value
-                                                            .o2o_msglist![
-                                                                topicindex!]
-                                                            .msg!
-                                                            .length
-                                                    ? index
-                                                    : index -
-                                                        value
-                                                            .o2o_msglist![
-                                                                topicindex!]
-                                                            .msg!
-                                                            .length;
-
-                                                return bubble(
-                                                  value
+                                                              );
+                                                  }
+                                                } else {
+                                                  //歷史訊息回傳[]-沒有歷史訊息
+                                                  if (topicindex == -1) {
+                                                    return Center(
+                                                      child: Container(
+                                                        child: Text('沒有聊天記錄'),
+                                                      ),
+                                                    );
+                                                  } else if (value
                                                       .o2o_msglist![topicindex!]
-                                                      .msg![correctindex],
-                                                );
-                                              }
-                                            }
-                                          },
-                                          reverse: true,
-                                          itemCount: value.o2ohistorymsg != null
-                                              ? value.o2ohistorymsg!.isEmpty
-                                                  ? value
+                                                      .msg!
+                                                      .isEmpty) {
+                                                    // 沒歷史 沒當前
+                                                    // 收到當前聊天室訊息
+                                                    return Center(
+                                                      child: Container(
+                                                        child:
+                                                            Text('此聊天室沒有聊天記錄'),
+                                                      ),
+                                                    );
+                                                  } else {
+                                                    // 沒歷史 有當前
+                                                    correctindex = index <
+                                                            value
+                                                                .o2o_msglist![
+                                                                    topicindex!]
+                                                                .msg!
+                                                                .length
+                                                        ? index
+                                                        : index -
+                                                            value
+                                                                .o2o_msglist![
+                                                                    topicindex!]
+                                                                .msg!
+                                                                .length;
+
+                                                    return bubble(
+                                                      value
+                                                          .o2o_msglist![
+                                                              topicindex!]
+                                                          .msg![correctindex],
+                                                    );
+                                                  }
+                                                }
+                                              },
+                                              reverse: true,
+                                              itemCount: value.o2ohistorymsg !=
+                                                      null
+                                                  ? value.o2ohistorymsg!.isEmpty
+                                                      ? value
+                                                              .o2o_msglist![
+                                                                  topicindex!]
+                                                              .msg!
+                                                              .isEmpty
+                                                          ? 1
+                                                          : value
+                                                              .o2o_msglist![
+                                                                  topicindex!]
+                                                              .msg!
+                                                              .length
+                                                      : value
+                                                              .o2o_msglist![
+                                                                  topicindex!]
+                                                              .msg!
+                                                              .isEmpty
+                                                          ? value.o2ohistorymsg!
+                                                              .length
+                                                          : value
+                                                                  .o2o_msglist![
+                                                                      topicindex!]
+                                                                  .msg!
+                                                                  .length +
+                                                              value
+                                                                  .o2ohistorymsg!
+                                                                  .length
+                                                  : value
                                                           .o2o_msglist![
                                                               topicindex!]
                                                           .msg!
@@ -407,42 +438,60 @@ class _O2OChatroomState extends State<O2OChatroom> {
                                                           .o2o_msglist![
                                                               topicindex!]
                                                           .msg!
-                                                          .length
-                                                  : value
-                                                          .o2o_msglist![
-                                                              topicindex!]
-                                                          .msg!
-                                                          .isEmpty
-                                                      ? value
-                                                          .o2ohistorymsg!.length
-                                                      : value
-                                                              .o2o_msglist![
-                                                                  topicindex!]
-                                                              .msg!
-                                                              .length +
-                                                          value.o2ohistorymsg!
-                                                              .length
-                                              : value.o2o_msglist![topicindex!]
-                                                      .msg!.isEmpty
-                                                  ? 1
-                                                  : value
-                                                      .o2o_msglist![topicindex!]
-                                                      .msg!
-                                                      .length,
-                                          controller: scrollController,
+                                                          .length,
+                                              controller: scrollController,
+                                            ),
+                                          )
+                                    : Center(
+                                        child: Container(
+                                          child: Text('歷史訊息加載中'),
                                         ),
-                                      )
-                                : Center(
-                                    child: Container(
-                                      child: Text('歷史訊息加載中'),
-                                    ),
-                                  );
-                      },
-                    )),
-                    bottomEnter(),
-                    bottomRecord(),
-                    bottomsticker()
-                  ],
+                                      )),
+
+                        value.myblocklog[0].list_id.indexWhere((element) =>
+                                    element == widget.chatroomid) !=
+                                -1
+                            ? Container(
+                                width: MediaQuery.of(context).size.width,
+                                decoration: BoxDecoration(
+                                  color: Color(0xffb9b9b9),
+                                ),
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 10),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      IconButton(
+                                        icon: Icon(
+                                          Icons.add,
+                                          color: Colors.transparent,
+                                        ),
+                                        onPressed: () {},
+                                      ),
+                                      Text('已經加入黑名單'),
+                                      IconButton(
+                                        icon: Icon(Icons.add,
+                                            color: Colors.transparent),
+                                        onPressed: () {},
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              )
+                            : bottomEnter(),
+                        value.myblocklog[0].list_id.indexWhere((element) =>
+                        element == widget.chatroomid) !=
+                            -1
+                            ?Container():bottomRecord(),
+                        value.myblocklog[0].list_id.indexWhere((element) =>
+                        element == widget.chatroomid) !=
+                            -1
+                            ?Container(): bottomsticker()
+                      ],
+                    );
+                  },
                 ),
                 //輸入框的那一排
                 Positioned(
@@ -1008,73 +1057,88 @@ class _O2OChatroomState extends State<O2OChatroom> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 // 泡泡
-                Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: Container(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
-                    //控制泡泡裡面的大小
-                    //大小
-                    constraints: BoxConstraints(
-                      maxWidth: MediaQuery.of(context).size.width * .6,
-                    ),
-                    //泡泡顏色
-                    decoration: BoxDecoration(
-                      color: Color(0xffEAEFF6),
-                      // gradient: LinearGradient(
-                      //     colors: [Color(0xfffd669a), Color(0xffff836a)]),
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(text_radius),
-                        bottomRight: Radius.circular(text_radius),
-                        bottomLeft: Radius.circular(text_radius),
-                      ),
-                    ),
-                    // 泡泡內容
-                    // 判斷type
-                    child: msg.type == 1
-                        ? Container(child: Text('${msg.text}'))
-                        : msg.type == 2
-                            ? GestureDetector(
-                                child: Container(
-                                  child: Image.network('${msg.text}'),
-                                ),
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => ShowImage(
-                                                img: msg.text!,
-                                              )));
-                                },
-                              )
-                            : msg.type == 3
-                                ? Image.asset(
-                                    '${stickers_list[int.parse(msg.text!)]}')
-                                : msg.type == 4
-                                    ? Container(
-                                        child: Column(
-                                          children: [
-                                            Text('已傳送錄音'),
-                                            IconButton(
-                                                icon: msg.play == false
-                                                    ? Icon(Icons.play_arrow)
-                                                    : Icon(Icons.pause),
-                                                onPressed: () {
-                                                  startplay(msg);
-                                                })
-                                          ],
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    msg.type == 3
+                        ? Container(
+                            padding: EdgeInsets.only(
+                              top: 10,
+                              bottom: 10,
+                            ),
+                            constraints: BoxConstraints(
+                              maxWidth: MediaQuery.of(context).size.width * .6,
+                            ),
+                            child: Image.asset(
+                                '${stickers_list[int.parse(msg.text!)]}'),
+                          )
+                        : Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 15.0, vertical: 10.0),
+                            //控制泡泡裡面的大小
+                            //大小
+                            constraints: BoxConstraints(
+                              maxWidth: MediaQuery.of(context).size.width * .6,
+                            ),
+                            //泡泡顏色
+                            decoration: BoxDecoration(
+                              color: Color(0xffEAEFF6),
+                              // gradient: LinearGradient(
+                              //     colors: [Color(0xfffd669a), Color(0xffff836a)]),
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(text_radius),
+                                bottomRight: Radius.circular(text_radius),
+                                bottomLeft: Radius.circular(text_radius),
+                              ),
+                            ),
+                            // 泡泡內容
+                            // 判斷type
+                            child: msg.type == 1
+                                ? Container(child: Text('${msg.text}'))
+                                : msg.type == 2
+                                    ? GestureDetector(
+                                        child: Container(
+                                          child: Image.network('${msg.text}'),
                                         ),
+                                        onTap: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      ShowImage(
+                                                        img: msg.text!,
+                                                      )));
+                                        },
                                       )
-                                    : msg.type == 6
+                                    // : msg.type == 3
+                                    // ? Image.asset(
+                                    // '${stickers_list[int.parse(msg.text!)]}')
+                                    : msg.type == 4
                                         ? Container(
-                                            child: Text('通知:${msg.text}'),
+                                            child: Column(
+                                              children: [
+                                                Text('已傳送錄音'),
+                                                IconButton(
+                                                    icon: msg.play == false
+                                                        ? Icon(Icons.play_arrow)
+                                                        : Icon(Icons.pause),
+                                                    onPressed: () {
+                                                      startplay(msg);
+                                                    })
+                                              ],
+                                            ),
                                           )
-                                        : Container(),
-                  ),
+                                        : msg.type == 6
+                                            ? Container(
+                                                child: Text('通知:${msg.text}'),
+                                              )
+                                            : Container(),
+                          ),
+                  ],
                 ),
-                // SizedBox(
-                //   width: 5.0,
-                // ),
+                SizedBox(
+                  width: 5.0,
+                ),
                 // //時間-已讀
                 // Container(
                 //   child: Column(
@@ -1193,72 +1257,88 @@ class _O2OChatroomState extends State<O2OChatroom> {
                       //   padding: const EdgeInsets.symmetric(vertical: 4),
                       //   child: Text('${msg.from}'),
                       // ),
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 15.0, vertical: 10.0),
-                        constraints: BoxConstraints(
-                          maxWidth: MediaQuery.of(context).size.width * .6,
-                        ),
-                        //泡泡顏色
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(text_radius),
-                            topRight: Radius.circular(text_radius),
-                            bottomRight: Radius.circular(text_radius),
-                          ),
-                        ),
-                        // 泡泡內容
-                        // 判斷type
-                        child: msg.type == 1
-                            ? Container(child: Text('${msg.text}'))
-                            : msg.type == 2
-                                ? GestureDetector(
-                                    child: Container(
-                                      child: Image.network('${msg.text}'),
-                                    ),
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) => ShowImage(
-                                                    img: msg.text!,
-                                                  )));
-                                    },
-                                  )
-                                : msg.type == 3
-                                    ? Image.asset(
-                                        '${stickers_list[int.parse(msg.text!)]}')
-                                    : msg.type == 4
-                                        ? Container(
-                                            child: Column(
-                                              children: [
-                                                Text('已收到錄音'),
-                                                IconButton(
-                                                    icon: msg.play == false
-                                                        ? Icon(Icons.play_arrow)
-                                                        : Icon(Icons.pause),
-                                                    onPressed: () {
-                                                      startplay(msg);
-                                                    })
-                                              ],
-                                            ),
-                                          )
-                                        : msg.type == 6
-                                            ? Container(
-                                                child: Text('通知'),
-                                              )
-                                            : Container(),
-                        // child: SelectableText(
-                        //   message.text, //訊息
-                        //   style: TextStyle(
-                        //       color: Colors.white,
-                        //       fontSize: 16.0,
-                        //       fontWeight: FontWeight.w600,
-                        //       height: 1.2),
-                        //   showCursor: true,
-                        // ),
-                      ),
+                      msg.type == 3
+                          ? Container(
+                              padding: EdgeInsets.only(
+                                top: 10,
+                                bottom: 10,
+                              ),
+                              constraints: BoxConstraints(
+                                maxWidth:
+                                    MediaQuery.of(context).size.width * .6,
+                              ),
+                              child: Image.asset(
+                                  '${stickers_list[int.parse(msg.text!)]}'),
+                            )
+                          : Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 15.0, vertical: 10.0),
+                              constraints: BoxConstraints(
+                                maxWidth:
+                                    MediaQuery.of(context).size.width * .6,
+                              ),
+                              //泡泡顏色
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.only(
+                                  bottomLeft: Radius.circular(text_radius),
+                                  topRight: Radius.circular(text_radius),
+                                  bottomRight: Radius.circular(text_radius),
+                                ),
+                              ),
+                              // 泡泡內容
+                              // 判斷type
+                              child: msg.type == 1
+                                  ? Container(child: Text('${msg.text}'))
+                                  : msg.type == 2
+                                      ? GestureDetector(
+                                          child: Container(
+                                            child: Image.network('${msg.text}'),
+                                          ),
+                                          onTap: () {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        ShowImage(
+                                                          img: msg.text!,
+                                                        )));
+                                          },
+                                        )
+                                      // : msg.type == 3
+                                      // ? Image.asset(
+                                      // '${stickers_list[int.parse(msg.text!)]}')
+                                      : msg.type == 4
+                                          ? Container(
+                                              child: Column(
+                                                children: [
+                                                  Text('已收到錄音'),
+                                                  IconButton(
+                                                      icon: msg.play == false
+                                                          ? Icon(
+                                                              Icons.play_arrow)
+                                                          : Icon(Icons.pause),
+                                                      onPressed: () {
+                                                        startplay(msg);
+                                                      })
+                                                ],
+                                              ),
+                                            )
+                                          : msg.type == 6
+                                              ? Container(
+                                                  child: Text('通知'),
+                                                )
+                                              : Container(),
+                              // child: SelectableText(
+                              //   message.text, //訊息
+                              //   style: TextStyle(
+                              //       color: Colors.white,
+                              //       fontSize: 16.0,
+                              //       fontWeight: FontWeight.w600,
+                              //       height: 1.2),
+                              //   showCursor: true,
+                              // ),
+                            ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 4),
                         child: Text(
@@ -1352,6 +1432,10 @@ class _O2OChatroomState extends State<O2OChatroom> {
         Provider.of<ChatProvider>(context, listen: false)
             .o2ohistorymsg!
             .isEmpty) {
+      //05 狀況
+      _textController.text = Provider.of<ChatProvider>(context, listen: false)
+          .remoteUserInfo[0]
+          .default_chat_text;
     } else if (topicindex != -1 &&
         Provider.of<ChatProvider>(context, listen: false).o2ohistorymsg !=
             null &&

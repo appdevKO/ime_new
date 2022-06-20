@@ -9,6 +9,9 @@ import 'package:ime_new/business_logic/provider/TD_game.dart';
 import 'package:ime_new/ui/loginpage/loginpage.dart';
 import 'package:provider/provider.dart';
 import 'business_logic/provider/chat_provider.dart';
+import 'package:move_to_background/move_to_background.dart';
+
+import 'business_logic/provider/sweetProvider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,10 +19,8 @@ Future<void> main() async {
     print('fire base 初始');
     await Firebase.initializeApp();
   }
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown
-  ]);
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   runApp(MyApp());
 }
 
@@ -35,6 +36,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<ChatProvider>(
             create: (context) => ChatProvider()),
         ChangeNotifierProvider<TD_game>(create: (context) => TD_game()),
+        ChangeNotifierProvider<sweetProvider>(
+            create: (context) => sweetProvider()),
       ],
       child: GetMaterialApp(
         title: 'IME',

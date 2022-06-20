@@ -16,7 +16,7 @@ class ActionMsgModel {
       this.createTime,
       this.memberid,
       this.nickname,
-    });
+      this.account});
 
   ObjectId? msgid;
   ObjectId? action_id;
@@ -25,17 +25,16 @@ class ActionMsgModel {
   String? avatar;
   String? nickname;
   DateTime? createTime;
-
-
+  String? account;
 
   factory ActionMsgModel.fromJson(Map<String, dynamic> json) => ActionMsgModel(
         action_id: json["action_id"],
         msgid: json["_id"],
         text: json["text"],
         avatar: json["avatar"],
+        account: json["account"],
         createTime: json["time"],
         memberid: json["memberid"],
-
         nickname: json["nickname"].toString(),
       );
 
@@ -43,7 +42,7 @@ class ActionMsgModel {
         "action_id": action_id,
         "_id": msgid,
         "text": text,
-
+        "account": account,
         "avatar": avatar,
         "time": createTime,
         "memberid": memberid,

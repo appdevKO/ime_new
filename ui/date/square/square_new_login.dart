@@ -81,7 +81,7 @@ class _DatelastloginState extends State<Datelastlogin> {
                                             value.last_login_memberlist?[index]
                                                     .introduction ==
                                                 ''
-                                        ? '目前沒有自我介紹'
+                                        ? '不詳'
                                         : '${value.last_login_memberlist?[index].introduction}',
                                     size: 12,
                                   ),

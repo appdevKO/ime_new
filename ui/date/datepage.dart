@@ -43,68 +43,56 @@ class _DatePageState extends State<DatePage> {
         items: [
           BottomNavigationBarItem(
               icon: pageIndex == 0
-                  ? const Icon(
-                      Icons.live_tv,
-                      color: Colors.red,
-                      size: 35,
-                    )
-                  : const Icon(
-                      Icons.live_tv_outlined,
-                      color: Colors.black,
-                      size: 35,
-                    ),
+                  ? Container(
+                      height: 30,
+                      child: Image.asset(
+                        'assets/icon/navigator/chat02.png',
+                      ))
+                  : Container(
+                      height: 30,
+                      child: Image.asset('assets/icon/navigator/chat01.png')),
+              // ? const Icon(
+              //     Icons.live_tv,
+              //     color: Colors.red,
+              //     size: 35,
+              //   )
+              // : const Icon(
+              //     Icons.live_tv_outlined,
+              //     color: Colors.black,
+              //     size: 35,
+              //   ),
               label: '私聊'),
           BottomNavigationBarItem(
               icon: pageIndex == 1
-                  ? const Icon(
-                Icons.message,
-                color: Colors.red,
-                size: 35,
-              )
-                  : const Icon(
-                Icons.message_outlined,
-                color: Colors.black,
-                size: 35,
-              ),
+                  ? Container(
+                      height: 30,
+                      child: Image.asset('assets/icon/navigator/group02.png'))
+                  : Container(
+                      height: 30,
+                      child: Image.asset('assets/icon/navigator/group01.png')),
               label: '揪團'),
           BottomNavigationBarItem(
               icon: pageIndex == 2
-                  ? const Icon(
-                Icons.home_filled,
-                color: Colors.red,
-                size: 35,
-              )
-                  : const Icon(
-                Icons.home_outlined,
-                color: Colors.black,
-                size: 35,
-              ),
+                  ? Container(
+                      height: 30,
+                      child: Image.asset('assets/icon/navigator/index02.png'))
+                  : Container(
+                      height: 30,
+                      child: Image.asset('assets/icon/navigator/index01.png')),
               label: '首頁'),
           BottomNavigationBarItem(
               icon: pageIndex == 3
-                  ? const Icon(
-                      Icons.group_add,
-                      color: Colors.red,
-                      size: 35,
-                    )
-                  : const Icon(
-                      Icons.group_add_outlined,
-                      color: Colors.black,
-                      size: 35,
-                    ),
+                  ? Container(
+                      height: 30,
+                      child: Image.asset('assets/icon/navigator/action02.png'))
+                  : Container(
+                      height: 30,
+                      child: Image.asset('assets/icon/navigator/action01.png')),
               label: '動態'),
           BottomNavigationBarItem(
               icon: pageIndex == 4
-                  ? const Icon(
-                      Icons.person,
-                      color: Colors.red,
-                      size: 35,
-                    )
-                  : const Icon(
-                      Icons.person_outline,
-                      color: Colors.black,
-                      size: 35,
-                    ),
+                  ? Container( height: 30,child: Image.asset('assets/icon/navigator/tod02.png'))
+                  : Container( height: 30,child: Image.asset('assets/icon/navigator/tod01.png')),
               label: '遊戲'),
         ],
         onTap: (currentindex) {

@@ -72,9 +72,17 @@ class ChatProvider with ChangeNotifier {
   List<O2OChatMsg>? o2o_msglist = [];
 
   final mqttclient = MqttServerClient(mqttbroker, clientID);
-  int pagesize = 5;
+  int pagesize = 10;
   int actionmsgpagesize = 1000;
   int chatpagesize = 200;
+
+  //按鈕等待 狀態
+  bool buttonwaiting = false;
+
+  change_button_waiting() {
+    buttonwaiting = !buttonwaiting;
+    notifyListeners();
+  }
 
   Future mqtt_connect() async {
     print('登入mqtt');
@@ -1050,6 +1058,7 @@ class ChatProvider with ChangeNotifier {
               'like_id_list': [],
               'area': remoteUserInfo[0].area,
               'avatar': remoteUserInfo[0].avatar,
+              'account': account_id,
             },
           );
         }
@@ -1124,6 +1133,7 @@ class ChatProvider with ChangeNotifier {
           "memberid": remoteUserInfo[0].memberid,
           "nickname": remoteUserInfo[0].nickname,
           'avatar': remoteUserInfo[0].avatar,
+          'account': account_id,
         },
       );
       // 留言+1
@@ -1173,7 +1183,7 @@ class ChatProvider with ChangeNotifier {
 
   int action_count = 0;
 
-  Future get_action_msg_count(id) async {
+  Future get_action_msg_count(id, type) async {
     print('獲得動態留言數量 $id');
     var result = await getcount(
       'action_msg',
@@ -1182,8 +1192,16 @@ class ChatProvider with ChangeNotifier {
     );
 
     if (result is int) {
-      action_count = result;
       print('動態留言.....數量$action_count');
+      if (type == 2) {
+        action_count = result;
+      } else {
+        var index =
+            newest_actionlist?.indexWhere((element) => element.id == id);
+        if (index is int && index != -1) {
+          newest_actionlist![index].msg_num = result;
+        }
+      }
     }
     notifyListeners();
   }
@@ -1212,10 +1230,10 @@ class ChatProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future delete_action_msg(action_id,msg_id) async {
+  Future delete_action_msg(action_id, msg_id) async {
     print("delete_action_msg ${msg_id}");
     await delete_one_remotemongodb('action_msg', mongo.where.eq('_id', msg_id));
-    await _mongoDB.plus_num('action', "_id", action_id, 'msg_num',- 1);
+    await _mongoDB.plus_num('action', "_id", action_id, 'msg_num', -1);
   }
 
   Future addpage_newest_action() async {
@@ -1735,6 +1753,7 @@ class ChatProvider with ChangeNotifier {
                   .and(mongo.where.eq('type', 1))
                   .sortBy('create_time', descending: true));
         } else {
+          print('沒目的 有地區');
           filter_grouppersonlist = await readremotemongodb(
               ChatRoomModel.fromJson, 'chatroom',
               field: mongo.where
@@ -1743,6 +1762,7 @@ class ChatProvider with ChangeNotifier {
                   .sortBy('create_time', descending: true));
         }
       } else {
+        print('有目的 沒地區');
         if (purposelist.isNotEmpty) {
           filter_grouppersonlist = await readremotemongodb(
               ChatRoomModel.fromJson, 'chatroom',
@@ -1757,6 +1777,7 @@ class ChatProvider with ChangeNotifier {
     } else {
       if (area != null) {
         if (purposelist.isNotEmpty) {
+          print('有目的 有地區');
           filter_groupteamlist = await readremotemongodb(
               ChatRoomModel.fromJson, 'chatroom',
               field: mongo.where
@@ -1765,6 +1786,7 @@ class ChatProvider with ChangeNotifier {
                   .and(mongo.where.eq('type', 0))
                   .sortBy('create_time', descending: true));
         } else {
+          print('沒目的 有地區');
           filter_groupteamlist = await readremotemongodb(
               ChatRoomModel.fromJson, 'chatroom',
               field: mongo.where
@@ -1774,11 +1796,12 @@ class ChatProvider with ChangeNotifier {
         }
       } else {
         if (purposelist.isNotEmpty) {
+          print('有目的 沒地區 ${purposelist[0]}');
           filter_groupteamlist = await readremotemongodb(
               ChatRoomModel.fromJson, 'chatroom',
               field: mongo.where
                   .eq('purpose', purposelist[0])
-                  .and(mongo.where.eq('type', 1))
+                  .and(mongo.where.eq('type', 0))
                   .sortBy('create_time', descending: true));
         } else {
           filter_groupteamlist = [];
@@ -1824,7 +1847,7 @@ class ChatProvider with ChangeNotifier {
       if (newpage.isEmpty) {
       } else {
         if (newpage != null) {
-          newpage = newpage!.reversed.toList();
+          newpage = newpage.reversed.toList();
           historymsg!.addAll(newpage);
         }
         groupp_his_value_plus();
@@ -1881,7 +1904,7 @@ class ChatProvider with ChangeNotifier {
       if (newpage.isEmpty) {
       } else {
         if (newpage != null) {
-          newpage = newpage!.reversed.toList();
+          newpage = newpage.reversed.toList();
           o2ohistorymsg!.addAll(newpage);
         }
         o2o_his_value_plus();
@@ -1938,19 +1961,21 @@ class ChatProvider with ChangeNotifier {
       String? area,
       String imgurl,
       int type,
-      // String purpose,
+      String purpose,
       String note,
       String rule,
       DateTime createtime,
       DateTime datetime) async {
     print("點增加聊天室 sex 1男 2女 type 0揪團  1約會 2私聊 設定約會時間$datetime");
+
+    print('輸入匡沒輸入');
     await _mongoDB.inserttomongo(
       "chatroom",
       {
         "imgurl": imgurl,
         "type": type,
         "title": title,
-        "purpose": purposelist[0],
+        "purpose": purpose == '' ? purposelist[0] : purpose,
         "note": note,
         "area": area,
         "rule": rule,
@@ -1960,7 +1985,8 @@ class ChatProvider with ChangeNotifier {
         "datetime": datetime,
       },
     );
-    Future.delayed(Duration(seconds: 2), () async {
+
+    Future.delayed(Duration(seconds: 1), () async {
       if (type == 0) {
         getgroupteam();
       } else {
@@ -1972,7 +1998,7 @@ class ChatProvider with ChangeNotifier {
   Future deleteAllRoom() async {
     print('all delete');
     // await _mongoDB.deletealltable('chatmsg');
-    await _mongoDB.deletealltable('action');
+    // await _mongoDB.deletealltable('action');
     await _mongoDB.deletealltable('action_msg');
     // await _mongoDB.deletealltable('groupchatmsg');
     // await _mongoDB.deletealltable('o2ochatmsg');
@@ -2612,9 +2638,10 @@ class ChatProvider with ChangeNotifier {
   List purposelist = [];
 
   add_purposelist(item) {
-    print('加入');
+    print('加入 或移出 $purposelist');
     if (purposelist.contains(item)) {
       purposelist.remove(item);
+      // purposelist.clear();
     } else {
       if (purposelist.length > 0) {
         purposelist.removeAt(0);

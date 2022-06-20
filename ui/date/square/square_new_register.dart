@@ -88,7 +88,7 @@ class _DateNewRegisterState extends State<DateNewRegister> {
                                                         index]
                                                     .introduction ==
                                                 ''
-                                        ? '目前沒有自我介紹'
+                                        ? '不詳'
                                         : '${value.newest_register_memberlist?[index].introduction}',
                                     size: 12,
                                   ),

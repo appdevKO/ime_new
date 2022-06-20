@@ -127,8 +127,8 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
       await [Permission.microphone, Permission.camera].request();
     }
     engine = await RtcEngine.create(appId);
-    engine!.setRemoteDefaultVideoStreamType(VideoStreamType.Low);
     // engine!.enableDualStreamMode(true);
+    engine!.setRemoteDefaultVideoStreamType(VideoStreamType.Low);
     engine!.disableVideo();
     engine!.setEventHandler(
         RtcEngineEventHandler(joinChannelSuccess: (channel, uid, elapsed) {
@@ -177,7 +177,7 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
     await engine!.muteAllRemoteAudioStreams(false);
 
     VideoEncoderConfiguration videoConfig =
-        VideoEncoderConfiguration(frameRate: VideoFrameRate.Fps30);
+        VideoEncoderConfiguration(frameRate: VideoFrameRate.Fps24,minFrameRate:VideoFrameRate.Fps7 , dimensions:VideoDimensions(width: 480,height: 360));
     await engine!.setVideoEncoderConfiguration(videoConfig);
     await engine!.enableLocalAudio(isSelfMute);
     await engine!.enableLocalVideo(isSelfHide);

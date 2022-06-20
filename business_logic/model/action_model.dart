@@ -21,12 +21,14 @@ class ActionModel {
       this.like_num,
       this.msg_num,
       this.share_num,
-      this.like_list});
+      this.like_list,
+      this.account});
 
   ObjectId? id;
   ObjectId? memberid;
   String? text;
   String? image;
+  String? account;
   String? image_sub;
   String? avatar;
   String? nickname;
@@ -41,6 +43,7 @@ class ActionModel {
         id: json["_id"],
         text: json["text"],
         image: json["image"],
+        account: json["account"],
         image_sub: json["image_sub"],
         avatar: json["avatar"],
         createTime: json["time"],
@@ -56,6 +59,7 @@ class ActionModel {
   Map<String, dynamic> toJson() => {
         "_id": id,
         "text": text,
+        "account": account,
         "image": image,
         "image_sub": image_sub,
         "avatar": avatar,

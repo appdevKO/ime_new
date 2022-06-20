@@ -109,10 +109,10 @@ class _ProfileOptionState extends State<ProfileOption> {
       //     callback: () {
       //       Provider.of<ChatProvider>(context, listen: false).getaddress();
       //     }),
-      SettingOption(
-          title: '遇見直播主',
-          icon: CircleAvatar(child: Center(child: Icon(Icons.favorite))),
-          callback: () {}),
+      // SettingOption(
+      //     title: '遇見直播主',
+      //     icon: CircleAvatar(child: Center(child: Icon(Icons.favorite))),
+      //     callback: () {}),
       SettingOption(
           title: '活動花絮',
           icon: CircleAvatar(child: Center(child: Icon(Icons.note))),

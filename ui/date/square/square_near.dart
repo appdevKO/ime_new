@@ -86,7 +86,7 @@ class _DateNearState extends State<DateNear> {
                                                   value.nearpeoplelist?[index]
                                                           .introduction ==
                                                       ''
-                                              ? '目前沒有自我介紹'
+                                              ? '不詳'
                                               : '${value.nearpeoplelist?[index].introduction}',
                                           size: 12,
                                         ),

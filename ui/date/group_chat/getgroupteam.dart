@@ -161,20 +161,20 @@ class _GetTeamState extends State<GetTeam> {
               //     Navigator.push(context, MaterialPageRoute(builder: (context)=>ChatTestPage()));
               //   },
               // ),
-              GestureDetector(
-                child: Container(
-                    width: 50,
-                    height: 30,
-                    decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                            colors: [Colors.blue, Colors.tealAccent]),
-                        borderRadius: BorderRadius.circular(15)),
-                    child: Center(child: Text('delete all'))),
-                onTap: () {
-                  Provider.of<ChatProvider>(context, listen: false)
-                      .deleteAllRoom();
-                },
-              ),
+              // GestureDetector(
+              //   child: Container(
+              //       width: 50,
+              //       height: 30,
+              //       decoration: BoxDecoration(
+              //           gradient: LinearGradient(
+              //               colors: [Colors.blue, Colors.tealAccent]),
+              //           borderRadius: BorderRadius.circular(15)),
+              //       child: Center(child: Text('delete all'))),
+              //   onTap: () {
+              //     Provider.of<ChatProvider>(context, listen: false)
+              //         .deleteAllRoom();
+              //   },
+              // ),
             ],
           ),
         ),
@@ -553,6 +553,7 @@ class _GetTeamState extends State<GetTeam> {
                                       onTap: () {
                                         value.add_purposelist(
                                             purposelist[index]);
+                                        _purposeController.clear();
                                       },
                                     )),
                             spacing: 10,
@@ -560,6 +561,23 @@ class _GetTeamState extends State<GetTeam> {
                           ),
                         );
                       }),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 5, vertical: 8),
+                      child: TextField(
+                        controller: _purposeController,
+                        decoration: InputDecoration(
+                          hintText: '或自訂目的',
+                        ),
+                        onTap: () {
+                          Provider.of<ChatProvider>(context, listen: false)
+                              .purposelist
+                              .clear();
+                        },
+                        maxLength: 10,
+                        maxLines: null,
+                      ),
                     ),
                     Text('區域'),
                     Padding(
@@ -701,67 +719,74 @@ class _GetTeamState extends State<GetTeam> {
                         Container(
                           width: 15,
                         ),
-                        ElevatedButton(
-                          onPressed: () {
-                            //送出 創建房間 條件
-                            if (checkvalue == true &&
-                                dropvalue != null &&
-                                selectedDateTime != null &&
-                                _titleController.text != '' &&
-                                Provider.of<ChatProvider>(context,
-                                        listen: false)
-                                    .purposelist
-                                    .isNotEmpty) {
-                              FocusScope.of(context).unfocus();
-                              Provider.of<ChatProvider>(context, listen: false)
-                                  .createchatroom(
-                                      _titleController.text,
-                                      dropvalue,
-                                      Provider.of<ChatProvider>(context,
-                                                  listen: false)
-                                              .remoteUserInfo[0]
-                                              .avatar_sub ??
-                                          '',
-                                      0,
-                                      _noteController.text,
-                                      _ruleController.text,
-                                      DateTime.now().add(Duration(hours: 8)),
-                                      selectedDateTime!.add(Duration(hours: 8)))
-                                  .whenComplete(() {
-                                _titleController.clear();
-                                _purposeController.clear();
-                                _areaController.clear();
-                                _noteController.clear();
-                                _ruleController.clear();
-                                _quotaController.clear();
-                              });
-                              setState(() {
-                                selectedDateTime = null;
-                                index = 0;
-                              });
+                        Consumer<ChatProvider>(builder: (context,value,child){
+                          return ElevatedButton(
+                            onPressed: () {
 
-                              Provider.of<ChatProvider>(context, listen: false)
-                                  .purposelist
-                                  .clear();
-                            } else {
-                              print('沒反應');
-                            }
-                          },
-                          child: Text('創建房間'),
-                          style: ElevatedButton.styleFrom(
-                              minimumSize: Size(115, 40),
-                              primary: checkvalue == true &&
-                                      dropvalue != null &&
-                                      selectedDateTime != null &&
-                                      _titleController.text != '' &&
-                                      Provider.of<ChatProvider>(context,
-                                              listen: false)
-                                          .purposelist
-                                          .isNotEmpty
-                                  ? Colors.red
-                                  : Colors.grey,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8.0))),
+                              // //送出 創建房間 條件
+                              if (checkvalue == true &&
+                                  dropvalue != null &&
+                                  selectedDateTime != null &&
+                                  _titleController.text != '' &&
+                                 ( _purposeController.text != '' ||
+                                  Provider.of<ChatProvider>(context,
+                                          listen: false)
+                                      .purposelist
+                                      .isNotEmpty)) {
+                                FocusScope.of(context).unfocus();
+                                Provider.of<ChatProvider>(context, listen: false)
+                                    .createchatroom(
+                                        _titleController.text,
+                                        dropvalue,
+                                        Provider.of<ChatProvider>(context,
+                                                    listen: false)
+                                                .remoteUserInfo[0]
+                                                .avatar_sub ??
+                                            '',
+                                        0,
+                                        _purposeController.text,
+                                        _noteController.text,
+                                        _ruleController.text,
+                                        DateTime.now().add(Duration(hours: 8)),
+                                        selectedDateTime!.add(Duration(hours: 8)))
+                                    .whenComplete(() {
+                                  _titleController.clear();
+                                  _purposeController.clear();
+                                  _areaController.clear();
+                                  _noteController.clear();
+                                  _ruleController.clear();
+                                  _quotaController.clear();
+                                });
+                                setState(() {
+                                  selectedDateTime = null;
+                                  index = 0;
+                                });
+
+                                Provider.of<ChatProvider>(context, listen: false)
+                                    .purposelist
+                                    .clear();
+                              } else {
+                                print('沒反應');
+                              }
+                            },
+                            child: Text('創建房間'),
+                            style: ElevatedButton.styleFrom(
+                                minimumSize: Size(115, 40),
+                                primary: checkvalue == true &&
+                                    dropvalue != null &&
+                                    selectedDateTime != null &&
+                                    _titleController.text != '' &&
+                                    (_purposeController.text != '' ||
+                                        value
+                                            .purposelist
+                                            .isNotEmpty)
+                                    ? Colors.red
+                                    : Colors.grey,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8.0))),
+                          );
+                        },
+
                         ),
                       ],
                     ),
@@ -909,10 +934,12 @@ class _GroupteamState extends State<Groupteam> {
                                                                                   index]
                                                                               .imgurl !=
                                                                           '' &&
-                                                                      value.filter_groupteamlist![index]
-                                                                              .imgurl !=
+                                                                      value.filter_groupteamlist![index].imgurl !=
                                                                           ''
-                                                                  ? ''
+                                                                  ? value
+                                                                      .filter_groupteamlist![
+                                                                          index]
+                                                                      .imgurl
                                                                   : default_roomimg),
                                                             ),
                                                             Text(

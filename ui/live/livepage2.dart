@@ -29,40 +29,20 @@ class _LivePage2State extends State<LivePage2> {
         selectedItemColor: Colors.red,
         unselectedItemColor: Colors.black45,
         currentIndex: pageIndex,
-
         items: [
           BottomNavigationBarItem(
               icon: pageIndex == 0
-                  ? const Icon(
-                      Icons.favorite,
-                      color: Colors.red,
-                      size: 35,
-                    )
-                  : const Icon(
-                      Icons.favorite_border,
-                      color: Colors.black,
-                      size: 35,
-                    ),
+                  ? Container( height: 50,child: Image.asset('assets/icon/navigator/sweetlive02.png'))
+                  : Container( height: 50,child: Image.asset('assets/icon/navigator/sweetlive01.png')),
               label: '甜心直播'),
           BottomNavigationBarItem(
-              icon: const Icon(
-                Icons.video_call_sharp,
-                color: Colors.pink,
-                size:60,
-              ),
+              icon: Center(
+                  child: Container(height: 70,child: Image.asset('assets/icon/navigator/takestream02.png'))),
               label: ''),
           BottomNavigationBarItem(
               icon: pageIndex == 2
-                  ? const Icon(
-                      Icons.home_filled,
-                      color: Colors.red,
-                      size: 35,
-                    )
-                  : const Icon(
-                      Icons.home_outlined,
-                      color: Colors.black,
-                      size: 35,
-                    ),
+                  ? Container(height: 50,child: Image.asset('assets/icon/navigator/spylive02.png'))
+                  : Container(height: 50,child: Image.asset('assets/icon/navigator/spylive01.png')),
               label: '特務直播'),
         ],
         onTap: (currentindex) {

@@ -34,6 +34,7 @@ class _ActionPageState extends State<ActionPage> {
     // TODO: implement dispose
     _tabController.dispose();
     _textEditingController.dispose();
+    super.dispose();
   }
 
   @override
@@ -71,7 +72,7 @@ class _ActionPageState extends State<ActionPage> {
               ),
             ),
             body: Container(
-                color: Colors.white,
+                // color: Colors.white,
                 child: CustomScrollView(
                     physics: NeverScrollableScrollPhysics(),
                     slivers: <Widget>[
