@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ime_new/business_logic/provider/chat_provider.dart';
+import 'package:ime_new/business_logic/provider/sweetProvider.dart';
 import 'package:ime_new/ui/loginpage/registerpage.dart';
 import 'package:provider/provider.dart';
 
@@ -17,7 +18,9 @@ class _WaitingPageState extends State<WaitingPage> {
   void initState() {
     // mqtt
     Provider.of<ChatProvider>(context, listen: false).mqtt_connect();
+    Provider.of<sweetProvider>(context, listen: false).connect();
     Provider.of<ChatProvider>(context, listen: false).initialGCP();
+
     super.initState();
   }
 

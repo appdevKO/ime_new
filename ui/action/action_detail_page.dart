@@ -19,10 +19,15 @@ class ActionDetailPage extends StatefulWidget {
   State<ActionDetailPage> createState() => _ActionDetailPageState();
 }
 
-class _ActionDetailPageState extends State<ActionDetailPage> {
+class _ActionDetailPageState extends State<ActionDetailPage>
+    with TickerProviderStateMixin {
   final FocusNode _focus = FocusNode();
   late TextEditingController _textController;
   int? index = -1;
+
+  // late Animation<double> _myAnimation;
+  // late AnimationController _controller;
+  bool _flag = false;
 
   // RefreshController _refreshController =
   //     RefreshController(initialRefresh: false);
@@ -31,7 +36,15 @@ class _ActionDetailPageState extends State<ActionDetailPage> {
   @override
   void initState() {
     _textController = TextEditingController();
-
+    // _controller = AnimationController(
+    //   vsync: this,
+    //   duration: Duration(milliseconds: 500),
+    // );
+    //
+    // _myAnimation = CurvedAnimation(
+    //     curve: Curves.decelerate,
+    //     parent: _controller
+    // );
     initdata();
 
     super.initState();
@@ -64,6 +77,21 @@ class _ActionDetailPageState extends State<ActionDetailPage> {
     return WillPopScope(
       child: SafeArea(
         child: Scaffold(
+          // floatingActionButton: FloatingActionButton(
+          //   onPressed: () {
+          //     if (_flag) {
+          //       _controller.forward();
+          //     } else {
+          //       _controller.reverse();
+          //     }
+          //     _flag = !_flag;
+          //   },
+          //   child: AnimatedIcon(
+          //     color: Colors.white,
+          //     progress: _myAnimation,
+          //     icon: AnimatedIcons.search_ellipsis,
+          //   ),
+          // ),
           body: Stack(
             children: [
               SingleChildScrollView(
@@ -87,11 +115,30 @@ class _ActionDetailPageState extends State<ActionDetailPage> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  CircleAvatar(
-                                      backgroundColor: Colors.grey,
-                                      radius: 30,
-                                      backgroundImage: NetworkImage(
-                                          '${widget.TheAction.avatar}')),
+                                  GestureDetector(
+                                    child: CircleAvatar(
+                                        backgroundColor: Colors.grey,
+                                        radius: 30,
+                                        backgroundImage: NetworkImage(
+                                            '${widget.TheAction.avatar}')),
+                                    onTap: () {
+                                      if (widget.TheAction.account !=
+                                          value.remoteUserInfo[0].account) {
+                                        //成員橫排 點 單一頭像
+                                        // 改成先進簡介
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    OtherProfilePage(
+                                                      chatroomid: widget
+                                                          .TheAction.memberid,
+                                                    )));
+                                      } else {
+                                        print('同一人');
+                                      }
+                                    },
+                                  ),
                                   Padding(
                                     padding: const EdgeInsets.only(left: 10),
                                     child: Column(
@@ -543,7 +590,8 @@ class _ActionDetailPageState extends State<ActionDetailPage> {
                             child: GestureDetector(
                               child: Container(
                                 child: Image.network(
-                                    '${widget.TheAction.image_sub}',fit: BoxFit.cover),
+                                    '${widget.TheAction.image_sub}',
+                                    fit: BoxFit.cover),
                                 width: MediaQuery.of(context).size.width,
                                 // decoration: BoxDecoration(
                                 //     color: Colors.grey,

@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:ime_new/business_logic/model/mqtt_model.dart';
 import 'package:ime_new/business_logic/provider/chat_provider.dart';
+import 'package:ime_new/ui/user_profile/other_profile_page.dart';
 import 'package:ime_new/ui/widget/showimage.dart';
 import 'package:ime_new/utils/sticker_address.dart';
 import 'package:ime_new/utils/viewconfig.dart';
@@ -1212,31 +1213,51 @@ class _O2OChatroomState extends State<O2OChatroom> {
                 Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    CircleAvatar(
-                      backgroundColor: Colors.white,
-                      backgroundImage: memberindex != -1 &&
-                              Provider.of<ChatProvider>(context, listen: false)
-                                      .o2omemberlist![memberindex]
-                                      .avatar_sub !=
-                                  null &&
-                              Provider.of<ChatProvider>(context, listen: false)
-                                      .o2omemberlist![memberindex]
-                                      .avatar_sub !=
-                                  ''
-                          ? NetworkImage(
-                              Provider.of<ChatProvider>(context, listen: false)
-                                  .o2omemberlist![memberindex]
-                                  .avatar_sub)
-                          : AssetImage(Provider.of<ChatProvider>(context, listen: false)
-                                          .o2omemberlist![memberindex]
-                                          .sex ==
-                                      null ||
-                                  Provider.of<ChatProvider>(context, listen: false)
-                                          .o2omemberlist![memberindex]
-                                          .sex ==
-                                      '男'
-                              ? 'assets/default/sex_man.png'
-                              : 'assets/default/sex_woman.png') as ImageProvider,
+                    GestureDetector(
+                      child: CircleAvatar(
+                        backgroundColor: Colors.white,
+                        backgroundImage: memberindex != -1 &&
+                                Provider.of<ChatProvider>(context, listen: false)
+                                        .o2omemberlist![memberindex]
+                                        .avatar_sub !=
+                                    null &&
+                                Provider.of<ChatProvider>(context, listen: false)
+                                        .o2omemberlist![memberindex]
+                                        .avatar_sub !=
+                                    ''
+                            ? NetworkImage(
+                                Provider.of<ChatProvider>(context, listen: false)
+                                    .o2omemberlist![memberindex]
+                                    .avatar_sub)
+                            : AssetImage(Provider.of<ChatProvider>(context, listen: false)
+                                            .o2omemberlist![memberindex]
+                                            .sex ==
+                                        null ||
+                                    Provider.of<ChatProvider>(context, listen: false)
+                                            .o2omemberlist![memberindex]
+                                            .sex ==
+                                        '男'
+                                ? 'assets/default/sex_man.png'
+                                : 'assets/default/sex_woman.png') as ImageProvider,
+                      ),onTap: (){
+                      if (Provider.of<ChatProvider>(context, listen: false)
+                          .o2omemberlist![memberindex].account !=
+                          Provider.of<ChatProvider>(context, listen: false)
+                            .remoteUserInfo[0].account) {
+                        //成員橫排 點 單一頭像
+                        // 改成先進簡介
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    OtherProfilePage(
+                                      chatroomid: Provider.of<ChatProvider>(context, listen: false)
+                                          .o2omemberlist![memberindex].memberid,
+                                    )));
+                      } else {
+                        print('同一人');
+                      }
+                    },
                     ),
                     Text(
                       '地區',

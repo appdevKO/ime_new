@@ -71,7 +71,8 @@ class ChatProvider with ChangeNotifier {
   //當前mqtt收到的o2o msglist
   List<O2OChatMsg>? o2o_msglist = [];
 
-  final mqttclient = MqttServerClient(mqttbroker, clientID);
+  // final mqttclient = MqttServerClient(mqttbroker, clientID);
+  final mqttclient = MqttServerClient.withPort('iot.gotcash.me', myid, port);
   int pagesize = 10;
   int actionmsgpagesize = 1000;
   int chatpagesize = 200;
@@ -365,36 +366,35 @@ class ChatProvider with ChangeNotifier {
                         memberid: json
                             .decode(utf8.decode(payload.codeUnits))["memberid"],
                         nickname: json
-                            .decode(utf8.decode(payload.codeUnits))["from"]
+                            .decode(utf8.decode(payload.codeUnits))["nickname"]
                             .toString()));
                   } else {
                     print('這個人曾經私訊過有存過::$topicindex ');
                     o2o_msglist?[topicindex].msg!.insert(
                           0,
                           MqttMsg(
-                            fromid: json
-                                .decode(utf8.decode(payload.codeUnits))["from"],
-                            text: json
-                                .decode(utf8.decode(payload.codeUnits))["text"],
-                            type: json
-                                .decode(utf8.decode(payload.codeUnits))["type"],
-                            id: json
-                                .decode(utf8.decode(payload.codeUnits))["id"],
-                            play: false,
-                            time: json.decode(utf8.decode(payload.codeUnits))[
-                                        "time"] ==
-                                    null
-                                ? null
-                                : DateTime.parse(json.decode(
-                                    utf8.decode(payload.codeUnits))["time"]),
-                            topicid: json.decode(
-                                utf8.decode(payload.codeUnits))["topic_id"],
-                            sendtopicid: json.decode(
-                                utf8.decode(payload.codeUnits))["memberid"],
-                            recordtime: '',
-                            note: json
-                                .decode(utf8.decode(payload.codeUnits))["note"],
-                          ),
+                              fromid: json.decode(
+                                  utf8.decode(payload.codeUnits))["from"],
+                              text: json.decode(
+                                  utf8.decode(payload.codeUnits))["text"],
+                              type: json.decode(
+                                  utf8.decode(payload.codeUnits))["type"],
+                              id: json
+                                  .decode(utf8.decode(payload.codeUnits))["id"],
+                              play: false,
+                              time: json.decode(utf8.decode(payload.codeUnits))["time"] == null
+                                  ? null
+                                  : DateTime.parse(json.decode(
+                                      utf8.decode(payload.codeUnits))["time"]),
+                              topicid: json.decode(
+                                  utf8.decode(payload.codeUnits))["topic_id"],
+                              sendtopicid: json.decode(
+                                  utf8.decode(payload.codeUnits))["memberid"],
+                              recordtime: '',
+                              note: json.decode(
+                                  utf8.decode(payload.codeUnits))["note"],
+                              nickname: json.decode(
+                                  utf8.decode(payload.codeUnits))["nickname"]),
                         );
                   }
                 }
@@ -515,21 +515,6 @@ class ChatProvider with ChangeNotifier {
             'note': note,
           },
         );
-
-        // _mongoDB.updateData(
-        //   "o2olog",
-        //   "member_id",
-        //   remoteUserInfo[0].memberid,
-        //   'o2ochating',
-        //   topic,
-        // );
-        // _mongoDB.updateData(
-        //   "o2olog",
-        //   "member_id",
-        //   topic,
-        //   'o2ochating',
-        //   remoteUserInfo[0].memberid,
-        // );
       }
     } catch (e) {
       if (e is ConnectionException) {
@@ -588,7 +573,7 @@ class ChatProvider with ChangeNotifier {
               play: false,
               recordtime: '')
         ],
-        from: 444,
+        from: account_id,
         mqtt_tyype: "ime_o2o_chat",
         topicid: memberid.toHexString(),
         memberid: totopic.toHexString(),
@@ -1120,6 +1105,13 @@ class ChatProvider with ChangeNotifier {
     }
   }
 
+  //刪除動態的留言
+  Future delete_action(action_id) async {
+    print("delete_action_msg ${action_id}");
+    await delete_one_remotemongodb('action', mongo.where.eq('_id', action_id));
+    get_new_action_list();
+  }
+
   Future upload_action_msg(action_id, text) async {
     print('送出留言 $action_id /$text');
     try {
@@ -1230,6 +1222,7 @@ class ChatProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  //刪除動態的留言
   Future delete_action_msg(action_id, msg_id) async {
     print("delete_action_msg ${msg_id}");
     await delete_one_remotemongodb('action_msg', mongo.where.eq('_id', msg_id));
@@ -1999,12 +1992,12 @@ class ChatProvider with ChangeNotifier {
     print('all delete');
     // await _mongoDB.deletealltable('chatmsg');
     // await _mongoDB.deletealltable('action');
-    await _mongoDB.deletealltable('action_msg');
+    // await _mongoDB.deletealltable('action_msg');
     // await _mongoDB.deletealltable('groupchatmsg');
     // await _mongoDB.deletealltable('o2ochatmsg');
     // await _mongoDB.deletealltable('o2olog');
-    // await _mongoDB.deletealltable('block_log');
-    // await _mongoDB.deletealltable('follow_log');
+    await _mongoDB.deletealltable('block_log');
+    await _mongoDB.deletealltable('follow_log');
     // await _mongoDB.deletealltable('chatroom');
     // await _mongoDB.deletealltable('member');
   }
@@ -2176,25 +2169,23 @@ class ChatProvider with ChangeNotifier {
   }
 
   Future createfollowlog() async {
-    await _mongoDB.upsertData2(
-      "follow_log",
-      'member_id',
-      remoteUserInfo[0].memberid,
-      {
-        'create_time': DateTime.now(),
-      },
-    );
+    await _mongoDB.updateData_single2(
+        "follow_log", 'member_id', remoteUserInfo[0].memberid, {
+      'create_time': DateTime.now().add(
+        Duration(hours: 8),
+      ),
+      'list_id': [],
+    });
   }
 
   Future createblocklog() async {
-    await _mongoDB.upsertData2(
-      "block_log",
-      'member_id',
-      remoteUserInfo[0].memberid,
-      {
-        'create_time': DateTime.now(),
-      },
-    );
+    await _mongoDB.updateData_single2(
+        "block_log", 'member_id', remoteUserInfo[0].memberid, {
+      'create_time': DateTime.now().add(
+        Duration(hours: 8),
+      ),
+      'list_id': [],
+    });
   }
 
   var myfollowlog;

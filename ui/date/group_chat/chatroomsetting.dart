@@ -146,8 +146,8 @@ class _ChatroomSettingState extends State<ChatroomSetting> {
                           padding: const EdgeInsets.only(
                               top: 20, bottom: 10),
                           child: Container(
-                            child: Text(value.chatroomsetting[0].note == null ||
-                                    value.chatroomsetting[0].note == ''
+                            child: Text(value.chatroomsetting[0].purpose == null ||
+                                    value.chatroomsetting[0].purpose == ''
                                 ? '目的:'
                                 : '目的:${value.chatroomsetting[0].purpose}'),
                           ),

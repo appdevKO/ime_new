@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:ime_new/business_logic/provider/chat_provider.dart';
 import 'package:ime_new/ui/user_profile/other_profile_page.dart';
@@ -109,16 +110,19 @@ class _SingleActionState extends State<SingleAction> {
   final scrollController = ScrollController();
   late TextEditingController _textController;
   final FocusNode _focus = FocusNode();
+  late CustomPopupMenuController _controller;
 
   @override
   void initState() {
     _textController = TextEditingController();
+    _controller = CustomPopupMenuController();
     super.initState();
   }
 
   @override
   void dispose() {
     _textController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -225,12 +229,62 @@ class _SingleActionState extends State<SingleAction> {
                             ),
                           ],
                         ),
-                        Text(
-                          value.newest_actionlist![widget.index!].createTime !=
-                                  null
-                              ? '${DateFormat('yyyy/MM/dd').format(value.newest_actionlist![widget.index!].createTime)}'
-                              : '--/--/--',
-                          style: TextStyle(color: Colors.grey),
+                        Column(
+                          children: [
+                            //是我的動態 要可以編輯 或是刪除
+                            value.newest_actionlist![widget.index!].memberid ==
+                                    value.remoteUserInfo[0].memberid
+                                ? Container(
+                                    height: 40, width: 40,
+                                    // color: Colors.red,
+                                    child: CustomPopupMenu(
+                                      child: Icon(Icons.more_vert),
+                                      menuBuilder: () => ClipRRect(
+                                        borderRadius: BorderRadius.circular(5),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.end,
+                                          children: [
+                                            Container(
+                                              color: Colors.white,
+                                              child: IntrinsicWidth(
+                                                  child: GestureDetector(
+                                                behavior:
+                                                    HitTestBehavior.translucent,
+                                                onTap: () async {
+                                                  value
+                                                      .delete_action(value.newest_actionlist![widget.index!].id);
+                                                  _controller.hideMenu();
+                                                },
+                                                child: Container(
+                                                  width: 150,
+                                                  margin: EdgeInsets.all(20),
+                                                  child: Text(
+                                                    "刪除動態",
+                                                    style:
+                                                        TextStyle(fontSize: 15),
+                                                  ),
+                                                ),
+                                              )),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      pressType: PressType.singleClick,
+                                      verticalMargin: -10,
+                                      controller: _controller,
+                                    ),
+                                  )
+                                : Container(),
+                            Text(
+                              value.newest_actionlist![widget.index!]
+                                          .createTime !=
+                                      null
+                                  ? '${DateFormat('yyyy/MM/dd').format(value.newest_actionlist![widget.index!].createTime)}'
+                                  : '--/--/--',
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -587,10 +641,11 @@ class _SingleActionState extends State<SingleAction> {
                                                                           context,
                                                                           listen:
                                                                               false)
-                                                                      .get_action_msg_count(value
-                                                                          .newest_actionlist![
-                                                                              widget.index!]
-                                                                          .id,1);
+                                                                      .get_action_msg_count(
+                                                                          value
+                                                                              .newest_actionlist![widget.index!]
+                                                                              .id,
+                                                                          1);
                                                                 } else {
                                                                   print('空空');
                                                                 }
@@ -687,11 +742,12 @@ class _SingleActionState extends State<SingleAction> {
                                                                     context,
                                                                     listen:
                                                                         false)
-                                                                .get_action_msg_count(value
-                                                                    .newest_actionlist![
-                                                                        widget
-                                                                            .index!]
-                                                                    .id,1);
+                                                                .get_action_msg_count(
+                                                                    value
+                                                                        .newest_actionlist![
+                                                                            widget.index!]
+                                                                        .id,
+                                                                    1);
                                                           } else {
                                                             print('空空');
                                                           }

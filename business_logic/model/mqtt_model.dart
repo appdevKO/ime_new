@@ -86,7 +86,7 @@ class O2OChatMsg {
       this.nickname});
 
   List<MqttMsg>? msg;
-  int? from;
+  String? from;
 
   //用不到
   String? mqtt_tyype;

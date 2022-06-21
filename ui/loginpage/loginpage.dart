@@ -21,7 +21,8 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
-    Provider.of<sweetProvider>(context, listen: false).connect();
+    //改到waiting page
+    // Provider.of<sweetProvider>(context, listen: false).connect();
     super.initState();
   }
   @override

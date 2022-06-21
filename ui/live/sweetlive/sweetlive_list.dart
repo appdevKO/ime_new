@@ -194,7 +194,7 @@ class _SweetLiveListState extends State<SweetLiveList> {
                 primary: Color(0xffff7090),
               ),
               onPressed: () async {
-                (await openRoom(context, avatar));
+                await openRoom(context, avatar);
               },
               child: Text('開播'),
             ),
