@@ -301,30 +301,7 @@ class _ProfileOptionState extends State<ProfileOption> {
                           Container(
                             width: 20,
                           ),
-                          // Column(
-                          //   children: [
-                          //     Text('5'),
-                          //     Row(
-                          //       children: [
-                          //         Icon(
-                          //           Icons.remove_red_eye_rounded,
-                          //           size: 12,
-                          //           color: Colors.green,
-                          //         ),
-                          //         Text(
-                          //           '誰看過我',
-                          //           style: TextStyle(
-                          //               color: Colors.grey, fontSize: 12),
-                          //         )
-                          //       ],
-                          //     )
-                          //   ],
-                          // ),
-                          // Container(
-                          //   height: 20,
-                          //   width: 1,
-                          //   color: Colors.grey,
-                          // ),
+
                           GestureDetector(
                             child: Column(
                               children: [
@@ -362,30 +339,7 @@ class _ProfileOptionState extends State<ProfileOption> {
                             width: 1,
                             color: Colors.grey,
                           ),
-                          // Column(
-                          //   children: [
-                          //     Text('5'),
-                          //     Row(
-                          //       children: [
-                          //         Icon(
-                          //           Icons.star,
-                          //           size: 12,
-                          //           color: Colors.red,
-                          //         ),
-                          //         Text(
-                          //           '最愛好友',
-                          //           style: TextStyle(
-                          //               color: Colors.grey, fontSize: 12),
-                          //         )
-                          //       ],
-                          //     )
-                          //   ],
-                          // ),
-                          // Container(
-                          //   height: 20,
-                          //   width: 1,
-                          //   color: Colors.grey,
-                          // ),
+
                           Column(
                             children: [
                               Consumer<ChatProvider>(
@@ -518,7 +472,10 @@ class _ProfileOptionState extends State<ProfileOption> {
                           Row(
                             children: [
                               IconButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    // Provider.of<ChatProvider>(context,listen: false).trylookup2();
+
+                                  },
                                   icon: Icon(
                                     Icons.mail_outline,
                                     color: Colors.grey,

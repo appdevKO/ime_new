@@ -15,6 +15,7 @@ import 'package:ime_new/business_logic/model/action_msg_model.dart';
 import 'package:ime_new/business_logic/model/chatroom_model.dart';
 import 'package:ime_new/business_logic/model/chatroomsetting_model.dart';
 import 'package:ime_new/business_logic/model/dbuserinfo_model.dart';
+import 'package:ime_new/business_logic/model/follow_action_model.dart';
 import 'package:ime_new/business_logic/model/follow_log_model.dart';
 import 'package:ime_new/business_logic/model/mqtt_model.dart';
 import 'package:ime_new/business_logic/model/o2ochatroom_model.dart';
@@ -117,6 +118,32 @@ class ChatProvider with ChangeNotifier {
       mqttclient.disconnect();
       return -1;
     }
+  }
+
+  void onDisconnected() {
+    print('EXAMPLE::OnDisconnected client callback - Client disconnection');
+    if (mqttclient.connectionStatus!.disconnectionOrigin ==
+        MqttDisconnectionOrigin.solicited) {
+      print('EXAMPLE::OnDisconnected callback is solicited, this is correct');
+    } else {
+      // print(
+      //     'EXAMPLE::OnDisconnected callback is unsolicited or none, this is incorrect - exiting');
+      // exit(-1);
+    }
+    // if (pongCount == 3) {
+    //   print('EXAMPLE:: Pong count is correct');
+    // } else {
+    //   print('EXAMPLE:: Pong count is incorrect, expected 3. actual $pongCount');
+    // }
+  }
+
+  void onConnected() {
+    print(
+        'EXAMPLE::OnConnected client callback - Client connection was successful');
+  }
+
+  void onSubscribed(String topic) {
+    print('EXAMPLE::Subscription confirmed for topic $topic');
   }
 
   var nowchatindex = -1;
@@ -500,6 +527,7 @@ class ChatProvider with ChangeNotifier {
           },
         );
       } else if (mqtt_type == "ime_o2o_chat") {
+        print('資料庫加入o2o');
         //建立雙方紀錄
         createo2olog(chatto_topicid, chatto_nickname, chatto_avatar);
         _mongoDB.inserttomongo(
@@ -541,7 +569,7 @@ class ChatProvider with ChangeNotifier {
     mqttpublish(text, totopic, receiverid, msgtype, nickname, "ime_o2o_chat",
         note: note, chatto_avatar: chatto_avatar);
     print(
-        'o2ochat test ::${account_id} / / $text / / $msgtype / / totopic $totopic //memberid $memberid ');
+        'o2ochat test ::${account_id} // $text // $msgtype // totopic $totopic //receiverid $receiverid //memberid $memberid  nickname $nickname');
     o2ofindindex(totopic.toHexString());
     if (topicindex != -1) {
       print('曾經私訊這個人過有存過::$topicindex');
@@ -583,30 +611,21 @@ class ChatProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void onDisconnected() {
-    print('EXAMPLE::OnDisconnected client callback - Client disconnection');
-    if (mqttclient.connectionStatus!.disconnectionOrigin ==
-        MqttDisconnectionOrigin.solicited) {
-      print('EXAMPLE::OnDisconnected callback is solicited, this is correct');
+  Future easyhi(chatroomid, nickname, avatar) async {
+    if (remoteUserInfo[0].default_chat_text != null &&
+        remoteUserInfo[0].default_chat_text != '') {
+      print('${remoteUserInfo[0].default_chat_text} $chatroomid');
+      o2ochat(
+          remoteUserInfo[0].default_chat_text,
+         chatroomid,
+          remoteUserInfo[0].memberid,
+          1,
+          remoteUserInfo[0].memberid,
+          nickname,
+          avatar);
     } else {
-      // print(
-      //     'EXAMPLE::OnDisconnected callback is unsolicited or none, this is incorrect - exiting');
-      // exit(-1);
+      print('未設置打招呼');
     }
-    // if (pongCount == 3) {
-    //   print('EXAMPLE:: Pong count is correct');
-    // } else {
-    //   print('EXAMPLE:: Pong count is incorrect, expected 3. actual $pongCount');
-    // }
-  }
-
-  void onConnected() {
-    print(
-        'EXAMPLE::OnConnected client callback - Client connection was successful');
-  }
-
-  void onSubscribed(String topic) {
-    print('EXAMPLE::Subscription confirmed for topic $topic');
   }
 
   //監聽個人資料改變
@@ -1070,6 +1089,7 @@ class ChatProvider with ChangeNotifier {
             'like_id_list': [],
             'area': remoteUserInfo[0].area,
             'avatar': remoteUserInfo[0].avatar,
+            'account': account_id,
           },
         );
         print('動態上傳資料庫');
@@ -1095,6 +1115,7 @@ class ChatProvider with ChangeNotifier {
             'like_id_list': [],
             'area': remoteUserInfo[0].area,
             'avatar': remoteUserInfo[0].avatar,
+            'account': account_id,
           },
         );
         print('動態上傳資料庫');
@@ -1148,13 +1169,32 @@ class ChatProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future get_favorite_action_list() async {
+  Future get_follow_action_list() async {
     action_favorite_value = 1;
-    print("get_action_list");
-    favorite_actionlist = await readremotemongodb(
-        ActionModel.fromJson, 'action',
-        field: mongo.where.sortBy('time', descending: true).limit(pagesize));
-    print("get_action_list $favorite_actionlist");
+    print("get_follow_action_list  my mongo id ${remoteUserInfo[0].memberid}");
+    final pipeline = mongo.AggregationPipelineBuilder()
+          ..addStage(mongo.Project({'_id': 0}))
+          ..addStage(mongo.Match(mongo.where
+              .eq('member_id', remoteUserInfo[0].memberid)
+              .map['\$query']))
+          ..addStage(mongo.Lookup(
+            from: 'action',
+            as: 'actionlist',
+            // let: {},
+            foreignField: 'memberid',
+            localField: 'list_id',
+            // pipeline: [],
+          ))
+          ..addStage(mongo.Project({
+            'member_id': 0,
+            'create_time': 0,
+          }))
+        // ..addStage(mongo.Project({'followlist': 'list_id'}))
+        // ..addStage(mongo.Unwind(mongo.Field('list_id')))
+        ;
+    favorite_actionlist =
+        await lookupmongodb(FollowActionModel.fromJson, 'follow_log', pipeline);
+    print("get_follow_action_list ${favorite_actionlist![0].actionlist}");
     notifyListeners();
   }
 
@@ -1940,11 +1980,21 @@ class ChatProvider with ChangeNotifier {
     return readresult;
   }
 
-  Future readremotemongodb2(func, table, loc, field) async {
+  //get near
+  Future getnearmongodb(func, table, loc, field) async {
     print('provider read mongo ::table name $func $table ');
-    final readresult = await queue.add(() =>
-        _mongoDB.readdb_near(DbUserinfoModel.fromJson, table, field: field));
+    final readresult =
+        await queue.add(() => _mongoDB.readdb_near(func, table, field: field));
     print("readreadread $readresult");
+    return readresult;
+  }
+
+  //look up
+  Future lookupmongodb(func, collname, pipeline) async {
+    print('provider look up  mongo :: ');
+    final readresult =
+        await queue.add(() => _mongoDB.lookup2(func, collname, pipeline));
+    print("lookuplookuplookup $readresult");
     return readresult;
   }
 
@@ -1996,8 +2046,8 @@ class ChatProvider with ChangeNotifier {
     // await _mongoDB.deletealltable('groupchatmsg');
     // await _mongoDB.deletealltable('o2ochatmsg');
     // await _mongoDB.deletealltable('o2olog');
-    await _mongoDB.deletealltable('block_log');
-    await _mongoDB.deletealltable('follow_log');
+    // await _mongoDB.deletealltable('block_log');
+    // await _mongoDB.deletealltable('follow_log');
     // await _mongoDB.deletealltable('chatroom');
     // await _mongoDB.deletealltable('member');
   }
@@ -2017,6 +2067,88 @@ class ChatProvider with ChangeNotifier {
             .fields(['imgurl', 'note', 'rule', 'purpose']));
     print('setting image $chatroomsetting');
     notifyListeners();
+  }
+
+  // Future trylookup() async {
+  //   print('account if$account_id ${remoteUserInfo[0].memberid}');
+  //   var result = await lookupmongodb(
+  //     DbUserinfoModel.fromJson,
+  //     'member',
+  //     {
+  //       '\$project': {
+  //         'account': 1,
+  //       },
+  //     },
+  //     {
+  //       '\$match': {'_id': remoteUserInfo[0].memberid}
+  //     },
+  //     {
+  //       '\$lookup': {
+  //         'from': 'follow_log',
+  //         'localField': '_id',
+  //         'foreignField': 'member_id',
+  //         'as': 'follow_log',
+  //         'pipeline': [
+  //           {
+  //             '\$project': {
+  //               'list_id': 1,
+  //               '_id': 0,
+  //             }
+  //           }
+  //         ],
+  //       }
+  //     },
+  //     //
+  //     // 'member',
+  //     // 'member_id',remoteUserInfo[0].memberid,
+  //     // 'follow_log',
+  //
+  //     // mongo.Match(mongo.where
+  //     //     .eq('member_id', remoteUserInfo[0].memberid)
+  //     //     .map['\$query']),
+  //
+  //     // {},
+  //     // [
+  //     //   mongo.Project({
+  //     //     'list_id': 1,
+  //     //     '_id': 0,
+  //     //   }),
+  //     // mongo.Match(mongo.Expr(mongo.And(
+  //     //   [
+  //     //     mongo.Eq(
+  //     //       mongo.Field('member_id'),
+  //     //       mongo.Field('_id'),
+  //     //     ),
+  //     //   ],
+  //     // )
+  //     // ))
+  //     // ],
+  //     // 'text_list'
+  //   );
+  //
+  //   // print('numbe fofofof ${result.length}');
+  // }
+
+  Future trylookup2() async {
+    // final result = await lookupmongodb(
+    //     DbUserinfoModel.fromJson,
+    //     'member',
+    //     mongo.Project({
+    //       'account': 1,
+    //     }),
+    //     mongo.Match(
+    //         mongo.where.eq('_id', remoteUserInfo[0].memberid).map['\$query']),
+    //     mongo.Lookup(
+    //       from: 'follow_log',
+    //       as: 'follow_log',
+    //       // let: {},
+    //       foreignField: 'member_id',
+    //       localField: '_id',
+    //       // pipeline: [],
+    //     ));
+    // print('numbe fofofof $result');
+    // print('numbe y7y7y7y ${result[0].follow_log_list[0]}');
+    return result;
   }
 
   Future addchatroom(chatroomid) async {
@@ -2728,7 +2860,7 @@ class ChatProvider with ChangeNotifier {
           'type': 'Point',
           'coordinates': [location.longitude, location.latitude]
         };
-        nearpeoplelist = await readremotemongodb2(
+        nearpeoplelist = await getnearmongodb(
             DbUserinfoModel.fromJson,
             'member',
             _loc,
@@ -2757,7 +2889,7 @@ class ChatProvider with ChangeNotifier {
       'type': 'Point',
       'coordinates': [location.longitude, location.latitude]
     };
-    var newpage = await readremotemongodb2(
+    var newpage = await getnearmongodb(
         DbUserinfoModel.fromJson,
         'member',
         _loc,

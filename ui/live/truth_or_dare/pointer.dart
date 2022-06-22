@@ -19,11 +19,11 @@ class SpinningContainer extends AnimatedWidget {
       angle: _progress.value * GetPos() * math.pi,
       // 12.25 右上 12.75 右下 1更新房間3.25 左下 13.75 左上  雙數:右 單數:左
       child: Container(
-        width: 90,
+        width: 200,
         height: 250,
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage("assets/images/scepter.png"),
+            image: AssetImage("assets/images/tdGame/arrow.png"),
             fit: BoxFit.cover,
           ),
         ),

@@ -43,7 +43,8 @@ class DbUserinfoModel {
       this.profilepic_list,
       this.little_profilepic_list,
       this.followme_num,
-      this.default_chat_text});
+      this.default_chat_text,
+      this.follow_log_list});
 
   ObjectId? memberid;
   String? account;
@@ -75,6 +76,7 @@ class DbUserinfoModel {
   List? profilepic_list;
   List? little_profilepic_list;
   List? interest_list;
+  List? follow_log_list;
 
   factory DbUserinfoModel.fromJson(Map<String, dynamic> json) =>
       DbUserinfoModel(
@@ -98,6 +100,7 @@ class DbUserinfoModel {
         size: json["size"] != null ? json['size'] : null,
         interest_list:
             json["interest_list"] != null ? json['interest_list'] : null,
+        follow_log_list: json["follow_log"] != null ? json['follow_log'] : null,
         personality: json["personality"] != null ? json['personality'] : null,
         profession: json["profession"] != null ? json['profession'] : null,
         area: json["area"] != null ? json['area'] : null,
@@ -136,6 +139,7 @@ class DbUserinfoModel {
         "introduction": introduction,
         "size": size,
         "interest_list": interest_list,
+        "follow_log": follow_log_list,
         "personality": personality,
         "profession": profession,
         "area": area,

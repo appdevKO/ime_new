@@ -55,34 +55,9 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                         top: 0,
                         child: Consumer<ChatProvider>(
                           builder: (context, value, child) {
-                            return
-                                // 封面圖
-                                Container(
+                            return Container(
                               height: MediaQuery.of(context).size.height * .5,
                               width: MediaQuery.of(context).size.width,
-                              // decoration: BoxDecoration(
-                              //   image: DecorationImage(
-                              //     image: CachedNetworkImageProvider(value
-                              //                     .o2omemberlist !=
-                              //                 null &&
-                              //             value.o2omemberlist!.isNotEmpty &&
-                              //             value.o2omemberlist![0].cover !=
-                              //                 null &&
-                              //             value.o2omemberlist![0].cover != ''
-                              //         ? '${value.o2omemberlist![0].cover}'
-                              //         : default_cover),
-                              //     // image: NetworkImage(value.o2omemberlist !=
-                              //     //             null &&
-                              //     //         value.o2omemberlist!.isNotEmpty &&
-                              //     //         value.o2omemberlist![0].cover !=
-                              //     //             null &&
-                              //     //         value.o2omemberlist![0].cover != ''
-                              //     //     ? '${value.o2omemberlist![0].cover}'
-                              //     //     : default_cover),
-                              //     fit: BoxFit.cover,
-                              //   ),
-                              //
-                              // ),
                               child: CachedNetworkImage(
                                 width: 100,
                                 height: 50,
@@ -92,23 +67,23 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                                     Container(
                                   decoration: BoxDecoration(
                                     image: DecorationImage(
-                                      image: NetworkImage(value.o2omemberlist !=
-                                                  null &&
+                                      image: value.o2omemberlist != null &&
                                               value.o2omemberlist!.isNotEmpty &&
-                                              value.o2omemberlist![0].cover !=
+                                              value.o2omemberlist![0]
+                                                      .avatar_sub !=
                                                   null &&
-                                              value.o2omemberlist![0].cover !=
+                                              value.o2omemberlist![0]
+                                                      .avatar_sub !=
                                                   ''
-                                          ? '${value.o2omemberlist![0].cover}'
-                                          : default_cover),
+                                          ? NetworkImage(
+                                              '${value.o2omemberlist![0].avatar_sub}')
+                                          : AssetImage(
+                                                  'assets/default/sex_man.png')
+                                              as ImageProvider,
                                       fit: BoxFit.cover,
                                     ),
                                   ),
                                 ),
-                                // placeholder: (context, url) => SizedBox(
-                                //     width: 40.0,
-                                //     height: 40.0,
-                                //     child: new CircularProgressIndicator()),
                                 progressIndicatorBuilder:
                                     (context, url, downloadProgress) =>
                                         CircularProgressIndicator(
@@ -457,192 +432,204 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                       ),
                       Positioned(
                           top: MediaQuery.of(context).size.height * .39,
-                          right: 43,
+                          right: 20,
                           child: Row(
                             children: [
-                              //點私聊
-                              Consumer<ChatProvider>(
-                                  builder: (context, value, child) {
-                                return GestureDetector(
-                                  child: CircleAvatar(
-                                    backgroundColor: Color(0xff32cd32),
-                                    child: Icon(
-                                      Icons.message,
-                                      color: Colors.white,
+                              Padding(
+                                padding: const EdgeInsets.only(right: 15.0),
+                                child: CircleAvatar(
+                                  child: Container(
+                                    margin: EdgeInsets.all(7),
+                                    child: Image.asset(
+                                      'assets/icon/navigator/action01.png',color: Colors.white,
                                     ),
                                   ),
-                                  onTap: () {
-                                    print('進入聊天室');
-                                    if (value.o2omemberlist != null) {
-                                      print(
-                                          'o2omemberlist ${value.remoteUserInfo[0].memberid}');
-                                      print(
-                                          'o2o list to memberid ${value.remoteUserInfo[0].memberid},chatroom id ${widget.chatroomid.toHexString()}');
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) => O2OChatroom(
-                                                    memberid: value
-                                                        .remoteUserInfo[0]
-                                                        .memberid,
-                                                    chatroomid: widget
-                                                        .chatroomid
-                                                        .toHexString(),
-                                                    nickname: value
-                                                        .o2omemberlist![0]
-                                                        .nickname,
-                                                    avatar: value
-                                                        .o2omemberlist![0]
-                                                        .avatar_sub,
-                                                  )));
-                                    } else {
-                                      print('empty');
-                                    }
-                                  },
+                                  backgroundColor: Color(0xffffbbbb),
+                                ),
+                              ),
+                              Consumer<ChatProvider>(
+                                  builder: (context, value, child) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(right: 15.0),
+                                  child: GestureDetector(
+                                    child: CircleAvatar(
+                                      child: Container(
+                                        margin: EdgeInsets.all(7),
+                                        child: Image.asset(
+                                          'assets/icon/navigator/action01.png',
+                                        ),
+                                      ),
+                                      backgroundColor: Colors.amber,
+                                    ),
+                                    onTap: () async {
+                                      Provider.of<ChatProvider>(context,
+                                              listen: false)
+                                          .easyhi(
+                                              widget.chatroomid,
+                                              value.o2omemberlist![0].nickname,
+                                              value.o2omemberlist![0]
+                                                  .avatar_sub);
+                                    },
+                                  ),
                                 );
                               }),
                               Consumer<ChatProvider>(
                                   builder: (context, value, child) {
                                 return Padding(
-                                  padding: const EdgeInsets.only(left: 20.0),
+                                  padding: const EdgeInsets.only(right: 15.0),
                                   child: GestureDetector(
                                     child: CircleAvatar(
-                                      backgroundColor: value.myfollowlog != null
-                                          ? value.myfollowlog[0].list_id != null
-                                              ? value.myfollowlog[0].list_id
-                                                          .indexWhere((element) =>
-                                                              element ==
-                                                              widget
-                                                                  .chatroomid) !=
-                                                      -1
-                                                  ? Colors.red
-                                                  : Colors.grey
-                                              : Colors.grey
-                                          : Colors.grey,
-                                      child: Icon(Icons.favorite,
-                                          color: Colors.white),
+                                      child: Container(
+                                        margin: EdgeInsets.all(7),
+                                        child: Image.asset(
+                                          'assets/icon/navigator/chat01.png',color: Colors.white,
+                                        ),
+                                      ),
+                                      backgroundColor: Color(0xff32cd32),
                                     ),
-                                    onTap: () async {
-                                      value.addfollowlog(widget.chatroomid);
-                                      value.find_who_likeme(widget.chatroomid);
-                                      // await value.getmemberinfo(
-                                      //     widget.chatroomid.toHexString());
+                                    onTap: () {
+                                      print('進入聊天室');
+                                      if (value.o2omemberlist != null) {
+                                        print(
+                                            'o2omemberlist ${value.remoteUserInfo[0].memberid}');
+                                        print(
+                                            'o2o list to memberid ${value.remoteUserInfo[0].memberid},chatroom id ${widget.chatroomid.toHexString()}');
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    O2OChatroom(
+                                                      memberid: value
+                                                          .remoteUserInfo[0]
+                                                          .memberid,
+                                                      chatroomid: widget
+                                                          .chatroomid
+                                                          .toHexString(),
+                                                      nickname: value
+                                                          .o2omemberlist![0]
+                                                          .nickname,
+                                                      avatar: value
+                                                          .o2omemberlist![0]
+                                                          .avatar_sub,
+                                                    )));
+                                      } else {
+                                        print('empty');
+                                      }
                                     },
                                   ),
+                                );
+                              }),
+                              Consumer<ChatProvider>(
+                                  builder: (context, value, child) {
+                                return GestureDetector(
+                                  child: CircleAvatar(
+                                    backgroundColor: value.myfollowlog != null
+                                        ? value.myfollowlog[0].list_id != null
+                                            ? value.myfollowlog[0].list_id
+                                                        .indexWhere((element) =>
+                                                            element ==
+                                                            widget
+                                                                .chatroomid) !=
+                                                    -1
+                                                ? Colors.red
+                                                : Colors.grey
+                                            : Colors.grey
+                                        : Colors.grey,
+                                    child: Icon(Icons.favorite,
+                                        color: Colors.white),
+                                  ),
+                                  onTap: () async {
+                                    value.addfollowlog(widget.chatroomid);
+                                    value.find_who_likeme(widget.chatroomid);
+                                    // await value.getmemberinfo(
+                                    //     widget.chatroomid.toHexString());
+                                  },
                                 );
                               })
                             ],
                           )),
-                      //頭像
-                      Positioned(
-                          top: MediaQuery.of(context).size.height * .33,
-                          left: 43,
-                          child: Consumer<ChatProvider>(
-                              builder: (context, value, child) {
-                            return Stack(
-                              children: [
-                                CircleAvatar(
-                                  backgroundColor: Colors.black.withOpacity(.4),
-                                  radius: 61,
-                                ),
-                                Positioned(
-                                  top: 1,
-                                  left: 1,
-                                  child: CircleAvatar(
-                                    backgroundColor: Colors.grey,
-                                    radius: 60,
-                                    backgroundImage: value.o2omemberlist![0]
-                                                    .avatar_sub !=
-                                                null &&
-                                            value.o2omemberlist![0]
-                                                    .avatar_sub !=
-                                                ''
-                                        ? NetworkImage(
-                                            '${value.o2omemberlist![0].avatar_sub}',
-                                          )
-                                        : AssetImage(value.o2omemberlist![0]
-                                                            .sex ==
-                                                        null ||
-                                                    value.o2omemberlist![0]
-                                                            .sex ==
-                                                        '男'
-                                                ? 'assets/default/sex_man.png'
-                                                : 'assets/default/sex_woman.png')
-                                            as ImageProvider
-                                    // NetworkImage(
-                                    //       value.o2omemberlist != null &&
-                                    //               value.o2omemberlist!.isNotEmpty &&
-                                    //               value.o2omemberlist![0].avatar_sub !=
-                                    //                   null &&
-                                    //               value.o2omemberlist![0].avatar_sub !=
-                                    //                   ''
-                                    //           ? '${value.o2omemberlist![0].avatar_sub}'
-                                    //           : default_cover)
-                                    ,
-                                  ),
-                                ),
-                                Positioned(
-                                    top: 0,
-                                    right: -5,
-                                    child: Icon(
-                                      value.o2omemberlist![0].sex == '男'
-                                          ? Icons.male
-                                          : Icons.female,
-                                      color: value.o2omemberlist![0].sex == '男'
-                                          ? Colors.blue
-                                          : Colors.pink,
-                                      size: 45,
-                                    ))
-                              ],
-                            );
-                          }))
+                      // //頭像
+                      // Positioned(
+                      //     top: MediaQuery.of(context).size.height * .33,
+                      //     left: 43,
+                      //     child: Consumer<ChatProvider>(
+                      //         builder: (context, value, child) {
+                      //       return Stack(
+                      //         children: [
+                      //           CircleAvatar(
+                      //             backgroundColor: Colors.black.withOpacity(.4),
+                      //             radius: 61,
+                      //           ),
+                      //           // Positioned(
+                      //           //   top: 1,
+                      //           //   left: 1,
+                      //           //   child: CircleAvatar(
+                      //           //     backgroundColor: Colors.grey,
+                      //           //     radius: 60,
+                      //           //     backgroundImage: value.o2omemberlist![0]
+                      //           //                     .avatar_sub !=
+                      //           //                 null &&
+                      //           //             value.o2omemberlist![0]
+                      //           //                     .avatar_sub !=
+                      //           //                 ''
+                      //           //         ? NetworkImage(
+                      //           //             '${value.o2omemberlist![0].avatar_sub}',
+                      //           //           )
+                      //           //         : AssetImage(value.o2omemberlist![0]
+                      //           //                             .sex ==
+                      //           //                         null ||
+                      //           //                     value.o2omemberlist![0]
+                      //           //                             .sex ==
+                      //           //                         '男'
+                      //           //                 ? 'assets/default/sex_man.png'
+                      //           //                 : 'assets/default/sex_woman.png')
+                      //           //             as ImageProvider,
+                      //           //   ),
+                      //           // ),
+                      //           Positioned(
+                      //               top: 0,
+                      //               right: -5,
+                      //               child: Icon(
+                      //                 value.o2omemberlist![0].sex == '男'
+                      //                     ? Icons.male
+                      //                     : Icons.female,
+                      //                 color: value.o2omemberlist![0].sex == '男'
+                      //                     ? Colors.blue
+                      //                     : Colors.pink,
+                      //                 size: 45,
+                      //               ))
+                      //         ],
+                      //       );
+                      //     }))
                     ],
                   ),
-
                 ],
               ),
             ),
             Container(
               height: 56,
               width: MediaQuery.of(context).size.width,
+              padding: EdgeInsets.symmetric(horizontal: 15),
               color: Colors.transparent,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(
-                      icon: Icon(
-                        Icons.arrow_back,
-                        color: Colors.white,
-                      ),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      }),
-                  Center(
-                      child: Text(
-                    '',
-                    style: TextStyle(
-                        color: Colors.transparent, fontWeight: FontWeight.w700),
-                  )),
-                  Container(
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.send,
-                        color: Colors.transparent,
-                      ),
-                      onPressed: () {},
+                  GestureDetector(
+                    child: Stack(
+                      children: <Widget>[
+                        Positioned(
+                          left: 1.0,
+                          top: 2.0,
+                          child: Icon(Icons.arrow_back, color: Colors.black54),
+                        ),
+                        Icon(Icons.arrow_back, color: Colors.white),
+                      ],
                     ),
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
                   ),
-                  // GestureDetector(
-                  //   child: Container(
-                  //     height: 40,
-                  //     width: 40,
-                  //     // color: Colors.white,
-                  //     child: Center(
-                  //       child: Text('儲存'),
-                  //     ),
-                  //   ),
-                  //   onTap: () {},
-                  // )
+                  Icon(Icons.arrow_back, color: Colors.transparent),
                 ],
               ),
             ),

@@ -61,36 +61,36 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                 color: Colors.grey,
                                 image: DecorationImage(
                                   image: NetworkImage(
-                                      '${value.remoteUserInfo[0].cover}'),
+                                      '${value.remoteUserInfo[0].avatar_sub}'),
                                   fit: BoxFit.cover,
                                 ),
                               ),
-                              child: GestureDetector(
-                                child: Center(
-                                  child: Stack(
-                                    children: [
-                                      Text(
-                                        '加入封面照片',
-                                        style: TextStyle(
-                                          fontSize: 20,
-                                          foreground: Paint()
-                                            ..style = PaintingStyle.stroke
-                                            ..strokeWidth = 2
-                                            ..color = Colors.white,
-                                        ),
-                                      ),
-                                      Text(
-                                        '加入封面照片',
-                                        style: TextStyle(
-                                            fontSize: 20, color: Colors.black),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                onTap: () {
-                                  value.change_cover();
-                                },
-                              ),
+                              // child: GestureDetector(
+                              //   child: Center(
+                              //     child: Stack(
+                              //       children: [
+                              //         Text(
+                              //           '加入封面照片',
+                              //           style: TextStyle(
+                              //             fontSize: 20,
+                              //             foreground: Paint()
+                              //               ..style = PaintingStyle.stroke
+                              //               ..strokeWidth = 2
+                              //               ..color = Colors.white,
+                              //           ),
+                              //         ),
+                              //         Text(
+                              //           '加入封面照片',
+                              //           style: TextStyle(
+                              //               fontSize: 20, color: Colors.black),
+                              //         ),
+                              //       ],
+                              //     ),
+                              //   ),
+                              //   onTap: () {
+                              //     value.change_cover();
+                              //   },
+                              // ),
                             );
                           },
                         ),

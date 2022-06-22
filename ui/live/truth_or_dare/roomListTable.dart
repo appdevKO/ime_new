@@ -7,6 +7,8 @@ import 'package:ime_new/business_logic/provider/chat_provider.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:ime_new/business_logic/model/TD_room.dart';
 import 'dart:convert';
+import 'package:mongo_dart/mongo_dart.dart' as mongo;
+import 'package:ime_new/business_logic/provider/chat_provider.dart';
 import 'package:provider/provider.dart';
 
 class RoomListController extends GetxController {
@@ -45,14 +47,14 @@ class _roomListTableState extends State<roomListTable> {
 
     return SafeArea(
       child: Scaffold(
-        //appBar: AppBar(
-        //  title: Text('真心話大冒險'),
-        //),
+          //appBar: AppBar(
+          //  title: Text('真心話大冒險'),
+          //),
           key: scaffoldKey,
           body: Stack(children: [
             Consumer<ChatProvider>(builder: (context, ChatProvider1, child) {
               try {
-                if (ChatProvider1.remoteUserInfo == null) {
+                if (ChatProvider1.remoteUserInfo[0].avatar == null) {
                   if ((ChatProvider1.remoteUserInfo[0].sex) == '男') {
                     avatar = "https://i.ibb.co/cFFSzdK/sex-man.png";
                   } else {
@@ -90,7 +92,7 @@ class _roomListTableState extends State<roomListTable> {
                             Text(
                               '真心話大冒險-房間列表',
                               style:
-                              TextStyle(color: Colors.white, fontSize: 18),
+                                  TextStyle(color: Colors.white, fontSize: 18),
                             ),
                             IconButton(
                                 onPressed: () {},
@@ -103,26 +105,26 @@ class _roomListTableState extends State<roomListTable> {
                       ),
                       Expanded(
                         child: Obx(() => ListView.builder(
-                          itemCount: rx.roomsList.length,
-                          itemBuilder: (context, index) {
-                            var encodeName = utf8.decode(
-                                (rx.roomsList[index].name)!.runes.toList());
-                            List<int> resName =
-                            base64.decode(base64.normalize(encodeName));
-                            var name = utf8.decode(resName);
+                              itemCount: rx.roomsList.length,
+                              itemBuilder: (context, index) {
+                                var encodeName = utf8.decode(
+                                    (rx.roomsList[index].name)!.runes.toList());
+                                List<int> resName =
+                                    base64.decode(base64.normalize(encodeName));
+                                var name = utf8.decode(resName);
 
-                            var encodeExplain = utf8.decode(
-                                (rx.roomsList[index].explain)!
-                                    .runes
-                                    .toList());
-                            List<int> resExplain = base64
-                                .decode(base64.normalize(encodeExplain));
-                            var explain = utf8.decode(resExplain);
-                            //print('encodeName $name');
-                            //print('encodeExplain $encodeExplain');
-                            //print('Explain $explain');
-                            return Card(
-                                child: ListTile(
+                                var encodeExplain = utf8.decode(
+                                    (rx.roomsList[index].explain)!
+                                        .runes
+                                        .toList());
+                                List<int> resExplain = base64
+                                    .decode(base64.normalize(encodeExplain));
+                                var explain = utf8.decode(resExplain);
+                                //print('encodeName $name');
+                                //print('encodeExplain $encodeExplain');
+                                //print('Explain $explain');
+                                return Card(
+                                    child: ListTile(
                                   title: Text(
                                     '${utf8.decode(resName)}',
                                     textAlign: TextAlign.right,
@@ -138,42 +140,42 @@ class _roomListTableState extends State<roomListTable> {
                                       children: [
                                         rx.roomsList[index].count > 0
                                             ? Positioned(
-                                            child: CircleAvatar(
-                                              backgroundImage: NetworkImage(rx
-                                                  .roomsList[index]
-                                                  .avatarUrl1!),
-                                            ))
-                                            : Container(),
+                                                child: CircleAvatar(
+                                                backgroundImage: NetworkImage(rx
+                                                    .roomsList[index]
+                                                    .avatarUrl1!),
+                                              ))
+                                            : Container(width: 0, height: 0),
                                         rx.roomsList[index].count > 1
                                             ? Positioned(
-                                          left: 20,
-                                          child: CircleAvatar(
-                                            backgroundImage: NetworkImage(
-                                                rx.roomsList[index]
-                                                    .avatarUrl2!),
-                                          ),
-                                        )
-                                            : Container(),
+                                                left: 20,
+                                                child: CircleAvatar(
+                                                  backgroundImage: NetworkImage(
+                                                      rx.roomsList[index]
+                                                          .avatarUrl2!),
+                                                ),
+                                              )
+                                            : Container(width: 0, height: 0),
                                         rx.roomsList[index].count > 2
                                             ? Positioned(
-                                          left: 40,
-                                          child: CircleAvatar(
-                                            backgroundImage: NetworkImage(
-                                                rx.roomsList[index]
-                                                    .avatarUrl3!),
-                                          ),
-                                        )
-                                            : Container(),
+                                                left: 40,
+                                                child: CircleAvatar(
+                                                  backgroundImage: NetworkImage(
+                                                      rx.roomsList[index]
+                                                          .avatarUrl3!),
+                                                ),
+                                              )
+                                            : Container(width: 0, height: 0),
                                         rx.roomsList[index].count > 3
                                             ? Positioned(
-                                          left: 60,
-                                          child: CircleAvatar(
-                                            backgroundImage: NetworkImage(
-                                                rx.roomsList[index]
-                                                    .avatarUrl4!),
-                                          ),
-                                        )
-                                            : Container(),
+                                                left: 60,
+                                                child: CircleAvatar(
+                                                  backgroundImage: NetworkImage(
+                                                      rx.roomsList[index]
+                                                          .avatarUrl4!),
+                                                ),
+                                              )
+                                            : Container(width: 0, height: 0),
                                       ],
                                     ),
                                   ),
@@ -186,8 +188,8 @@ class _roomListTableState extends State<roomListTable> {
                                         avatar));
                                   },
                                 ));
-                          },
-                        )),
+                              },
+                            )),
                       ),
                       Row(
                         mainAxisSize: MainAxisSize.max,
@@ -243,27 +245,27 @@ Future<Future<String?>> inputDialog(BuildContext context, avatalUrl) async {
               children: <Widget>[
                 new Expanded(
                     child: new TextField(
-                      autofocus: true,
-                      maxLength: 10,
-                      decoration: new InputDecoration(hintText: _hintText),
-                      onChanged: (value) {
-                        roomName = value;
-                      },
-                    ))
+                  autofocus: true,
+                  maxLength: 10,
+                  decoration: new InputDecoration(hintText: _hintText),
+                  onChanged: (value) {
+                    roomName = value;
+                  },
+                ))
               ],
             ),
             new Row(
               children: <Widget>[
                 new Expanded(
                     child: new TextField(
-                      autofocus: true,
-                      decoration: new InputDecoration(hintText: '房間說明'),
-                      onChanged: (value) {
-                        if (value != '') {
-                          roomExplain = value;
-                        }
-                      },
-                    ))
+                  autofocus: true,
+                  decoration: new InputDecoration(hintText: '房間說明'),
+                  onChanged: (value) {
+                    if (value != '') {
+                      roomExplain = value;
+                    }
+                  },
+                ))
               ],
             ),
           ],

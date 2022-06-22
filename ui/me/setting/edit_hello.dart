@@ -64,11 +64,11 @@ class _EditHelloState extends State<EditHello> {
                     child: IconButton(
                       icon: Icon(
                         Icons.send,
-                        color: Colors.white,
+                        color: Colors.transparent,
                       ),
                       onPressed: () {
-                        print(
-                            'default_chat_text:${Provider.of<ChatProvider>(context, listen: false).remoteUserInfo[0].default_chat_text}');
+                        // print(
+                        //     'default_chat_text:${Provider.of<ChatProvider>(context, listen: false).remoteUserInfo[0].default_chat_text}');
                       },
                     ),
                   ),

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
+import 'package:mongo_dart/mongo_dart.dart';
 
 class MongoDB {
   var db;
@@ -122,7 +123,7 @@ class MongoDB {
   ///順序很重要
   Future upsertData(collection_name, con_field, con_value, data_field,
       data_value, data) async {
-    print('測試一下');
+    // print('測試一下');
     // data.forEach((key, value) => print('$key'));
     try {
       var coll = db.collection(collection_name);
@@ -274,4 +275,154 @@ class MongoDB {
   Future dbclose() async {
     await db.close();
   }
+
+  Future lookup(func, collname, project, match, lookup) async {
+    var coll = db.collection(collname);
+    var result = await coll.modernAggregate([
+      // 剝除
+      {
+        '\$project': {
+          'account': 1,
+        },
+      },
+      // project,
+      {
+        '\$match': {'_id': ''}
+      },
+      // match,
+      // lookup,
+      {
+        '\$lookup': {
+          'from': 'follow_log',
+          'localField': '_id',
+          'foreignField': 'member_id',
+          'as': 'follow_log',
+          'pipeline': [
+            {
+              '\$project': {
+                'list_id': 1,
+                '_id': 0,
+              }
+            }
+          ],
+        }
+      }
+
+      // Lookup.withPipeline(
+      //         from: from,
+      //         let: {},
+      //
+      //         ///{}
+      //         // {
+      //         // 'memberid': Field('memberid'),
+      //         // 'order_qty': Field('ordered')
+      //         // },
+      //         pipeline: pipeline as List<AggregationStage>,
+      //
+      //         //     [
+      //         //   Match(where.eq( 'from', pipeline).map['\$query']),
+      //         //   // Match(Expr(And([
+      //         //   //   Eq(
+      //         //   //     Field('member_id'),
+      //         //   //     Field('_id'),
+      //         //   //   ),
+      //         //   // ]))),
+      //         //
+      //         //
+      //         //
+      //         //
+      //         //   // 剝離不要顯示的欄位
+      //         //   // Project({
+      //         //   //   'text':1,
+      //         //   // })
+      //         // ],
+      //         as: asfield)
+      //     .build()
+      // {
+      //執行兩個集合的並集
+      // 來自兩個集合的管道結果合併到一個結果集中
+      // r'$unionWith': {
+      //   'coll': collection2Name,
+      //   'pipeline': [
+      //     {
+      //       r'$project': {'state': 1, '_id': 0}
+      //     }
+      //   ]
+      // }
+      // }
+    ]).toList();
+    try {
+      var result = await coll.modernAggregate([
+        {
+          // 剝除
+          '\$project': {
+            'account': 1,
+          },
+        },
+        {
+          '\$match': {'_id': ''}
+        },
+        {
+          '\$lookup': {
+            'from': 'follow_log',
+            'localField': '_id',
+            'foreignField': 'member_id',
+            'as': 'follow_log',
+            'pipeline': [
+              {
+                '\$project': {
+                  'list_id': 1,
+                  '_id': 0,
+                }
+              }
+            ],
+          }
+        }
+        //執行兩個集合的並集
+        // 來自兩個集合的管道結果合併到一個結果集中
+        // r'$unionWith': {
+        //   'coll': collection2Name,
+        //   'pipeline': [
+        //     {
+        //       r'$project': {'state': 1, '_id': 0}
+        //     }
+        //   ]
+        // }
+        // }
+      ]).toList();
+      return result;
+    } catch (e) {
+      print('mongo Aggregate exception :: $e');
+    }
+  }
+
+  Future lookup2(func, collname, pipeline) async {
+    datalist = [];
+    var coll = db.collection(collname);
+    Map<String, dynamic> map;
+    // final pipeline = AggregationPipelineBuilder()
+    //   ..addStage(project)
+    //   ..addStage(match)
+    //   ..addStage(lookup)
+    //   ..addStage(mongo.Unwind(Field('list_id')))
+    //   ..addStage(mongo.Project({'member_id': 0, 'create_time': 0}));
+
+    try {
+      await coll.modernAggregate(pipeline).forEach((v) {
+        print("lookup 回傳單一資料 $v");
+        map = Map<String, dynamic>.from(v);
+        datalist.add(func(map));
+      });
+
+      return datalist;
+    } catch (e) {
+      print('mongo Aggregate exception :: $e');
+    }
+  }
+// Future aggrregate(memberid) async {
+//   var coll = db.collection('member');
+//   final pipeline = AggregationPipelineBuilder()
+//       .addStage(Match(where.eq('memberid', memberid).map['\$query']))
+//       .build();
+// }
 }

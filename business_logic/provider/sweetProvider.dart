@@ -3,9 +3,9 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-
+import 'package:ime_new/ui/live/sweet/sweetView.dart';
+import 'package:ime_new/ui/live/sweet/sweetlive_list.dart';
 import 'package:ime_new/business_logic/model/sweetRoom.dart';
-import 'package:ime_new/ui/live/sweetlive/sweetView.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -21,17 +21,23 @@ var sweetRoomId;
 final client = MqttServerClient.withPort('iot.gotcash.me', myUid, 1883);
 const appId = '27e69b885f864b0da5a75265e8c96cdb';
 
+class ChatMessage {
+  String account;
+  String messageContent;
+  ChatMessage({required this.account, required this.messageContent});
+}
+
 class sweetProvider with ChangeNotifier {
   var rooms;
   var roomId;
   var seatId1;
   int? roomCount;
+  int? AudienceCount;
   String roomNam = '';
   String roomExplain = '';
   String inRoomAvatar = '';
   bool vdoSta = false;
   bool getGift_1 = false;
-  bool firstOut = true;
 
   Future<MqttServerClient> connect() async {
     WidgetsFlutterBinding.ensureInitialized();
@@ -67,10 +73,10 @@ class sweetProvider with ChangeNotifier {
       final MqttPublishMessage recMess = c[0].payload;
       final pt =
           MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
-      print('topic is <${c[0].topic}>, payload is <-- $pt -->');
+      // print('topic is <${c[0].topic}>, payload is <-- $pt -->');
 
       if ('${c[0].topic}' == 'imeSweet/info') {
-        print('myUid $myUid');
+        // print('myUid $myUid');
         Iterable l = json.decode('$pt');
         rooms =
             RxList<sweetRoom>.from(l.map((model) => sweetRoom.fromJson(model)));
@@ -98,7 +104,6 @@ class sweetProvider with ChangeNotifier {
           sweetRoomId = pt.split(',')[1];
           var sweetRoomName = pt.split(',')[2];
           inRoomAvatar = pt.split(',')[3];
-          print('出現吧 ${pt.split(',')[4]}');
           if (pt.split(',')[4] == 'true') {
             vdoSta = true;
           }
@@ -116,10 +121,12 @@ class sweetProvider with ChangeNotifier {
         }
       } else if ('${c[0].topic}' == ('imeSweetRoom/' + sweetRoomId)) {
         // 從MQTT收新人入房消息，改變瀏覽器網址
-        if ('$pt'.startsWith('getid,')) {
+        if ('$pt'.startsWith('postAudienceCount,')) {
+          AudienceCount = int.parse('$pt'.split(',')[1]);
           notifyListeners();
         } else if ('$pt'.startsWith('leaveRoom,')) {
           seatId1 = null;
+          vdoSta = false;
           print('leave');
           notifyListeners();
         } else if ('$pt'.startsWith('vdoHide,')) {
@@ -127,7 +134,7 @@ class sweetProvider with ChangeNotifier {
           print('vdoHide $_vdosta');
           if (_vdosta == 'true') {
             vdoSta = true;
-          } else if (firstOut == 'false') {
+          } else if (_vdosta == 'false') {
             vdoSta = false;
           }
           notifyListeners();
@@ -141,7 +148,7 @@ class sweetProvider with ChangeNotifier {
 
 // 连接成功
 void onConnected() {
-  print('Connected');
+  print('sweet Connected');
 }
 
 // 连接断开

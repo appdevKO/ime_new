@@ -60,10 +60,7 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
     super.initState();
     _controller =
         AnimationController(vsync: this, duration: const Duration(seconds: 2));
-    // myUid = getUid();
-    // MqttListen().resetSeats();
     Future(() async {
-      // myAgoraUid = getUid();
       myAgoraUid = myUid;
       final builder = MqttClientPayloadBuilder();
       builder.addString(
@@ -127,8 +124,8 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
       await [Permission.microphone, Permission.camera].request();
     }
     engine = await RtcEngine.create(appId);
-    // engine!.enableDualStreamMode(true);
     engine!.setRemoteDefaultVideoStreamType(VideoStreamType.Low);
+    // engine!.enableDualStreamMode(true);
     engine!.disableVideo();
     engine!.setEventHandler(
         RtcEngineEventHandler(joinChannelSuccess: (channel, uid, elapsed) {
@@ -176,8 +173,10 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
     await engine!.muteAllRemoteVideoStreams(false);
     await engine!.muteAllRemoteAudioStreams(false);
 
-    VideoEncoderConfiguration videoConfig =
-        VideoEncoderConfiguration(frameRate: VideoFrameRate.Fps24,minFrameRate:VideoFrameRate.Fps7 , dimensions:VideoDimensions(width: 480,height: 360));
+    VideoEncoderConfiguration videoConfig = VideoEncoderConfiguration(
+        frameRate: VideoFrameRate.Fps24,
+        minFrameRate: VideoFrameRate.Fps7,
+        dimensions: VideoDimensions(width: 480, height: 360));
     await engine!.setVideoEncoderConfiguration(videoConfig);
     await engine!.enableLocalAudio(isSelfMute);
     await engine!.enableLocalVideo(isSelfHide);
@@ -226,16 +225,11 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
               } else if (MqttListen1.roulette_wheel_view == false) {
                 _controller!.reset();
               }
-              if (MqttListen1.youOut == true) {}
-              // Timer(const Duration(milliseconds: 1500), () {
-              //   getSize();
-              // });
               return Stack(children: <Widget>[
                 Column(
                   children: [
                     Expanded(
                       child: Container(
-                        //height: MediaQuery.of(context).size.height * 0.835,
                         child: Stack(
                           children: [
                             Column(
@@ -261,139 +255,24 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                           children: [
                                             startPreview_1 //玩家1
                                                 ? isSelfHide == false
-                                                    ? Stack(children: [
-                                                        Container(
-                                                          child: Image.network(
-                                                            MqttListen1
-                                                                .avatarUrl1,
-                                                            fit: BoxFit.cover,
-                                                            height:
-                                                                double.infinity,
-                                                            width:
-                                                                double.infinity,
-                                                            alignment: Alignment
-                                                                .center,
-                                                          ),
+                                                    ? Container(
+                                                        child: Image.network(
+                                                          MqttListen1
+                                                              .avatarUrl1,
+                                                          fit: BoxFit.cover,
+                                                          height:
+                                                              double.infinity,
+                                                          width:
+                                                              double.infinity,
+                                                          alignment:
+                                                              Alignment.center,
                                                         ),
-                                                        Align(
-                                                            alignment: Alignment
-                                                                .topCenter,
-                                                            child: Stack(
-                                                              children: <
-                                                                  Widget>[
-                                                                Text(
-                                                                  '1',
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .center,
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontSize:
-                                                                        20,
-                                                                    foreground:
-                                                                        Paint()
-                                                                          ..style =
-                                                                              PaintingStyle.stroke
-                                                                          ..strokeWidth =
-                                                                              5
-                                                                          ..color =
-                                                                              Colors.white,
-                                                                  ),
-                                                                ),
-                                                                Text(
-                                                                  '1',
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .center,
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontSize:
-                                                                        20,
-                                                                    color: Colors
-                                                                        .black,
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            )),
-                                                      ])
-                                                    : Container(
-                                                        child: Stack(children: [
-                                                          RtcLocalView
-                                                              .SurfaceView(),
-                                                          Align(
-                                                              alignment:
-                                                                  Alignment
-                                                                      .topCenter,
-                                                              child: Stack(
-                                                                children: <
-                                                                    Widget>[
-                                                                  Text(
-                                                                    '1',
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .center,
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontSize:
-                                                                          20,
-                                                                      foreground:
-                                                                          Paint()
-                                                                            ..style =
-                                                                                PaintingStyle.stroke
-                                                                            ..strokeWidth =
-                                                                                5
-                                                                            ..color =
-                                                                                Colors.white,
-                                                                    ),
-                                                                  ),
-                                                                  Text(
-                                                                    '1',
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .center,
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontSize:
-                                                                          20,
-                                                                      color: Colors
-                                                                          .black,
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              )),
-                                                          Visibility(
-                                                            visible: MqttListen1
-                                                                .crown_view_1,
-                                                            child: Align(
-                                                              alignment:
-                                                                  Alignment
-                                                                      .topLeft,
-                                                              child:
-                                                                  Image.asset(
-                                                                'assets/images/crown.png',
-                                                                width: 40,
-                                                                height: 40,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          Visibility(
-                                                            visible: MqttListen1
-                                                                .hat_view_1,
-                                                            child: Align(
-                                                              alignment:
-                                                                  Alignment
-                                                                      .topLeft,
-                                                              child:
-                                                                  Image.asset(
-                                                                'assets/images/hat.png',
-                                                                width: 40,
-                                                                height: 40,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ]),
                                                       )
-                                                : MqttListen1.seatId1 != null
+                                                    : Container(
+                                                        child: RtcLocalView
+                                                            .SurfaceView(),
+                                                      )
+                                                : MqttListen1.TDseatId1 != null
                                                     ? MqttListen1.vdoSta_1
                                                         ? Container(
                                                             child: Stack(
@@ -401,139 +280,27 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                                   RtcRemoteView
                                                                       .SurfaceView(
                                                                     uid: MqttListen1
-                                                                        .seatId1!,
+                                                                        .TDseatId1!,
                                                                     channelId:
                                                                         myRoomId,
                                                                   ),
-                                                                  Align(
-                                                                      alignment:
-                                                                          Alignment
-                                                                              .topCenter,
-                                                                      child:
-                                                                          Stack(
-                                                                        children: <
-                                                                            Widget>[
-                                                                          Text(
-                                                                            '1',
-                                                                            textAlign:
-                                                                                TextAlign.center,
-                                                                            style:
-                                                                                TextStyle(
-                                                                              fontSize: 20,
-                                                                              foreground: Paint()
-                                                                                ..style = PaintingStyle.stroke
-                                                                                ..strokeWidth = 5
-                                                                                ..color = Colors.white,
-                                                                            ),
-                                                                          ),
-                                                                          Text(
-                                                                            '1',
-                                                                            textAlign:
-                                                                                TextAlign.center,
-                                                                            style:
-                                                                                TextStyle(
-                                                                              fontSize: 20,
-                                                                              color: Colors.black,
-                                                                            ),
-                                                                          ),
-                                                                        ],
-                                                                      )),
-                                                                  Visibility(
-                                                                    visible:
-                                                                        MqttListen1
-                                                                            .crown_view_1,
-                                                                    child:
-                                                                        Align(
-                                                                      alignment:
-                                                                          Alignment
-                                                                              .topLeft,
-                                                                      child: Image
-                                                                          .asset(
-                                                                        'assets/images/crown.png',
-                                                                        width:
-                                                                            40,
-                                                                        height:
-                                                                            40,
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                  Visibility(
-                                                                    visible:
-                                                                        MqttListen1
-                                                                            .hat_view_1,
-                                                                    child:
-                                                                        Align(
-                                                                      alignment:
-                                                                          Alignment
-                                                                              .topLeft,
-                                                                      child: Image
-                                                                          .asset(
-                                                                        'assets/images/hat.png',
-                                                                        width:
-                                                                            40,
-                                                                        height:
-                                                                            40,
-                                                                      ),
-                                                                    ),
-                                                                  ),
                                                                 ]),
                                                           )
-                                                        : Stack(children: [
-                                                            Container(
-                                                              child:
-                                                                  Image.network(
-                                                                MqttListen1
-                                                                    .avatarUrl1,
-                                                                fit: BoxFit
-                                                                    .cover,
-                                                                height: double
-                                                                    .infinity,
-                                                                width: double
-                                                                    .infinity,
-                                                                alignment:
-                                                                    Alignment
-                                                                        .center,
-                                                              ),
+                                                        : Container(
+                                                            child:
+                                                                Image.network(
+                                                              MqttListen1
+                                                                  .avatarUrl1,
+                                                              fit: BoxFit.cover,
+                                                              height: double
+                                                                  .infinity,
+                                                              width: double
+                                                                  .infinity,
+                                                              alignment:
+                                                                  Alignment
+                                                                      .center,
                                                             ),
-                                                            Align(
-                                                                alignment:
-                                                                    Alignment
-                                                                        .topCenter,
-                                                                child: Stack(
-                                                                  children: <
-                                                                      Widget>[
-                                                                    Text(
-                                                                      '1',
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .center,
-                                                                      style:
-                                                                          TextStyle(
-                                                                        fontSize:
-                                                                            20,
-                                                                        foreground:
-                                                                            Paint()
-                                                                              ..style = PaintingStyle.stroke
-                                                                              ..strokeWidth = 5
-                                                                              ..color = Colors.white,
-                                                                      ),
-                                                                    ),
-                                                                    Text(
-                                                                      '1',
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .center,
-                                                                      style:
-                                                                          TextStyle(
-                                                                        fontSize:
-                                                                            20,
-                                                                        color: Colors
-                                                                            .black,
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                )),
-                                                          ])
+                                                          )
                                                     : Image.asset(
                                                         'assets/images/blank_avatar.png',
                                                         fit: BoxFit.cover,
@@ -542,6 +309,201 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                         alignment:
                                                             Alignment.center,
                                                       ),
+                                            MqttListen1.hat_view_1
+                                                ? Align(
+                                                    alignment:
+                                                        Alignment.topLeft,
+                                                    child: Image.asset(
+                                                      'assets/images/tdGame/hat.png',
+                                                      width: 40,
+                                                      height: 40,
+                                                    ),
+                                                  )
+                                                : Container(
+                                                    width: 0, height: 0),
+                                            MqttListen1.crown_view_1
+                                                ? Align(
+                                                    alignment:
+                                                        Alignment.topLeft,
+                                                    child: Image.asset(
+                                                      'assets/images/tdGame/crown.png',
+                                                      width: 40,
+                                                      height: 40,
+                                                    ),
+                                                  )
+                                                : Container(
+                                                    width: 0, height: 0),
+                                            MqttListen1.pass_view_1
+                                                ? Positioned(
+                                                    left: 15.0,
+                                                    bottom: 80.0,
+                                                    child: Align(
+                                                      alignment: Alignment
+                                                          .bottomCenter,
+                                                      child: ButtonBar(
+                                                        alignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: <Widget>[
+                                                          IconButton(
+                                                            icon: Image.asset(
+                                                                'assets/images/tdGame/ok.png'),
+                                                            iconSize: 60,
+                                                            onPressed: () {
+                                                              pushMqtt(
+                                                                  "imedotRoom/" +
+                                                                      (myRoomId),
+                                                                  'next_game,');
+                                                            },
+                                                          ),
+                                                          IconButton(
+                                                            icon: Image.asset(
+                                                                'assets/images/tdGame/punish.png'),
+                                                            iconSize: 60,
+                                                            onPressed: () {
+                                                              pushMqtt(
+                                                                  "imedotRoom/" +
+                                                                      (myRoomId) +
+                                                                      "/game",
+                                                                  'backend_punish,' +
+                                                                      T_D_player);
+                                                            },
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ))
+                                                : Container(
+                                                    width: 0, height: 0),
+                                            MqttListen1.truth_dare_view_1
+                                                ? Positioned(
+                                                    left: 15.0,
+                                                    bottom: 80.0,
+                                                    child: Align(
+                                                      alignment: Alignment
+                                                          .bottomCenter,
+                                                      child: ButtonBar(
+                                                        alignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: <Widget>[
+                                                          IconButton(
+                                                            icon: Image.asset(
+                                                              'assets/images/tdGame/truth.png',
+                                                            ),
+                                                            iconSize: 55,
+                                                            onPressed: () {
+                                                              setState(() {
+                                                                pushMqtt(
+                                                                    "imedotRoom/" +
+                                                                        (myRoomId) +
+                                                                        "/game",
+                                                                    'truth,');
+                                                                MqttListen1
+                                                                        .truth_dare_view_1 =
+                                                                    false;
+                                                              });
+                                                            },
+                                                          ),
+                                                          IconButton(
+                                                            icon: Image.asset(
+                                                              'assets/images/tdGame/dare.png',
+                                                            ),
+                                                            iconSize: 55,
+                                                            onPressed: () {
+                                                              setState(() {
+                                                                pushMqtt(
+                                                                    "imedotRoom/" +
+                                                                        (myRoomId) +
+                                                                        "/game",
+                                                                    'dare,');
+                                                                MqttListen1
+                                                                        .truth_dare_view_1 =
+                                                                    false;
+                                                              });
+                                                            },
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ))
+                                                : Container(
+                                                    width: 0, height: 0),
+                                            MqttListen1.choose_button_view_1
+                                                ? Stack(
+                                                    children: [
+                                                      Positioned(
+                                                        bottom: 80.0,
+                                                        child: Align(
+                                                          alignment: Alignment
+                                                              .bottomCenter,
+                                                          child: ButtonBar(
+                                                            alignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: <Widget>[
+                                                              IconButton(
+                                                                icon: Image.asset(
+                                                                    'assets/images/tdGame/2b.png'),
+                                                                iconSize: 40,
+                                                                onPressed: () {
+                                                                  pushMqtt(
+                                                                      "imedotRoom/" +
+                                                                          (myRoomId) +
+                                                                          "/game",
+                                                                      'choose_this,2');
+                                                                  setState(() {
+                                                                    T_D_player =
+                                                                        "2";
+                                                                  });
+                                                                },
+                                                              ),
+                                                              IconButton(
+                                                                icon: Image.asset(
+                                                                    'assets/images/tdGame/3b.png'),
+                                                                iconSize: 40,
+                                                                onPressed: () {
+                                                                  pushMqtt(
+                                                                      "imedotRoom/" +
+                                                                          (myRoomId) +
+                                                                          "/game",
+                                                                      'choose_this,3');
+                                                                  setState(() {
+                                                                    T_D_player =
+                                                                        "3";
+                                                                  });
+                                                                },
+                                                              ),
+                                                              IconButton(
+                                                                icon: Image.asset(
+                                                                    'assets/images/tdGame/4b.png'),
+                                                                iconSize: 40,
+                                                                onPressed: () {
+                                                                  pushMqtt(
+                                                                      "imedotRoom/" +
+                                                                          (myRoomId) +
+                                                                          "/game",
+                                                                      'choose_this,4');
+                                                                  setState(() {
+                                                                    T_D_player =
+                                                                        "4";
+                                                                  });
+                                                                },
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      )
+                                                    ],
+                                                  )
+                                                : Container(
+                                                    width: 0, height: 0),
+                                            Align(
+                                              alignment: Alignment.topCenter,
+                                              child: Image.asset(
+                                                'assets/images/tdGame/1.png',
+                                                width: 20,
+                                                height: 20,
+                                              ),
+                                            ),
                                           ],
                                         ),
                                       ),
@@ -556,139 +518,24 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                           children: [
                                             startPreview_2 //玩家2
                                                 ? isSelfHide == false
-                                                    ? Stack(children: [
-                                                        Container(
-                                                          child: Image.network(
-                                                            MqttListen1
-                                                                .avatarUrl2,
-                                                            fit: BoxFit.cover,
-                                                            height:
-                                                                double.infinity,
-                                                            width:
-                                                                double.infinity,
-                                                            alignment: Alignment
-                                                                .center,
-                                                          ),
+                                                    ? Container(
+                                                        child: Image.network(
+                                                          MqttListen1
+                                                              .avatarUrl2,
+                                                          fit: BoxFit.cover,
+                                                          height:
+                                                              double.infinity,
+                                                          width:
+                                                              double.infinity,
+                                                          alignment:
+                                                              Alignment.center,
                                                         ),
-                                                        Align(
-                                                            alignment: Alignment
-                                                                .topCenter,
-                                                            child: Stack(
-                                                              children: <
-                                                                  Widget>[
-                                                                Text(
-                                                                  '2',
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .center,
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontSize:
-                                                                        20,
-                                                                    foreground:
-                                                                        Paint()
-                                                                          ..style =
-                                                                              PaintingStyle.stroke
-                                                                          ..strokeWidth =
-                                                                              5
-                                                                          ..color =
-                                                                              Colors.white,
-                                                                  ),
-                                                                ),
-                                                                Text(
-                                                                  '2',
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .center,
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontSize:
-                                                                        20,
-                                                                    color: Colors
-                                                                        .black,
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            )),
-                                                      ])
-                                                    : Container(
-                                                        child: Stack(children: [
-                                                          RtcLocalView
-                                                              .SurfaceView(),
-                                                          Align(
-                                                              alignment:
-                                                                  Alignment
-                                                                      .topCenter,
-                                                              child: Stack(
-                                                                children: <
-                                                                    Widget>[
-                                                                  Text(
-                                                                    '2',
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .center,
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontSize:
-                                                                          20,
-                                                                      foreground:
-                                                                          Paint()
-                                                                            ..style =
-                                                                                PaintingStyle.stroke
-                                                                            ..strokeWidth =
-                                                                                5
-                                                                            ..color =
-                                                                                Colors.white,
-                                                                    ),
-                                                                  ),
-                                                                  Text(
-                                                                    '2',
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .center,
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontSize:
-                                                                          20,
-                                                                      color: Colors
-                                                                          .black,
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              )),
-                                                          Visibility(
-                                                            visible: MqttListen1
-                                                                .crown_view_2,
-                                                            child: Align(
-                                                              alignment:
-                                                                  Alignment
-                                                                      .topLeft,
-                                                              child:
-                                                                  Image.asset(
-                                                                'assets/images/crown.png',
-                                                                width: 40,
-                                                                height: 40,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          Visibility(
-                                                            visible: MqttListen1
-                                                                .hat_view_2,
-                                                            child: Align(
-                                                              alignment:
-                                                                  Alignment
-                                                                      .topLeft,
-                                                              child:
-                                                                  Image.asset(
-                                                                'assets/images/hat.png',
-                                                                width: 40,
-                                                                height: 40,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ]),
                                                       )
-                                                : MqttListen1.seatId2 != null
+                                                    : Container(
+                                                        child: RtcLocalView
+                                                            .SurfaceView(),
+                                                      )
+                                                : MqttListen1.TDseatId2 != null
                                                     ? MqttListen1.vdoSta_2
                                                         ? Container(
                                                             child: Stack(
@@ -696,184 +543,27 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                                   RtcRemoteView
                                                                       .SurfaceView(
                                                                     uid: MqttListen1
-                                                                        .seatId2!,
+                                                                        .TDseatId2!,
                                                                     channelId:
                                                                         myRoomId,
                                                                   ),
-                                                                  Align(
-                                                                      alignment:
-                                                                          Alignment
-                                                                              .topCenter,
-                                                                      child:
-                                                                          Stack(
-                                                                        children: <
-                                                                            Widget>[
-                                                                          Text(
-                                                                            '2',
-                                                                            textAlign:
-                                                                                TextAlign.center,
-                                                                            style:
-                                                                                TextStyle(
-                                                                              fontSize: 20,
-                                                                              foreground: Paint()
-                                                                                ..style = PaintingStyle.stroke
-                                                                                ..strokeWidth = 5
-                                                                                ..color = Colors.white,
-                                                                            ),
-                                                                          ),
-                                                                          Text(
-                                                                            '2',
-                                                                            textAlign:
-                                                                                TextAlign.center,
-                                                                            style:
-                                                                                TextStyle(
-                                                                              fontSize: 20,
-                                                                              color: Colors.black,
-                                                                            ),
-                                                                          ),
-                                                                        ],
-                                                                      )),
-                                                                  Visibility(
-                                                                    visible:
-                                                                        MqttListen1
-                                                                            .crown_view_2,
-                                                                    child:
-                                                                        Align(
-                                                                      alignment:
-                                                                          Alignment
-                                                                              .topLeft,
-                                                                      child: Image
-                                                                          .asset(
-                                                                        'assets/images/crown.png',
-                                                                        width:
-                                                                            40,
-                                                                        height:
-                                                                            40,
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                  Visibility(
-                                                                    visible:
-                                                                        MqttListen1
-                                                                            .hat_view_2,
-                                                                    child:
-                                                                        Align(
-                                                                      alignment:
-                                                                          Alignment
-                                                                              .topLeft,
-                                                                      child: Image
-                                                                          .asset(
-                                                                        'assets/images/hat.png',
-                                                                        width:
-                                                                            40,
-                                                                        height:
-                                                                            40,
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                  myRoomSeatIndex ==
-                                                                          1
-                                                                      ? Align(
-                                                                          alignment:
-                                                                              Alignment.topRight,
-                                                                          child:
-                                                                              IconButton(
-                                                                            icon:
-                                                                                Icon(Icons.logout, color: Colors.black),
-                                                                            iconSize:
-                                                                                20,
-                                                                            onPressed:
-                                                                                () {
-                                                                              pushMqtt("imedotRoom/" + myRoomId, "leaveRoom,2");
-                                                                              MqttListen1.out_view_2 = false;
-                                                                            },
-                                                                          ),
-                                                                        )
-                                                                      : Container()
                                                                 ]),
                                                           )
-                                                        : Stack(children: [
-                                                            Container(
-                                                              child:
-                                                                  Image.network(
-                                                                MqttListen1
-                                                                    .avatarUrl2,
-                                                                fit: BoxFit
-                                                                    .cover,
-                                                                height: double
-                                                                    .infinity,
-                                                                width: double
-                                                                    .infinity,
-                                                                alignment:
-                                                                    Alignment
-                                                                        .center,
-                                                              ),
+                                                        : Container(
+                                                            child:
+                                                                Image.network(
+                                                              MqttListen1
+                                                                  .avatarUrl2,
+                                                              fit: BoxFit.cover,
+                                                              height: double
+                                                                  .infinity,
+                                                              width: double
+                                                                  .infinity,
+                                                              alignment:
+                                                                  Alignment
+                                                                      .center,
                                                             ),
-                                                            Align(
-                                                                alignment:
-                                                                    Alignment
-                                                                        .topCenter,
-                                                                child: Stack(
-                                                                  children: <
-                                                                      Widget>[
-                                                                    Text(
-                                                                      '2',
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .center,
-                                                                      style:
-                                                                          TextStyle(
-                                                                        fontSize:
-                                                                            20,
-                                                                        foreground:
-                                                                            Paint()
-                                                                              ..style = PaintingStyle.stroke
-                                                                              ..strokeWidth = 5
-                                                                              ..color = Colors.white,
-                                                                      ),
-                                                                    ),
-                                                                    Text(
-                                                                      '2',
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .center,
-                                                                      style:
-                                                                          TextStyle(
-                                                                        fontSize:
-                                                                            20,
-                                                                        color: Colors
-                                                                            .black,
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                )),
-                                                            myRoomSeatIndex == 1
-                                                                ? Align(
-                                                                    alignment:
-                                                                        Alignment
-                                                                            .topRight,
-                                                                    child:
-                                                                        IconButton(
-                                                                      icon: Icon(
-                                                                          Icons
-                                                                              .logout,
-                                                                          color:
-                                                                              Colors.black),
-                                                                      iconSize:
-                                                                          20,
-                                                                      onPressed:
-                                                                          () {
-                                                                        pushMqtt(
-                                                                            "imedotRoom/" +
-                                                                                myRoomId,
-                                                                            "leaveRoom,2");
-                                                                        MqttListen1.out_view_2 =
-                                                                            false;
-                                                                      },
-                                                                    ),
-                                                                  )
-                                                                : Container()
-                                                          ])
+                                                          )
                                                     : Image.asset(
                                                         'assets/images/blank_avatar.png',
                                                         fit: BoxFit.cover,
@@ -882,6 +572,238 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                         alignment:
                                                             Alignment.center,
                                                       ),
+                                            myRoomSeatIndex == 1
+                                                ? MqttListen1.TDseatId2 != null
+                                                    ? Align(
+                                                        alignment:
+                                                            Alignment.topRight,
+                                                        child: IconButton(
+                                                          icon: Icon(
+                                                              Icons.logout,
+                                                              color:
+                                                                  Colors.black),
+                                                          iconSize: 20,
+                                                          onPressed: () {
+                                                            pushMqtt(
+                                                                "imedotRoom/" +
+                                                                    myRoomId,
+                                                                "leaveRoom,2");
+                                                            MqttListen1
+                                                                    .out_view_2 =
+                                                                false;
+                                                          },
+                                                        ),
+                                                      )
+                                                    : Container(
+                                                        width: 0,
+                                                        height: 0,
+                                                      )
+                                                : Container(
+                                                    width: 0,
+                                                    height: 0,
+                                                  ),
+                                            MqttListen1.pass_view_2
+                                                ? Positioned(
+                                                    left: 15.0,
+                                                    bottom: 80.0,
+                                                    child: Align(
+                                                      alignment: Alignment
+                                                          .bottomCenter,
+                                                      child: ButtonBar(
+                                                        alignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: <Widget>[
+                                                          IconButton(
+                                                            icon: Image.asset(
+                                                                'assets/images/tdGame/ok.png'),
+                                                            iconSize: 60,
+                                                            onPressed: () {
+                                                              setState(() {
+                                                                pushMqtt(
+                                                                    "imedotRoom/" +
+                                                                        (myRoomId),
+                                                                    'next_game,');
+                                                              });
+                                                            },
+                                                          ),
+                                                          IconButton(
+                                                            icon: Image.asset(
+                                                                'assets/images/tdGame/punish.png'),
+                                                            iconSize: 60,
+                                                            onPressed: () {
+                                                              setState(() {
+                                                                pushMqtt(
+                                                                    "imedotRoom/" +
+                                                                        (myRoomId) +
+                                                                        "/game",
+                                                                    'backend_punish,' +
+                                                                        T_D_player);
+                                                              });
+                                                            },
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ))
+                                                : Container(
+                                                    width: 0, height: 0),
+                                            MqttListen1.truth_dare_view_2
+                                                ? Positioned(
+                                                    left: 15.0,
+                                                    bottom: 80.0,
+                                                    child: Align(
+                                                      alignment: Alignment
+                                                          .bottomCenter,
+                                                      child: ButtonBar(
+                                                        alignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: <Widget>[
+                                                          IconButton(
+                                                            icon: Image.asset(
+                                                              'assets/images/tdGame/truth.png',
+                                                            ),
+                                                            iconSize: 55,
+                                                            onPressed: () {
+                                                              setState(() {
+                                                                pushMqtt(
+                                                                    "imedotRoom/" +
+                                                                        (myRoomId) +
+                                                                        "/game",
+                                                                    'truth,');
+                                                                MqttListen1
+                                                                        .truth_dare_view_2 =
+                                                                    false;
+                                                              });
+                                                            },
+                                                          ),
+                                                          IconButton(
+                                                            icon: Image.asset(
+                                                              'assets/images/tdGame/dare.png',
+                                                            ),
+                                                            iconSize: 55,
+                                                            onPressed: () {
+                                                              setState(() {
+                                                                pushMqtt(
+                                                                    "imedotRoom/" +
+                                                                        (myRoomId) +
+                                                                        "/game",
+                                                                    'dare,');
+                                                                MqttListen1
+                                                                        .truth_dare_view_2 =
+                                                                    false;
+                                                              });
+                                                            },
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ))
+                                                : Container(
+                                                    width: 0, height: 0),
+                                            MqttListen1.hat_view_2
+                                                ? Align(
+                                                    alignment:
+                                                        Alignment.topLeft,
+                                                    child: Image.asset(
+                                                      'assets/images/tdGame/hat.png',
+                                                      width: 40,
+                                                      height: 40,
+                                                    ),
+                                                  )
+                                                : Container(
+                                                    width: 0, height: 0),
+                                            MqttListen1.crown_view_2
+                                                ? Align(
+                                                    alignment:
+                                                        Alignment.topLeft,
+                                                    child: Image.asset(
+                                                      'assets/images/tdGame/crown.png',
+                                                      width: 40,
+                                                      height: 40,
+                                                    ),
+                                                  )
+                                                : Container(
+                                                    width: 0, height: 0),
+                                            MqttListen1.choose_button_view_2
+                                                ? Stack(
+                                                    children: [
+                                                      Positioned(
+                                                        bottom: 80.0,
+                                                        child: Align(
+                                                          alignment: Alignment
+                                                              .bottomCenter,
+                                                          child: ButtonBar(
+                                                            alignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: <Widget>[
+                                                              IconButton(
+                                                                icon: Image.asset(
+                                                                    'assets/images/tdGame/1b.png'),
+                                                                iconSize: 40,
+                                                                onPressed: () {
+                                                                  pushMqtt(
+                                                                      "imedotRoom/" +
+                                                                          (myRoomId) +
+                                                                          "/game",
+                                                                      'choose_this,1');
+                                                                  setState(() {
+                                                                    T_D_player =
+                                                                        "1";
+                                                                  });
+                                                                },
+                                                              ),
+                                                              IconButton(
+                                                                icon: Image.asset(
+                                                                    'assets/images/tdGame/3b.png'),
+                                                                iconSize: 40,
+                                                                onPressed: () {
+                                                                  pushMqtt(
+                                                                      "imedotRoom/" +
+                                                                          (myRoomId) +
+                                                                          "/game",
+                                                                      'choose_this,3');
+                                                                  setState(() {
+                                                                    T_D_player =
+                                                                        "3";
+                                                                  });
+                                                                },
+                                                              ),
+                                                              IconButton(
+                                                                icon: Image.asset(
+                                                                    'assets/images/tdGame/4b.png'),
+                                                                iconSize: 40,
+                                                                onPressed: () {
+                                                                  pushMqtt(
+                                                                      "imedotRoom/" +
+                                                                          (myRoomId) +
+                                                                          "/game",
+                                                                      'choose_this,4');
+                                                                  setState(() {
+                                                                    T_D_player =
+                                                                        "4";
+                                                                  });
+                                                                },
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  )
+                                                : Container(
+                                                    width: 0, height: 0),
+                                            Align(
+                                              alignment: Alignment.topCenter,
+                                              child: Align(
+                                                alignment: Alignment.topCenter,
+                                                child: Image.asset(
+                                                  'assets/images/tdGame/2.png',
+                                                  width: 20,
+                                                  height: 20,
+                                                ),
+                                              ),
+                                            ),
                                           ],
                                         ),
                                       ),
@@ -890,7 +812,10 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                 ),
                                 Expanded(
                                   child: Row(
-                                    mainAxisSize: MainAxisSize.max,
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Container(
                                         width:
@@ -901,141 +826,26 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                 0.5,
                                         child: Stack(
                                           children: [
-                                            startPreview_3 //玩家3
+                                            startPreview_3 //玩家1
                                                 ? isSelfHide == false
-                                                    ? Stack(children: [
-                                                        Container(
-                                                          child: Image.network(
-                                                            MqttListen1
-                                                                .avatarUrl3,
-                                                            fit: BoxFit.cover,
-                                                            height:
-                                                                double.infinity,
-                                                            width:
-                                                                double.infinity,
-                                                            alignment: Alignment
-                                                                .center,
-                                                          ),
+                                                    ? Container(
+                                                        child: Image.network(
+                                                          MqttListen1
+                                                              .avatarUrl3,
+                                                          fit: BoxFit.cover,
+                                                          height:
+                                                              double.infinity,
+                                                          width:
+                                                              double.infinity,
+                                                          alignment:
+                                                              Alignment.center,
                                                         ),
-                                                        Align(
-                                                            alignment: Alignment
-                                                                .topCenter,
-                                                            child: Stack(
-                                                              children: <
-                                                                  Widget>[
-                                                                Text(
-                                                                  '3',
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .center,
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontSize:
-                                                                        20,
-                                                                    foreground:
-                                                                        Paint()
-                                                                          ..style =
-                                                                              PaintingStyle.stroke
-                                                                          ..strokeWidth =
-                                                                              5
-                                                                          ..color =
-                                                                              Colors.white,
-                                                                  ),
-                                                                ),
-                                                                Text(
-                                                                  '3',
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .center,
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontSize:
-                                                                        20,
-                                                                    color: Colors
-                                                                        .black,
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            )),
-                                                      ])
-                                                    : Container(
-                                                        child: Stack(children: [
-                                                          RtcLocalView
-                                                              .SurfaceView(),
-                                                          Visibility(
-                                                            visible: MqttListen1
-                                                                .hat_view_3,
-                                                            child: Align(
-                                                              alignment:
-                                                                  Alignment
-                                                                      .topLeft,
-                                                              child:
-                                                                  Image.asset(
-                                                                'assets/images/hat.png',
-                                                                width: 40,
-                                                                height: 40,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          Align(
-                                                              alignment:
-                                                                  Alignment
-                                                                      .topCenter,
-                                                              child: Stack(
-                                                                children: <
-                                                                    Widget>[
-                                                                  Text(
-                                                                    '3',
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .center,
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontSize:
-                                                                          20,
-                                                                      foreground:
-                                                                          Paint()
-                                                                            ..style =
-                                                                                PaintingStyle.stroke
-                                                                            ..strokeWidth =
-                                                                                5
-                                                                            ..color =
-                                                                                Colors.white,
-                                                                    ),
-                                                                  ),
-                                                                  Text(
-                                                                    '3',
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .center,
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontSize:
-                                                                          20,
-                                                                      color: Colors
-                                                                          .black,
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              )),
-                                                          Visibility(
-                                                            visible: MqttListen1
-                                                                .crown_view_3,
-                                                            child: Align(
-                                                              alignment:
-                                                                  Alignment
-                                                                      .topLeft,
-                                                              child:
-                                                                  Image.asset(
-                                                                'assets/images/crown.png',
-                                                                width: 40,
-                                                                height: 40,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ]),
                                                       )
-                                                : MqttListen1.seatId3 != null
+                                                    : Container(
+                                                        child: RtcLocalView
+                                                            .SurfaceView(),
+                                                      )
+                                                : MqttListen1.TDseatId3 != null
                                                     ? MqttListen1.vdoSta_3
                                                         ? Container(
                                                             child: Stack(
@@ -1043,184 +853,27 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                                   RtcRemoteView
                                                                       .SurfaceView(
                                                                     uid: MqttListen1
-                                                                        .seatId3!,
+                                                                        .TDseatId3!,
                                                                     channelId:
                                                                         myRoomId,
                                                                   ),
-                                                                  Align(
-                                                                      alignment:
-                                                                          Alignment
-                                                                              .topCenter,
-                                                                      child:
-                                                                          Stack(
-                                                                        children: <
-                                                                            Widget>[
-                                                                          Text(
-                                                                            '3',
-                                                                            textAlign:
-                                                                                TextAlign.center,
-                                                                            style:
-                                                                                TextStyle(
-                                                                              fontSize: 20,
-                                                                              foreground: Paint()
-                                                                                ..style = PaintingStyle.stroke
-                                                                                ..strokeWidth = 5
-                                                                                ..color = Colors.white,
-                                                                            ),
-                                                                          ),
-                                                                          Text(
-                                                                            '3',
-                                                                            textAlign:
-                                                                                TextAlign.center,
-                                                                            style:
-                                                                                TextStyle(
-                                                                              fontSize: 20,
-                                                                              color: Colors.black,
-                                                                            ),
-                                                                          ),
-                                                                        ],
-                                                                      )),
-                                                                  Visibility(
-                                                                    visible:
-                                                                        MqttListen1
-                                                                            .crown_view_3,
-                                                                    child:
-                                                                        Align(
-                                                                      alignment:
-                                                                          Alignment
-                                                                              .topLeft,
-                                                                      child: Image
-                                                                          .asset(
-                                                                        'assets/images/crown.png',
-                                                                        width:
-                                                                            40,
-                                                                        height:
-                                                                            40,
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                  Visibility(
-                                                                    visible:
-                                                                        MqttListen1
-                                                                            .hat_view_3,
-                                                                    child:
-                                                                        Align(
-                                                                      alignment:
-                                                                          Alignment
-                                                                              .topLeft,
-                                                                      child: Image
-                                                                          .asset(
-                                                                        'assets/images/hat.png',
-                                                                        width:
-                                                                            40,
-                                                                        height:
-                                                                            40,
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                  myRoomSeatIndex ==
-                                                                          1
-                                                                      ? Align(
-                                                                          alignment:
-                                                                              Alignment.topRight,
-                                                                          child:
-                                                                              IconButton(
-                                                                            icon:
-                                                                                Icon(Icons.logout, color: Colors.black),
-                                                                            iconSize:
-                                                                                20,
-                                                                            onPressed:
-                                                                                () {
-                                                                              pushMqtt("imedotRoom/" + myRoomId, "leaveRoom,3");
-                                                                              MqttListen1.out_view_3 = false;
-                                                                            },
-                                                                          ),
-                                                                        )
-                                                                      : Container()
                                                                 ]),
                                                           )
-                                                        : Stack(children: [
-                                                            Container(
-                                                              child:
-                                                                  Image.network(
-                                                                MqttListen1
-                                                                    .avatarUrl3,
-                                                                fit: BoxFit
-                                                                    .cover,
-                                                                height: double
-                                                                    .infinity,
-                                                                width: double
-                                                                    .infinity,
-                                                                alignment:
-                                                                    Alignment
-                                                                        .center,
-                                                              ),
+                                                        : Container(
+                                                            child:
+                                                                Image.network(
+                                                              MqttListen1
+                                                                  .avatarUrl3,
+                                                              fit: BoxFit.cover,
+                                                              height: double
+                                                                  .infinity,
+                                                              width: double
+                                                                  .infinity,
+                                                              alignment:
+                                                                  Alignment
+                                                                      .center,
                                                             ),
-                                                            Align(
-                                                                alignment:
-                                                                    Alignment
-                                                                        .topCenter,
-                                                                child: Stack(
-                                                                  children: <
-                                                                      Widget>[
-                                                                    Text(
-                                                                      '3',
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .center,
-                                                                      style:
-                                                                          TextStyle(
-                                                                        fontSize:
-                                                                            20,
-                                                                        foreground:
-                                                                            Paint()
-                                                                              ..style = PaintingStyle.stroke
-                                                                              ..strokeWidth = 5
-                                                                              ..color = Colors.white,
-                                                                      ),
-                                                                    ),
-                                                                    Text(
-                                                                      '3',
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .center,
-                                                                      style:
-                                                                          TextStyle(
-                                                                        fontSize:
-                                                                            20,
-                                                                        color: Colors
-                                                                            .black,
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                )),
-                                                            myRoomSeatIndex == 1
-                                                                ? Align(
-                                                                    alignment:
-                                                                        Alignment
-                                                                            .topRight,
-                                                                    child:
-                                                                        IconButton(
-                                                                      icon: Icon(
-                                                                          Icons
-                                                                              .logout,
-                                                                          color:
-                                                                              Colors.black),
-                                                                      iconSize:
-                                                                          20,
-                                                                      onPressed:
-                                                                          () {
-                                                                        pushMqtt(
-                                                                            "imedotRoom/" +
-                                                                                myRoomId,
-                                                                            "leaveRoom,3");
-                                                                        MqttListen1.out_view_3 =
-                                                                            false;
-                                                                      },
-                                                                    ),
-                                                                  )
-                                                                : Container()
-                                                          ])
+                                                          )
                                                     : Image.asset(
                                                         'assets/images/blank_avatar.png',
                                                         fit: BoxFit.cover,
@@ -1229,6 +882,241 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                         alignment:
                                                             Alignment.center,
                                                       ),
+                                            myRoomSeatIndex == 1
+                                                ? MqttListen1.TDseatId3 != null
+                                                    ? Align(
+                                                        alignment:
+                                                            Alignment.topRight,
+                                                        child: IconButton(
+                                                          icon: Icon(
+                                                              Icons.logout,
+                                                              color:
+                                                                  Colors.black),
+                                                          iconSize: 20,
+                                                          onPressed: () {
+                                                            pushMqtt(
+                                                                "imedotRoom/" +
+                                                                    myRoomId,
+                                                                "leaveRoom,3");
+                                                            MqttListen1
+                                                                    .out_view_3 =
+                                                                false;
+                                                          },
+                                                        ),
+                                                      )
+                                                    : Container(
+                                                        width: 0,
+                                                        height: 0,
+                                                      )
+                                                : Container(
+                                                    width: 0,
+                                                    height: 0,
+                                                  ),
+                                            MqttListen1.pass_view_3
+                                                ? Positioned(
+                                                    left: 15.0,
+                                                    bottom: 80.0,
+                                                    child: Align(
+                                                      alignment: Alignment
+                                                          .bottomCenter,
+                                                      child: ButtonBar(
+                                                        alignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: <Widget>[
+                                                          IconButton(
+                                                            icon: Image.asset(
+                                                                'assets/images/tdGame/ok.png'),
+                                                            iconSize: 60,
+                                                            onPressed: () {
+                                                              setState(() {
+                                                                pushMqtt(
+                                                                    "imedotRoom/" +
+                                                                        (myRoomId),
+                                                                    'next_game,');
+                                                              });
+                                                            },
+                                                          ),
+                                                          IconButton(
+                                                            icon: Image.asset(
+                                                                'assets/images/tdGame/punish.png'),
+                                                            iconSize: 60,
+                                                            onPressed: () {
+                                                              setState(() {
+                                                                pushMqtt(
+                                                                    "imedotRoom/" +
+                                                                        (myRoomId) +
+                                                                        "/game",
+                                                                    'backend_punish,' +
+                                                                        T_D_player);
+                                                              });
+                                                            },
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ))
+                                                : Container(
+                                                    width: 0, height: 0),
+                                            MqttListen1.truth_dare_view_3
+                                                ? Positioned(
+                                                    left: 15.0,
+                                                    bottom: 20.0,
+                                                    child: Align(
+                                                      alignment: Alignment
+                                                          .bottomCenter,
+                                                      child: ButtonBar(
+                                                        alignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: <Widget>[
+                                                          IconButton(
+                                                            icon: Image.asset(
+                                                              'assets/images/tdGame/truth.png',
+                                                            ),
+                                                            iconSize: 55,
+                                                            onPressed: () {
+                                                              setState(() {
+                                                                pushMqtt(
+                                                                    "imedotRoom/" +
+                                                                        (myRoomId) +
+                                                                        "/game",
+                                                                    'truth,');
+                                                                MqttListen1
+                                                                        .truth_dare_view_3 =
+                                                                    false;
+                                                              });
+                                                            },
+                                                          ),
+                                                          IconButton(
+                                                            icon: Image.asset(
+                                                              'assets/images/tdGame/dare.png',
+                                                            ),
+                                                            iconSize: 55,
+                                                            onPressed: () {
+                                                              setState(() {
+                                                                pushMqtt(
+                                                                    "imedotRoom/" +
+                                                                        (myRoomId) +
+                                                                        "/game",
+                                                                    'dare,');
+                                                                MqttListen1
+                                                                        .truth_dare_view_3 =
+                                                                    false;
+                                                              });
+                                                            },
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ))
+                                                : Container(
+                                                    width: 0, height: 0),
+                                            MqttListen1.hat_view_3
+                                                ? Align(
+                                                    alignment:
+                                                        Alignment.topLeft,
+                                                    child: Image.asset(
+                                                      'assets/images/tdGame/hat.png',
+                                                      width: 40,
+                                                      height: 40,
+                                                    ),
+                                                  )
+                                                : Container(
+                                                    width: 0, height: 0),
+                                            MqttListen1.crown_view_3
+                                                ? Visibility(
+                                                    visible: MqttListen1
+                                                        .crown_view_3,
+                                                    child: Align(
+                                                      alignment:
+                                                          Alignment.topLeft,
+                                                      child: Image.asset(
+                                                        'assets/images/tdGame/crown.png',
+                                                        width: 40,
+                                                        height: 40,
+                                                      ),
+                                                    ),
+                                                  )
+                                                : Container(
+                                                    width: 0, height: 0),
+                                            MqttListen1.choose_button_view_3
+                                                ? Stack(
+                                                    children: [
+                                                      Positioned(
+                                                        child: Align(
+                                                          alignment: Alignment
+                                                              .bottomCenter,
+                                                          child: ButtonBar(
+                                                            alignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: <Widget>[
+                                                              IconButton(
+                                                                icon: Image.asset(
+                                                                    'assets/images/tdGame/1b.png'),
+                                                                iconSize: 40,
+                                                                onPressed: () {
+                                                                  pushMqtt(
+                                                                      "imedotRoom/" +
+                                                                          (myRoomId) +
+                                                                          "/game",
+                                                                      'choose_this,1');
+                                                                  setState(() {
+                                                                    T_D_player =
+                                                                        "1";
+                                                                  });
+                                                                },
+                                                              ),
+                                                              IconButton(
+                                                                icon: Image.asset(
+                                                                    'assets/images/tdGame/2b.png'),
+                                                                iconSize: 40,
+                                                                onPressed: () {
+                                                                  pushMqtt(
+                                                                      "imedotRoom/" +
+                                                                          (myRoomId) +
+                                                                          "/game",
+                                                                      'choose_this,2');
+                                                                  setState(() {
+                                                                    T_D_player =
+                                                                        "2";
+                                                                  });
+                                                                },
+                                                              ),
+                                                              IconButton(
+                                                                icon: Image.asset(
+                                                                    'assets/images/tdGame/4b.png'),
+                                                                iconSize: 40,
+                                                                onPressed: () {
+                                                                  pushMqtt(
+                                                                      "imedotRoom/" +
+                                                                          (myRoomId) +
+                                                                          "/game",
+                                                                      'choose_this,4');
+                                                                  setState(() {
+                                                                    T_D_player =
+                                                                        "4";
+                                                                  });
+                                                                },
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      )
+                                                    ],
+                                                  )
+                                                : Container(
+                                                    width: 0, height: 0),
+                                            Align(
+                                              alignment: Alignment.topCenter,
+                                              child: Align(
+                                                alignment: Alignment.topCenter,
+                                                child: Image.asset(
+                                                  'assets/images/tdGame/3.png',
+                                                  width: 20,
+                                                  height: 20,
+                                                ),
+                                              ),
+                                            ),
                                           ],
                                         ),
                                       ),
@@ -1243,139 +1131,24 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                           children: [
                                             startPreview_4 //玩家4
                                                 ? isSelfHide == false
-                                                    ? Stack(children: [
-                                                        Container(
-                                                          child: Image.network(
-                                                            MqttListen1
-                                                                .avatarUrl4,
-                                                            fit: BoxFit.cover,
-                                                            height:
-                                                                double.infinity,
-                                                            width:
-                                                                double.infinity,
-                                                            alignment: Alignment
-                                                                .center,
-                                                          ),
+                                                    ? Container(
+                                                        child: Image.network(
+                                                          MqttListen1
+                                                              .avatarUrl4,
+                                                          fit: BoxFit.cover,
+                                                          height:
+                                                              double.infinity,
+                                                          width:
+                                                              double.infinity,
+                                                          alignment:
+                                                              Alignment.center,
                                                         ),
-                                                        Align(
-                                                            alignment: Alignment
-                                                                .topCenter,
-                                                            child: Stack(
-                                                              children: <
-                                                                  Widget>[
-                                                                Text(
-                                                                  '4',
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .center,
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontSize:
-                                                                        20,
-                                                                    foreground:
-                                                                        Paint()
-                                                                          ..style =
-                                                                              PaintingStyle.stroke
-                                                                          ..strokeWidth =
-                                                                              5
-                                                                          ..color =
-                                                                              Colors.white,
-                                                                  ),
-                                                                ),
-                                                                Text(
-                                                                  '4',
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .center,
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontSize:
-                                                                        20,
-                                                                    color: Colors
-                                                                        .black,
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            )),
-                                                      ])
-                                                    : Container(
-                                                        child: Stack(children: [
-                                                          RtcLocalView
-                                                              .SurfaceView(),
-                                                          Visibility(
-                                                            visible: MqttListen1
-                                                                .hat_view_4,
-                                                            child: Align(
-                                                              alignment:
-                                                                  Alignment
-                                                                      .topLeft,
-                                                              child:
-                                                                  Image.asset(
-                                                                'assets/images/hat.png',
-                                                                width: 40,
-                                                                height: 40,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          Align(
-                                                              alignment:
-                                                                  Alignment
-                                                                      .topCenter,
-                                                              child: Stack(
-                                                                children: <
-                                                                    Widget>[
-                                                                  Text(
-                                                                    '4',
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .center,
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontSize:
-                                                                          20,
-                                                                      foreground:
-                                                                          Paint()
-                                                                            ..style =
-                                                                                PaintingStyle.stroke
-                                                                            ..strokeWidth =
-                                                                                5
-                                                                            ..color =
-                                                                                Colors.white,
-                                                                    ),
-                                                                  ),
-                                                                  Text(
-                                                                    '4',
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .center,
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontSize:
-                                                                          20,
-                                                                      color: Colors
-                                                                          .black,
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              )),
-                                                          Visibility(
-                                                            visible: MqttListen1
-                                                                .crown_view_4,
-                                                            child: Align(
-                                                              alignment:
-                                                                  Alignment
-                                                                      .topLeft,
-                                                              child:
-                                                                  Image.asset(
-                                                                'assets/images/crown.png',
-                                                                width: 40,
-                                                                height: 40,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ]),
                                                       )
-                                                : MqttListen1.seatId4 != null
+                                                    : Container(
+                                                        child: RtcLocalView
+                                                            .SurfaceView(),
+                                                      )
+                                                : MqttListen1.TDseatId4 != null
                                                     ? MqttListen1.vdoSta_4
                                                         ? Container(
                                                             child: Stack(
@@ -1383,184 +1156,27 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                                   RtcRemoteView
                                                                       .SurfaceView(
                                                                     uid: MqttListen1
-                                                                        .seatId4!,
+                                                                        .TDseatId4!,
                                                                     channelId:
                                                                         myRoomId,
                                                                   ),
-                                                                  Align(
-                                                                      alignment:
-                                                                          Alignment
-                                                                              .topCenter,
-                                                                      child:
-                                                                          Stack(
-                                                                        children: <
-                                                                            Widget>[
-                                                                          Text(
-                                                                            '4',
-                                                                            textAlign:
-                                                                                TextAlign.center,
-                                                                            style:
-                                                                                TextStyle(
-                                                                              fontSize: 20,
-                                                                              foreground: Paint()
-                                                                                ..style = PaintingStyle.stroke
-                                                                                ..strokeWidth = 5
-                                                                                ..color = Colors.white,
-                                                                            ),
-                                                                          ),
-                                                                          Text(
-                                                                            '4',
-                                                                            textAlign:
-                                                                                TextAlign.center,
-                                                                            style:
-                                                                                TextStyle(
-                                                                              fontSize: 20,
-                                                                              color: Colors.black,
-                                                                            ),
-                                                                          ),
-                                                                        ],
-                                                                      )),
-                                                                  Visibility(
-                                                                    visible:
-                                                                        MqttListen1
-                                                                            .crown_view_4,
-                                                                    child:
-                                                                        Align(
-                                                                      alignment:
-                                                                          Alignment
-                                                                              .topLeft,
-                                                                      child: Image
-                                                                          .asset(
-                                                                        'assets/images/crown.png',
-                                                                        width:
-                                                                            40,
-                                                                        height:
-                                                                            40,
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                  Visibility(
-                                                                    visible:
-                                                                        MqttListen1
-                                                                            .hat_view_4,
-                                                                    child:
-                                                                        Align(
-                                                                      alignment:
-                                                                          Alignment
-                                                                              .topLeft,
-                                                                      child: Image
-                                                                          .asset(
-                                                                        'assets/images/hat.png',
-                                                                        width:
-                                                                            40,
-                                                                        height:
-                                                                            40,
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                  myRoomSeatIndex ==
-                                                                          1
-                                                                      ? Align(
-                                                                          alignment:
-                                                                              Alignment.topRight,
-                                                                          child:
-                                                                              IconButton(
-                                                                            icon:
-                                                                                Icon(Icons.logout, color: Colors.black),
-                                                                            iconSize:
-                                                                                20,
-                                                                            onPressed:
-                                                                                () {
-                                                                              pushMqtt("imedotRoom/" + myRoomId, "leaveRoom,4");
-                                                                              MqttListen1.out_view_4 = false;
-                                                                            },
-                                                                          ),
-                                                                        )
-                                                                      : Container()
                                                                 ]),
                                                           )
-                                                        : Stack(children: [
-                                                            Container(
-                                                              child:
-                                                                  Image.network(
-                                                                MqttListen1
-                                                                    .avatarUrl4,
-                                                                fit: BoxFit
-                                                                    .cover,
-                                                                height: double
-                                                                    .infinity,
-                                                                width: double
-                                                                    .infinity,
-                                                                alignment:
-                                                                    Alignment
-                                                                        .center,
-                                                              ),
+                                                        : Container(
+                                                            child:
+                                                                Image.network(
+                                                              MqttListen1
+                                                                  .avatarUrl4,
+                                                              fit: BoxFit.cover,
+                                                              height: double
+                                                                  .infinity,
+                                                              width: double
+                                                                  .infinity,
+                                                              alignment:
+                                                                  Alignment
+                                                                      .center,
                                                             ),
-                                                            Align(
-                                                                alignment:
-                                                                    Alignment
-                                                                        .topCenter,
-                                                                child: Stack(
-                                                                  children: <
-                                                                      Widget>[
-                                                                    Text(
-                                                                      '4',
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .center,
-                                                                      style:
-                                                                          TextStyle(
-                                                                        fontSize:
-                                                                            20,
-                                                                        foreground:
-                                                                            Paint()
-                                                                              ..style = PaintingStyle.stroke
-                                                                              ..strokeWidth = 5
-                                                                              ..color = Colors.white,
-                                                                      ),
-                                                                    ),
-                                                                    Text(
-                                                                      '4',
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .center,
-                                                                      style:
-                                                                          TextStyle(
-                                                                        fontSize:
-                                                                            20,
-                                                                        color: Colors
-                                                                            .black,
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                )),
-                                                            myRoomSeatIndex == 1
-                                                                ? Align(
-                                                                    alignment:
-                                                                        Alignment
-                                                                            .topRight,
-                                                                    child:
-                                                                        IconButton(
-                                                                      icon: Icon(
-                                                                          Icons
-                                                                              .logout,
-                                                                          color:
-                                                                              Colors.black),
-                                                                      iconSize:
-                                                                          20,
-                                                                      onPressed:
-                                                                          () {
-                                                                        pushMqtt(
-                                                                            "imedotRoom/" +
-                                                                                myRoomId,
-                                                                            "leaveRoom,4");
-                                                                        MqttListen1.out_view_4 =
-                                                                            false;
-                                                                      },
-                                                                    ),
-                                                                  )
-                                                                : Container()
-                                                          ])
+                                                          )
                                                     : Image.asset(
                                                         'assets/images/blank_avatar.png',
                                                         fit: BoxFit.cover,
@@ -1569,6 +1185,238 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                         alignment:
                                                             Alignment.center,
                                                       ),
+                                            myRoomSeatIndex == 1
+                                                ? MqttListen1.TDseatId4 != null
+                                                    ? Align(
+                                                        alignment:
+                                                            Alignment.topRight,
+                                                        child: IconButton(
+                                                          icon: Icon(
+                                                              Icons.logout,
+                                                              color:
+                                                                  Colors.black),
+                                                          iconSize: 20,
+                                                          onPressed: () {
+                                                            pushMqtt(
+                                                                "imedotRoom/" +
+                                                                    myRoomId,
+                                                                "leaveRoom,4");
+                                                            MqttListen1
+                                                                    .out_view_4 =
+                                                                false;
+                                                          },
+                                                        ),
+                                                      )
+                                                    : Container(
+                                                        width: 0,
+                                                        height: 0,
+                                                      )
+                                                : Container(
+                                                    width: 0,
+                                                    height: 0,
+                                                  ),
+                                            MqttListen1.pass_view_4
+                                                ? Positioned(
+                                                    left: 15.0,
+                                                    bottom: 80.0,
+                                                    child: Align(
+                                                      alignment: Alignment
+                                                          .bottomCenter,
+                                                      child: ButtonBar(
+                                                        alignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: <Widget>[
+                                                          IconButton(
+                                                            icon: Image.asset(
+                                                                'assets/images/tdGame/ok.png'),
+                                                            iconSize: 60,
+                                                            onPressed: () {
+                                                              setState(() {
+                                                                pushMqtt(
+                                                                    "imedotRoom/" +
+                                                                        (myRoomId),
+                                                                    'next_game,');
+                                                              });
+                                                            },
+                                                          ),
+                                                          IconButton(
+                                                            icon: Image.asset(
+                                                                'assets/images/tdGame/punish.png'),
+                                                            iconSize: 60,
+                                                            onPressed: () {
+                                                              setState(() {
+                                                                pushMqtt(
+                                                                    "imedotRoom/" +
+                                                                        (myRoomId) +
+                                                                        "/game",
+                                                                    'backend_punish,' +
+                                                                        T_D_player);
+                                                              });
+                                                            },
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ))
+                                                : Container(
+                                                    width: 0, height: 0),
+                                            MqttListen1.truth_dare_view_4
+                                                ? Positioned(
+                                                    left: 15.0,
+                                                    bottom: 20.0,
+                                                    child: Align(
+                                                      alignment: Alignment
+                                                          .bottomCenter,
+                                                      child: ButtonBar(
+                                                        alignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: <Widget>[
+                                                          IconButton(
+                                                            icon: Image.asset(
+                                                              'assets/images/tdGame/truth.png',
+                                                            ),
+                                                            iconSize: 55,
+                                                            onPressed: () {
+                                                              setState(() {
+                                                                pushMqtt(
+                                                                    "imedotRoom/" +
+                                                                        (myRoomId) +
+                                                                        "/game",
+                                                                    'truth,');
+                                                                MqttListen1
+                                                                        .truth_dare_view_4 =
+                                                                    false;
+                                                              });
+                                                            },
+                                                          ),
+                                                          IconButton(
+                                                            icon: Image.asset(
+                                                              'assets/images/tdGame/dare.png',
+                                                            ),
+                                                            iconSize: 55,
+                                                            onPressed: () {
+                                                              setState(() {
+                                                                pushMqtt(
+                                                                    "imedotRoom/" +
+                                                                        (myRoomId) +
+                                                                        "/game",
+                                                                    'dare,');
+                                                                MqttListen1
+                                                                        .truth_dare_view_4 =
+                                                                    false;
+                                                              });
+                                                            },
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ))
+                                                : Container(
+                                                    width: 0, height: 0),
+                                            MqttListen1.hat_view_4
+                                                ? Align(
+                                                    alignment:
+                                                        Alignment.topLeft,
+                                                    child: Image.asset(
+                                                      'assets/images/tdGame/hat.png',
+                                                      width: 40,
+                                                      height: 40,
+                                                    ),
+                                                  )
+                                                : Container(
+                                                    width: 0, height: 0),
+                                            MqttListen1.crown_view_4
+                                                ? Align(
+                                                    alignment:
+                                                        Alignment.topLeft,
+                                                    child: Image.asset(
+                                                      'assets/images/tdGame/crown.png',
+                                                      width: 40,
+                                                      height: 40,
+                                                    ),
+                                                  )
+                                                : Container(
+                                                    width: 0, height: 0),
+                                            MqttListen1.choose_button_view_4
+                                                ? Stack(
+                                                    children: [
+                                                      Positioned(
+                                                        bottom: 20.0,
+                                                        child: Align(
+                                                          alignment: Alignment
+                                                              .bottomCenter,
+                                                          child: ButtonBar(
+                                                            alignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: <Widget>[
+                                                              IconButton(
+                                                                icon: Image.asset(
+                                                                    'assets/images/tdGame/1b.png'),
+                                                                iconSize: 40,
+                                                                onPressed: () {
+                                                                  pushMqtt(
+                                                                      "imedotRoom/" +
+                                                                          (myRoomId) +
+                                                                          "/game",
+                                                                      'choose_this,1');
+                                                                  setState(() {
+                                                                    T_D_player =
+                                                                        "1";
+                                                                  });
+                                                                },
+                                                              ),
+                                                              IconButton(
+                                                                icon: Image.asset(
+                                                                    'assets/images/tdGame/2b.png'),
+                                                                iconSize: 40,
+                                                                onPressed: () {
+                                                                  pushMqtt(
+                                                                      "imedotRoom/" +
+                                                                          (myRoomId) +
+                                                                          "/game",
+                                                                      'choose_this,2');
+                                                                  setState(() {
+                                                                    T_D_player =
+                                                                        "2";
+                                                                  });
+                                                                },
+                                                              ),
+                                                              IconButton(
+                                                                icon: Image.asset(
+                                                                    'assets/images/tdGame/3b.png'),
+                                                                iconSize: 40,
+                                                                onPressed: () {
+                                                                  pushMqtt(
+                                                                      "imedotRoom/" +
+                                                                          (myRoomId) +
+                                                                          "/game",
+                                                                      'choose_this,3');
+                                                                  setState(() {
+                                                                    T_D_player =
+                                                                        "3";
+                                                                  });
+                                                                },
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      )
+                                                    ],
+                                                  )
+                                                : Container(
+                                                    width: 0, height: 0),
+                                            Align(
+                                              alignment: Alignment.topCenter,
+                                              child: Align(
+                                                alignment: Alignment.topCenter,
+                                                child: Image.asset(
+                                                  'assets/images/tdGame/4.png',
+                                                  width: 20,
+                                                  height: 20,
+                                                ),
+                                              ),
+                                            ),
                                           ],
                                         ),
                                       ),
@@ -1594,466 +1442,221 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                     controller: _controller!)),
                                           ),
                                         )
-                                      : Container(),
+                                      : Container(
+                                          height: 0.1,
+                                          width: 0.1,
+                                        ),
                                   MqttListen1.choose_button_view_1
-                                      ? Visibility(
-                                          visible:
-                                              MqttListen1.choose_button_view_1,
-                                          child: Align(
-                                            alignment: Alignment.center,
-                                            child: ButtonBar(
-                                              alignment:
-                                                  MainAxisAlignment.center,
-                                              children: <Widget>[
-                                                ElevatedButton(
-                                                  child: Text('2'),
-                                                  onPressed: () {
-                                                    pushMqtt(
-                                                        "imedotRoom/" +
-                                                            (myRoomId) +
-                                                            "/game",
-                                                        'choose_this,2');
-                                                    setState(() {
-                                                      T_D_player = "2";
-                                                    });
-                                                  },
-                                                ),
-                                                ElevatedButton(
-                                                  child: Text('3'),
-                                                  onPressed: () {
-                                                    pushMqtt(
-                                                        "imedotRoom/" +
-                                                            (myRoomId) +
-                                                            "/game",
-                                                        'choose_this,3');
-                                                    setState(() {
-                                                      T_D_player = "3";
-                                                    });
-                                                  },
-                                                ),
-                                                ElevatedButton(
-                                                  child: Text('4'),
-                                                  onPressed: () {
-                                                    pushMqtt(
-                                                        "imedotRoom/" +
-                                                            (myRoomId) +
-                                                            "/game",
-                                                        'choose_this,4');
-                                                    setState(() {
-                                                      T_D_player = "4";
-                                                    });
-                                                  },
-                                                ),
-                                              ],
-                                            ),
+                                      ? Align(
+                                          alignment: Alignment.center,
+                                          child: Image.asset(
+                                            'assets/images/tdGame/chooseOne.png',
+                                            width: 250,
+                                            height: 250,
                                           ),
                                         )
-                                      : Container(),
+                                      : Container(width: 0, height: 0),
                                   MqttListen1.choose_button_view_2
-                                      ? Visibility(
-                                          visible:
-                                              MqttListen1.choose_button_view_2,
-                                          child: Align(
-                                            alignment: Alignment.center,
-                                            child: ButtonBar(
-                                              alignment:
-                                                  MainAxisAlignment.center,
-                                              children: <Widget>[
-                                                ElevatedButton(
-                                                  child: Text('1'),
-                                                  onPressed: () {
-                                                    pushMqtt(
-                                                        "imedotRoom/" +
-                                                            (myRoomId) +
-                                                            "/game",
-                                                        'choose_this,1');
-                                                    setState(() {
-                                                      T_D_player = "1";
-                                                    });
-                                                  },
-                                                ),
-                                                ElevatedButton(
-                                                  child: Text('3'),
-                                                  onPressed: () {
-                                                    pushMqtt(
-                                                        "imedotRoom/" +
-                                                            (myRoomId) +
-                                                            "/game",
-                                                        'choose_this,3');
-                                                    setState(() {
-                                                      T_D_player = "3";
-                                                    });
-                                                  },
-                                                ),
-                                                ElevatedButton(
-                                                  child: Text('4'),
-                                                  onPressed: () {
-                                                    pushMqtt(
-                                                        "imedotRoom/" +
-                                                            (myRoomId) +
-                                                            "/game",
-                                                        'choose_this,4');
-                                                    setState(() {
-                                                      T_D_player = "4";
-                                                    });
-                                                  },
-                                                ),
-                                              ],
-                                            ),
+                                      ? Align(
+                                          alignment: Alignment.center,
+                                          child: Image.asset(
+                                            'assets/images/tdGame/chooseOne.png',
+                                            width: 250,
+                                            height: 250,
                                           ),
                                         )
-                                      : Container(),
+                                      : Container(width: 0, height: 0),
                                   MqttListen1.choose_button_view_3
-                                      ? Visibility(
-                                          visible:
-                                              MqttListen1.choose_button_view_3,
-                                          child: Align(
-                                            alignment: Alignment.center,
-                                            child: ButtonBar(
-                                              alignment:
-                                                  MainAxisAlignment.center,
-                                              children: <Widget>[
-                                                ElevatedButton(
-                                                  child: Text('1'),
-                                                  onPressed: () {
-                                                    pushMqtt(
-                                                        "imedotRoom/" +
-                                                            (myRoomId) +
-                                                            "/game",
-                                                        'choose_this,1');
-                                                    setState(() {
-                                                      T_D_player = "1";
-                                                    });
-                                                  },
-                                                ),
-                                                ElevatedButton(
-                                                  child: Text('2'),
-                                                  onPressed: () {
-                                                    pushMqtt(
-                                                        "imedotRoom/" +
-                                                            (myRoomId) +
-                                                            "/game",
-                                                        'choose_this,2');
-                                                    setState(() {
-                                                      T_D_player = "2";
-                                                    });
-                                                  },
-                                                ),
-                                                ElevatedButton(
-                                                  child: Text('4'),
-                                                  onPressed: () {
-                                                    pushMqtt(
-                                                        "imedotRoom/" +
-                                                            (myRoomId) +
-                                                            "/game",
-                                                        'choose_this,4');
-                                                    setState(() {
-                                                      T_D_player = "4";
-                                                    });
-                                                  },
-                                                ),
-                                              ],
-                                            ),
+                                      ? Align(
+                                          alignment: Alignment.center,
+                                          child: Image.asset(
+                                            'assets/images/tdGame/chooseOne.png',
+                                            width: 250,
+                                            height: 250,
                                           ),
                                         )
-                                      : Container(),
+                                      : Container(width: 0, height: 0),
                                   MqttListen1.choose_button_view_4
-                                      ? Visibility(
-                                          visible:
-                                              MqttListen1.choose_button_view_4,
-                                          child: Align(
-                                            alignment: Alignment.center,
-                                            child: ButtonBar(
-                                              alignment:
-                                                  MainAxisAlignment.center,
-                                              children: <Widget>[
-                                                ElevatedButton(
-                                                  child: Text('1'),
-                                                  onPressed: () {
-                                                    pushMqtt(
-                                                        "imedotRoom/" +
-                                                            (myRoomId) +
-                                                            "/game",
-                                                        'choose_this,1');
-                                                    setState(() {
-                                                      T_D_player = "1";
-                                                    });
-                                                  },
-                                                ),
-                                                ElevatedButton(
-                                                  child: Text('2'),
-                                                  onPressed: () {
-                                                    pushMqtt(
-                                                        "imedotRoom/" +
-                                                            (myRoomId) +
-                                                            "/game",
-                                                        'choose_this,2');
-                                                    setState(() {
-                                                      T_D_player = "2";
-                                                    });
-                                                  },
-                                                ),
-                                                ElevatedButton(
-                                                  child: Text('3'),
-                                                  onPressed: () {
-                                                    pushMqtt(
-                                                        "imedotRoom/" +
-                                                            (myRoomId) +
-                                                            "/game",
-                                                        'choose_this,3');
-                                                    setState(() {
-                                                      T_D_player = "3";
-                                                    });
-                                                  },
-                                                ),
-                                              ],
-                                            ),
+                                      ? Align(
+                                          alignment: Alignment.center,
+                                          child: Image.asset(
+                                            'assets/images/tdGame/chooseOne.png',
+                                            width: 250,
+                                            height: 250,
                                           ),
                                         )
-                                      : Container(),
-                                  MqttListen1.truth_dare_view
-                                      ? Visibility(
-                                          visible: MqttListen1.truth_dare_view,
-                                          child: Align(
-                                            alignment: Alignment.center,
-                                            child: ButtonBar(
-                                              alignment:
-                                                  MainAxisAlignment.center,
-                                              children: <Widget>[
-                                                ElevatedButton(
-                                                  child: Text('真心話'),
-                                                  onPressed: () {
-                                                    setState(() {
-                                                      pushMqtt(
-                                                          "imedotRoom/" +
-                                                              (myRoomId) +
-                                                              "/game",
-                                                          'truth,');
-                                                      MqttListen1
-                                                              .truth_dare_view =
-                                                          false;
-                                                    });
-                                                  },
-                                                ),
-                                                ElevatedButton(
-                                                  child: Text('大冒險'),
-                                                  onPressed: () {
-                                                    setState(() {
-                                                      pushMqtt(
-                                                          "imedotRoom/" +
-                                                              (myRoomId) +
-                                                              "/game",
-                                                          'dare,');
-                                                      MqttListen1
-                                                              .truth_dare_view =
-                                                          false;
-                                                    });
-                                                  },
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        )
-                                      : Container(),
-                                  MqttListen1.pass_view
-                                      ? Visibility(
-                                          visible: MqttListen1.pass_view,
-                                          child: Align(
-                                            alignment: Alignment.center,
-                                            child: ButtonBar(
-                                              alignment:
-                                                  MainAxisAlignment.center,
-                                              children: <Widget>[
-                                                ElevatedButton(
-                                                  child: Text(
-                                                    '完成',
-                                                  ),
-                                                  onPressed: () {
-                                                    setState(() {
-                                                      pushMqtt(
-                                                          "imedotRoom/" +
-                                                              (myRoomId),
-                                                          'next_game,');
-                                                    });
-                                                  },
-                                                ),
-                                                ElevatedButton(
-                                                  child: Text('懲罰'),
-                                                  onPressed: () {
-                                                    setState(() {
-                                                      pushMqtt(
-                                                          "imedotRoom/" +
-                                                              (myRoomId) +
-                                                              "/game",
-                                                          'backend_punish,' +
-                                                              T_D_player);
-                                                      MqttListen1.pass_view =
-                                                          false;
-                                                    });
-                                                  },
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        )
-                                      : Container(),
-                                  MqttListen1.next_view
-                                      ? Visibility(
-                                          visible: MqttListen1.next_view,
-                                          child: Align(
-                                            alignment: Alignment.center,
-                                            child: ButtonBar(
-                                              alignment:
-                                                  MainAxisAlignment.center,
-                                              children: <Widget>[
-                                                ElevatedButton(
-                                                  child: Text('下一回合'),
-                                                  onPressed: () {
-                                                    setState(() {
-                                                      pushMqtt(
-                                                          "imedotRoom/" +
-                                                              (myRoomId),
-                                                          'next_game,');
-                                                    });
-                                                  },
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        )
-                                      : Container(),
+                                      : Container(width: 0, height: 0),
                                   MqttListen1.text_view_start
                                       ? Visibility(
                                           visible: MqttListen1.text_view_start,
                                           child: Align(
-                                              alignment: Alignment.topCenter,
-                                              child: Stack(
-                                                children: <Widget>[
-                                                  Text(
-                                                    '開始遊戲',
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                      fontSize: 60,
-                                                      foreground: Paint()
-                                                        ..style =
-                                                            PaintingStyle.stroke
-                                                        ..strokeWidth = 6
-                                                        ..color = Colors.white,
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    '開始遊戲',
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                      fontSize: 60,
-                                                      color: Colors.black,
-                                                    ),
-                                                  ),
-                                                ],
-                                              )),
+                                            alignment: Alignment.center,
+                                            child: Image.asset(
+                                              'assets/images/tdGame/start.png',
+                                              width: 300,
+                                              height: 300,
+                                            ),
+                                          ),
                                         )
-                                      : Container(),
+                                      : Container(width: 0, height: 0),
                                   MqttListen1.text_view_be_choose
                                       ? Visibility(
                                           visible:
                                               MqttListen1.text_view_be_choose,
                                           child: Align(
-                                              alignment: Alignment.topCenter,
-                                              child: Stack(
+                                              alignment: Alignment.center,
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
                                                 children: <Widget>[
-                                                  Text(
-                                                    '${MqttListen1.BeChosen}號玩家被選擇了!\n請選擇真心話或大冒險',
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                      fontSize: 30,
-                                                      foreground: Paint()
-                                                        ..style =
-                                                            PaintingStyle.stroke
-                                                        ..strokeWidth = 6
-                                                        ..color = Colors.white,
+                                                  if (MqttListen1.BeChosen ==
+                                                      '1') ...[
+                                                    Image.asset(
+                                                      'assets/images/tdGame/1.png',
+                                                      width: 30,
+                                                      height: 30,
                                                     ),
-                                                  ),
-                                                  Text(
-                                                    '${MqttListen1.BeChosen}號玩家被選擇了!\n請選擇真心話或大冒險',
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                      fontSize: 30,
-                                                      color: Colors.black,
+                                                  ] else if (MqttListen1
+                                                          .BeChosen ==
+                                                      '2') ...[
+                                                    Image.asset(
+                                                      'assets/images/tdGame/2.png',
+                                                      width: 30,
+                                                      height: 30,
                                                     ),
-                                                  ),
+                                                  ] else if (MqttListen1
+                                                          .BeChosen ==
+                                                      '3') ...[
+                                                    Image.asset(
+                                                      'assets/images/tdGame/3.png',
+                                                      width: 30,
+                                                      height: 30,
+                                                    ),
+                                                  ] else if (MqttListen1
+                                                          .BeChosen ==
+                                                      '4') ...[
+                                                    Image.asset(
+                                                      'assets/images/tdGame/4.png',
+                                                      width: 30,
+                                                      height: 30,
+                                                    ),
+                                                  ],
+                                                  Image.asset(
+                                                    'assets/images/tdGame/beChoose.png',
+                                                    width: 200,
+                                                    height: 200,
+                                                  )
                                                 ],
                                               )),
                                         )
-                                      : Container(),
+                                      : Container(width: 0, height: 0),
                                   MqttListen1.text_view_choose_T
                                       ? Visibility(
                                           visible:
                                               MqttListen1.text_view_choose_T,
                                           child: Align(
-                                              alignment: Alignment.topCenter,
-                                              child: Stack(
-                                                children: <Widget>[
-                                                  Text(
-                                                    '${MqttListen1.BeChosen}號玩家選擇的是真心話',
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                      fontSize: 30,
-                                                      foreground: Paint()
-                                                        ..style =
-                                                            PaintingStyle.stroke
-                                                        ..strokeWidth = 6
-                                                        ..color = Colors.white,
+                                              alignment: Alignment.center,
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  if (MqttListen1.BeChosen ==
+                                                      '1') ...[
+                                                    Image.asset(
+                                                      'assets/images/tdGame/1.png',
+                                                      width: 30,
+                                                      height: 30,
                                                     ),
-                                                  ),
-                                                  Text(
-                                                    '${MqttListen1.BeChosen}號玩家選擇的是真心話',
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                      fontSize: 30,
-                                                      color: Colors.black,
+                                                  ] else if (MqttListen1
+                                                          .BeChosen ==
+                                                      '2') ...[
+                                                    Image.asset(
+                                                      'assets/images/tdGame/2.png',
+                                                      width: 30,
+                                                      height: 30,
                                                     ),
-                                                  ),
+                                                  ] else if (MqttListen1
+                                                          .BeChosen ==
+                                                      '3') ...[
+                                                    Image.asset(
+                                                      'assets/images/tdGame/3.png',
+                                                      width: 30,
+                                                      height: 30,
+                                                    ),
+                                                  ] else if (MqttListen1
+                                                          .BeChosen ==
+                                                      '4') ...[
+                                                    Image.asset(
+                                                      'assets/images/tdGame/4.png',
+                                                      width: 30,
+                                                      height: 30,
+                                                    ),
+                                                  ],
+                                                  Image.asset(
+                                                    'assets/images/tdGame/chooseT.png',
+                                                    width: 250,
+                                                    height: 250,
+                                                  )
                                                 ],
                                               )),
                                         )
-                                      : Container(),
+                                      : Container(width: 0, height: 0),
                                   MqttListen1.text_view_choose_D
                                       ? Visibility(
                                           visible:
                                               MqttListen1.text_view_choose_D,
                                           child: Align(
-                                              alignment: Alignment.topCenter,
-                                              child: Stack(
-                                                children: <Widget>[
-                                                  Text(
-                                                    '${MqttListen1.BeChosen}號玩家選擇的是大冒險',
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                      fontSize: 30,
-                                                      foreground: Paint()
-                                                        ..style =
-                                                            PaintingStyle.stroke
-                                                        ..strokeWidth = 6
-                                                        ..color = Colors.white,
+                                              alignment: Alignment.center,
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  if (MqttListen1.BeChosen ==
+                                                      '1') ...[
+                                                    Image.asset(
+                                                      'assets/images/tdGame/1.png',
+                                                      width: 30,
+                                                      height: 30,
                                                     ),
-                                                  ),
-                                                  Text(
-                                                    '${MqttListen1.BeChosen}號玩家選擇的是大冒險',
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                      fontSize: 30,
-                                                      color: Colors.black,
+                                                  ] else if (MqttListen1
+                                                          .BeChosen ==
+                                                      '2') ...[
+                                                    Image.asset(
+                                                      'assets/images/tdGame/2.png',
+                                                      width: 30,
+                                                      height: 30,
                                                     ),
-                                                  ),
+                                                  ] else if (MqttListen1
+                                                          .BeChosen ==
+                                                      '3') ...[
+                                                    Image.asset(
+                                                      'assets/images/tdGame/3.png',
+                                                      width: 30,
+                                                      height: 30,
+                                                    ),
+                                                  ] else if (MqttListen1
+                                                          .BeChosen ==
+                                                      '4') ...[
+                                                    Image.asset(
+                                                      'assets/images/tdGame/4.png',
+                                                      width: 30,
+                                                      height: 30,
+                                                    ),
+                                                  ],
+                                                  Image.asset(
+                                                    'assets/images/tdGame/chooseD.png',
+                                                    width: 250,
+                                                    height: 250,
+                                                  )
                                                 ],
                                               )),
                                         )
-                                      : Container(),
+                                      : Container(width: 0, height: 0),
                                   MqttListen1.text_view_punish
                                       ? Visibility(
                                           visible: MqttListen1.text_view_punish,
                                           child: Align(
-                                              alignment: Alignment.topCenter,
+                                              alignment: Alignment.center,
                                               child: Stack(
                                                 children: <Widget>[
                                                   Text(
@@ -2079,39 +1682,19 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                 ],
                                               )),
                                         )
-                                      : Container(),
+                                      : Container(width: 0, height: 0),
                                   MqttListen1.text_view_notify_king
                                       ? Visibility(
                                           visible:
                                               MqttListen1.text_view_notify_king,
                                           child: Align(
-                                              alignment: Alignment.topCenter,
-                                              child: Stack(
-                                                children: <Widget>[
-                                                  Text(
-                                                    '恭喜 ${(int.parse(king)) + 1} 號玩家成為國王\n請選擇一位玩家',
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                      fontSize: 30,
-                                                      foreground: Paint()
-                                                        ..style =
-                                                            PaintingStyle.stroke
-                                                        ..strokeWidth = 6
-                                                        ..color = Colors.white,
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    '恭喜 ${(int.parse(king)) + 1} 號玩家成為國王\n請選擇一位玩家',
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                      fontSize: 30,
-                                                      color: Colors.black,
-                                                    ),
-                                                  ),
-                                                ],
-                                              )),
-                                        )
-                                      : Container(),
+                                              alignment: Alignment.center,
+                                              child: Image.asset(
+                                                'assets/images/tdGame/selecting.png',
+                                                width: 200,
+                                                height: 200,
+                                              )))
+                                      : Container(width: 0, height: 0),
                                 ]),
                               ),
                             ),
@@ -2207,9 +1790,7 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                         ),
                       ),
                     ),
-                    FaceunityUI(
-                      cameraCallback: () => engine!.switchCamera(),
-                    ),
+                    FaceunityUI(cameraCallback: () => engine!.switchCamera()),
                   ],
                 ),
               ]);

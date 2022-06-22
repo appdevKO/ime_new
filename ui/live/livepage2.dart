@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ime_new/ui/live/spylive/spylivepage.dart';
-import 'package:ime_new/ui/live/sweetlive/start_stream.dart';
-import 'package:ime_new/ui/live/sweetlive/sweetlive_list.dart';
-import 'package:ime_new/ui/live/sweetlivepage.dart';
-
+import 'package:ime_new/ui/live/sweet/sweetlive_list.dart';
 class LivePage2 extends StatefulWidget {
   const LivePage2({Key? key}) : super(key: key);
 
@@ -16,8 +13,8 @@ class _LivePage2State extends State<LivePage2> {
   String avatar = "https://i.ibb.co/cFFSzdK/sex-man.png";
 
   final pages = [
-    SweetLivePage(),
     SweetLiveList(),
+    Container(),
     SpyLivePage(),
   ];
 

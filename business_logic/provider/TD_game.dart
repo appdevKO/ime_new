@@ -37,7 +37,7 @@ var punish_list = [
   '聞自己的腳丫子10秒',
   '分享人生最糗的事',
   '模仿大猩猩',
-  '擺一個你認為異性最具代表性的姿勢',
+  '擺一個你認為\n異性最具代表性的姿勢',
   '頭頂一樣物品10秒不能掉',
   '表演喜怒哀樂',
   '做一個最性感的動作',
@@ -59,10 +59,10 @@ var punish_list = [
 class TD_game with ChangeNotifier {
   String BeChosen = '';
   String Punish = '';
-  int? seatId1 = null;
-  int? seatId2 = null;
-  int? seatId3 = null;
-  int? seatId4 = null;
+  int? TDseatId1 = null;
+  int? TDseatId2 = null;
+  int? TDseatId3 = null;
+  int? TDseatId4 = null;
   String avatarUrl1 = '';
   String avatarUrl2 = '';
   String avatarUrl3 = '';
@@ -89,8 +89,14 @@ class TD_game with ChangeNotifier {
   bool choose_button_view_2 = false;
   bool choose_button_view_3 = false;
   bool choose_button_view_4 = false;
-  bool truth_dare_view = false;
-  bool pass_view = false;
+  bool truth_dare_view_1 = false;
+  bool truth_dare_view_2 = false;
+  bool truth_dare_view_3 = false;
+  bool truth_dare_view_4 = false;
+  bool pass_view_1 = false;
+  bool pass_view_2 = false;
+  bool pass_view_3 = false;
+  bool pass_view_4 = false;
   bool next_view = false;
   bool text_view_start = false;
   bool text_view_be_choose = false;
@@ -181,9 +187,14 @@ class TD_game with ChangeNotifier {
           choose_button_view_2 = false;
           choose_button_view_3 = false;
           choose_button_view_4 = false;
-          truth_dare_view = false;
-          pass_view = false;
-          next_view = false;
+          truth_dare_view_1 = false;
+          truth_dare_view_2 = false;
+          truth_dare_view_3 = false;
+          truth_dare_view_4 = false;
+          pass_view_1 = false;
+          pass_view_2 = false;
+          pass_view_3 = false;
+          pass_view_4 = false;
           text_view_start = false;
           text_view_be_choose = false;
           text_view_choose_T = false;
@@ -202,7 +213,7 @@ class TD_game with ChangeNotifier {
           var dataList = '$pt'.split(',');
           print('dataList $dataList');
           if (dataList[2] != 'null') {
-            seatId1 = int.parse(dataList[2].replaceAll(' ', ''));
+            TDseatId1 = int.parse(dataList[2].replaceAll(' ', ''));
             avatarUrl1 = dataList[10];
             if (dataList[6] == 'true') {
               vdoSta_1 = true;
@@ -212,7 +223,7 @@ class TD_game with ChangeNotifier {
           }
           if (dataList[3] != 'null') {
             avatarUrl2 = dataList[11];
-            seatId2 = int.parse(dataList[3].replaceAll(' ', ''));
+            TDseatId2 = int.parse(dataList[3].replaceAll(' ', ''));
             if (dataList[7] == 'true') {
               vdoSta_2 = true;
             } else if (dataList[7] == 'false') {
@@ -221,7 +232,7 @@ class TD_game with ChangeNotifier {
           }
           if (dataList[4] != 'null') {
             avatarUrl3 = dataList[12];
-            seatId3 = int.parse(dataList[4].replaceAll(' ', ''));
+            TDseatId3 = int.parse(dataList[4].replaceAll(' ', ''));
             if (dataList[8] == 'true') {
               vdoSta_3 = true;
             } else if (dataList[8] == 'false') {
@@ -230,7 +241,7 @@ class TD_game with ChangeNotifier {
           }
           if (dataList[5] != 'null') {
             avatarUrl4 = dataList[13];
-            seatId4 = int.parse(dataList[5].replaceAll(' ', ''));
+            TDseatId4 = int.parse(dataList[5].replaceAll(' ', ''));
             if (dataList[9] == 'true') {
               vdoSta_4 = true;
             } else if (dataList[9] == 'false') {
@@ -242,10 +253,10 @@ class TD_game with ChangeNotifier {
         } else if ('$pt'.startsWith('leaveRoom,')) {
           var getSeatIndex = '$pt'.split(',')[1];
           if (myRoomSeatIndex.toString() == getSeatIndex) {
-            seatId1 = null;
-            seatId2 = null;
-            seatId3 = null;
-            seatId4 = null;
+            TDseatId1 = null;
+            TDseatId2 = null;
+            TDseatId3 = null;
+            TDseatId4 = null;
             avatarUrl1 = '';
             avatarUrl2 = '';
             avatarUrl3 = '';
@@ -258,16 +269,16 @@ class TD_game with ChangeNotifier {
           } else {
             if (getSeatIndex == '1') {
               vdoSta_1 = false;
-              seatId1 = null;
+              TDseatId1 = null;
             } else if (getSeatIndex == '2') {
               vdoSta_2 = false;
-              seatId2 = null;
+              TDseatId2 = null;
             } else if (getSeatIndex == '3') {
               vdoSta_3 = false;
-              seatId3 = null;
+              TDseatId3 = null;
             } else if (getSeatIndex == '4') {
               vdoSta_4 = false;
-              seatId4 = null;
+              TDseatId4 = null;
             }
           }
           stopGame = true;
@@ -287,8 +298,14 @@ class TD_game with ChangeNotifier {
           choose_button_view_2 = false;
           choose_button_view_3 = false;
           choose_button_view_4 = false;
-          truth_dare_view = false;
-          pass_view = false;
+          truth_dare_view_1 = false;
+          truth_dare_view_2 = false;
+          truth_dare_view_3 = false;
+          truth_dare_view_4 = false;
+          pass_view_1 = false;
+          pass_view_2 = false;
+          pass_view_3 = false;
+          pass_view_4 = false;
           next_view = false;
           text_view_start = false;
           text_view_be_choose = false;
@@ -315,8 +332,14 @@ class TD_game with ChangeNotifier {
           choose_button_view_2 = false;
           choose_button_view_3 = false;
           choose_button_view_4 = false;
-          truth_dare_view = false;
-          pass_view = false;
+          truth_dare_view_1 = false;
+          truth_dare_view_2 = false;
+          truth_dare_view_3 = false;
+          truth_dare_view_4 = false;
+          pass_view_1 = false;
+          pass_view_2 = false;
+          pass_view_3 = false;
+          pass_view_4 = false;
           next_view = false;
           text_view_start = false;
           text_view_be_choose = false;
@@ -372,8 +395,14 @@ class TD_game with ChangeNotifier {
           choose_button_view_2 = false;
           choose_button_view_3 = false;
           choose_button_view_4 = false;
-          truth_dare_view = false;
-          pass_view = false;
+          truth_dare_view_1 = false;
+          truth_dare_view_2 = false;
+          truth_dare_view_3 = false;
+          truth_dare_view_4 = false;
+          pass_view_1 = false;
+          pass_view_2 = false;
+          pass_view_3 = false;
+          pass_view_4 = false;
           next_view = false;
           text_view_start = false;
           text_view_be_choose = false;
@@ -382,63 +411,6 @@ class TD_game with ChangeNotifier {
           text_view_punish = false;
           text_view_notify_king = false;
           notifyListeners();
-        } else if ('$pt'.startsWith('getOut,')) {
-          /*var getOutplayer = '$pt'.split(',')[1];
-          print('房內 被踢$getOutplayer');
-          if (myRoomSeatIndex.toString() == getOutplayer) {
-            seatId1 = null;
-            seatId2 = null;
-            seatId3 = null;
-            seatId4 = null;
-            avatarUrl1 = '';
-            avatarUrl2 = '';
-            avatarUrl3 = '';
-            avatarUrl4 = '';
-            Get.back();
-            youOut = true;
-            notifyListeners();
-          } else {
-            if (getOutplayer == '1') {
-              vdoSta_1 = false;
-              seatId1 = null;
-            } else if (getOutplayer == '2') {
-              vdoSta_2 = false;
-              seatId2 = null;
-            } else if (getOutplayer == '3') {
-              vdoSta_3 = false;
-              seatId3 = null;
-            } else if (getOutplayer == '4') {
-              vdoSta_4 = false;
-              seatId4 = null;
-            }
-          }
-          stopGame = true;
-          BeChosen = '';
-          Punish = '';
-          roulette_wheel_view = false;
-          scepter = false;
-          crown_view_1 = false;
-          crown_view_2 = false;
-          crown_view_3 = false;
-          crown_view_4 = false;
-          hat_view_1 = false;
-          hat_view_2 = false;
-          hat_view_3 = false;
-          hat_view_4 = false;
-          choose_button_view_1 = false;
-          choose_button_view_2 = false;
-          choose_button_view_3 = false;
-          choose_button_view_4 = false;
-          truth_dare_view = false;
-          pass_view = false;
-          next_view = false;
-          text_view_start = false;
-          text_view_be_choose = false;
-          text_view_choose_T = false;
-          text_view_choose_D = false;
-          text_view_punish = false;
-          text_view_notify_king = false;
-          notifyListeners();*/
         } else if ('$pt'.startsWith('vdoHide,')) {
           String hidePlayer = '$pt'.split(',')[1];
           print('hidePlayer $hidePlayer');
@@ -509,12 +481,16 @@ class TD_game with ChangeNotifier {
         } else if ('$pt'.startsWith('choose_one,')) {
           if (myRoomSeatIndex == (int.parse(king!) + 1)) {
             if (king == '0') {
+              text_view_notify_king = false;
               choose_button_view_1 = true;
             } else if (king == '1') {
+              text_view_notify_king = false;
               choose_button_view_2 = true;
             } else if (king == '2') {
+              text_view_notify_king = false;
               choose_button_view_3 = true;
             } else if (king == '3') {
+              text_view_notify_king = false;
               choose_button_view_4 = true;
             }
             notifyListeners();
@@ -540,44 +516,76 @@ class TD_game with ChangeNotifier {
           pushMqtt("imedotRoom/" + (myRoomId) + "/game", 'truth_dare_view,');
         } else if ('$pt'.startsWith('truth_dare_view,')) {
           if (BeChosen == (myRoomSeatIndex.toString())) {
-            truth_dare_view = true;
+            if (BeChosen == '1') {
+              truth_dare_view_1 = true;
+            } else if (BeChosen == '2') {
+              truth_dare_view_2 = true;
+            } else if (BeChosen == '3') {
+              truth_dare_view_3 = true;
+            } else if (BeChosen == '4') {
+              truth_dare_view_4 = true;
+            }
             notifyListeners();
           }
         } else if ('$pt'.startsWith('truth,')) {
-          truth_dare_view = false;
+          truth_dare_view_1 = false;
+          truth_dare_view_2 = false;
+          truth_dare_view_3 = false;
+          truth_dare_view_4 = false;
           text_view_choose_T = true;
           text_view_be_choose = false;
           notifyListeners();
-          if (BeChosen != myRoomSeatIndex.toString()) {
-            pass_view = true;
+          if (int.parse(king) + 1 == myRoomSeatIndex) {
+            if (myRoomSeatIndex == 1) {
+              pass_view_1 = true;
+            } else if (myRoomSeatIndex == 2) {
+              pass_view_2 = true;
+            } else if (myRoomSeatIndex == 3) {
+              pass_view_3 = true;
+            } else if (myRoomSeatIndex == 4) {
+              pass_view_4 = true;
+            }
             notifyListeners();
           }
         } else if ('$pt'.startsWith('dare,')) {
-          truth_dare_view = false;
+          truth_dare_view_1 = false;
+          truth_dare_view_2 = false;
+          truth_dare_view_3 = false;
+          truth_dare_view_4 = false;
           text_view_choose_D = true;
           text_view_be_choose = false;
           notifyListeners();
-          Timer(const Duration(milliseconds: 1500 + 2000), () {
-            text_view_choose_D = false;
-            //pass_view = true; //單人測試用
-            if (BeChosen != myRoomSeatIndex.toString()) {
-              pass_view = true;
+          if (int.parse(king) + 1 == myRoomSeatIndex) {
+            if (myRoomSeatIndex == 1) {
+              pass_view_1 = true;
+            } else if (myRoomSeatIndex == 2) {
+              pass_view_2 = true;
+            } else if (myRoomSeatIndex == 3) {
+              pass_view_3 = true;
+            } else if (myRoomSeatIndex == 4) {
+              pass_view_4 = true;
             }
             notifyListeners();
-          });
+          }
         } else if ('$pt'.startsWith('punish,')) {
-          pass_view = false;
           text_view_choose_T = false;
+          text_view_choose_D = false;
           var index = int.parse('$pt'.split(',')[1]);
           Punish = punish_list[index];
           text_view_punish = true;
           notifyListeners();
-          Timer(const Duration(milliseconds: 300 + 5000), () {
-            if (BeChosen != myRoomSeatIndex.toString()) {
-              next_view = true;
+          if (int.parse(king) + 1 == myRoomSeatIndex) {
+            if (myRoomSeatIndex == 1) {
+              pass_view_1 = true;
+            } else if (myRoomSeatIndex == 2) {
+              pass_view_2 = true;
+            } else if (myRoomSeatIndex == 3) {
+              pass_view_3 = true;
+            } else if (myRoomSeatIndex == 4) {
+              pass_view_4 = true;
             }
             notifyListeners();
-          });
+          }
         }
       }
     });
@@ -588,7 +596,7 @@ class TD_game with ChangeNotifier {
 
 // 连接成功
 void onConnected() {
-  print('Connected');
+  print('tdgame Connected');
 }
 
 // 连接断开

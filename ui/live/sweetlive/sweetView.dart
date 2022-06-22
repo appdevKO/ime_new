@@ -19,6 +19,7 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 
+// 開播 看直播畫面
 int myRoomSeatIndex = 0;
 String T_D_player = "";
 const appId = '27e69b885f864b0da5a75265e8c96cdb';
@@ -44,6 +45,7 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
   final TextEditingController _chatController = new TextEditingController();
   final List<Widget> _message = [];
   Size? _gridViewSize;
+
   void getSize() {
     setState(() {
       _gridViewSize = _gridViewKey.currentContext!.size;

@@ -3,6 +3,7 @@ import 'package:ime_new/ui/action/actionpage.dart';
 import 'package:ime_new/ui/date/square/date_square.dart';
 import 'package:ime_new/ui/live/truth_or_dare/truth_or_dare_page.dart';
 
+
 import 'group_chat/grouppage.dart';
 import 'one2one_chat/o2o_chatroomlist.dart';
 
@@ -28,7 +29,6 @@ class _DatePageState extends State<DatePage> {
   Widget build(BuildContext context) {
     return SafeArea(
         child: Scaffold(
-      body: pages[pageIndex],
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         selectedItemColor: Colors.red,
@@ -91,8 +91,12 @@ class _DatePageState extends State<DatePage> {
               label: '動態'),
           BottomNavigationBarItem(
               icon: pageIndex == 4
-                  ? Container( height: 30,child: Image.asset('assets/icon/navigator/tod02.png'))
-                  : Container( height: 30,child: Image.asset('assets/icon/navigator/tod01.png')),
+                  ? Container(
+                      height: 30,
+                      child: Image.asset('assets/icon/navigator/tod02.png'))
+                  : Container(
+                      height: 30,
+                      child: Image.asset('assets/icon/navigator/tod01.png')),
               label: '遊戲'),
         ],
         onTap: (currentindex) {
@@ -101,6 +105,13 @@ class _DatePageState extends State<DatePage> {
           });
         },
       ),
+      body: pages[pageIndex],
+      // body: Container(
+      //     child: Stack(
+      //   children: <Widget>[
+      //
+      //   ],
+      // )),
     ));
   }
 }
