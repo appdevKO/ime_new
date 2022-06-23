@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:ime_new/business_logic/provider/chat_provider.dart';
-import 'package:ime_new/ui/user_profile/other_profile_page.dart';
+import 'package:ime_new/ui/otherpage/other_profile_page.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -28,7 +28,8 @@ class _NewestActionListState extends State<NewestActionList> {
   Widget build(BuildContext context) {
     return Consumer<ChatProvider>(
       builder: (context, value, child) {
-        return value.newest_actionlist!.isNotEmpty
+        return value.newest_actionlist!=null?
+          value.newest_actionlist!.isNotEmpty
             ? SmartRefresher(
                 enablePullDown: true,
                 enablePullUp: true,
@@ -62,7 +63,11 @@ class _NewestActionListState extends State<NewestActionList> {
                 child: Center(
                   child: Text('目前沒有動態'),
                 ),
-              );
+              ): Container(
+          child: Center(
+            child: Text('動態加載中'),
+          ),
+        );
       },
     );
   }
@@ -252,8 +257,10 @@ class _SingleActionState extends State<SingleAction> {
                                                 behavior:
                                                     HitTestBehavior.translucent,
                                                 onTap: () async {
-                                                  value
-                                                      .delete_action(value.newest_actionlist![widget.index!].id);
+                                                  value.delete_action(value
+                                                      .newest_actionlist![
+                                                          widget.index!]
+                                                      .id);
                                                   _controller.hideMenu();
                                                 },
                                                 child: Container(

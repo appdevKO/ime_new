@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:ime_new/business_logic/model/mqtt_model.dart';
 import 'package:ime_new/business_logic/provider/chat_provider.dart';
-import 'package:ime_new/ui/user_profile/other_profile_page.dart';
+import 'package:ime_new/ui/otherpage/other_profile_page.dart';
 import 'package:ime_new/ui/widget/showimage.dart';
 import 'package:ime_new/utils/sticker_address.dart';
 import 'package:ime_new/utils/viewconfig.dart';

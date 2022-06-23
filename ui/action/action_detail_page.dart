@@ -4,12 +4,11 @@ import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:ime_new/business_logic/model/action_model.dart';
 import 'package:ime_new/business_logic/provider/chat_provider.dart';
-import 'package:ime_new/ui/user_profile/other_profile_page.dart';
+import 'package:ime_new/ui/otherpage/other_profile_page.dart';
 import 'package:ime_new/ui/widget/showimage.dart';
 import 'package:intl/intl.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:provider/provider.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class ActionDetailPage extends StatefulWidget {
   ActionDetailPage({Key? key, required this.TheAction}) : super(key: key);

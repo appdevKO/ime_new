@@ -617,7 +617,7 @@ class ChatProvider with ChangeNotifier {
       print('${remoteUserInfo[0].default_chat_text} $chatroomid');
       o2ochat(
           remoteUserInfo[0].default_chat_text,
-         chatroomid,
+          chatroomid,
           remoteUserInfo[0].memberid,
           1,
           remoteUserInfo[0].memberid,
@@ -984,6 +984,7 @@ class ChatProvider with ChangeNotifier {
    * */
   String action_imgpath = '';
   int action_newest_value = 1;
+  int action_someone_value = 1;
   int action_favorite_value = 1;
 
   void cancelaction_img() {
@@ -1001,6 +1002,8 @@ class ChatProvider with ChangeNotifier {
       case 2:
         action_favorite_value = action_favorite_value + 1;
         break;
+      case 3:
+        action_someone_value = action_someone_value + 1;
     }
 
     notifyListeners();
@@ -1157,6 +1160,7 @@ class ChatProvider with ChangeNotifier {
   }
 
   List? newest_actionlist;
+  List? someone_actionlist;
   List? favorite_actionlist;
   List? actionmsglist;
 
@@ -1166,6 +1170,18 @@ class ChatProvider with ChangeNotifier {
     newest_actionlist = await readremotemongodb(ActionModel.fromJson, 'action',
         field: mongo.where.sortBy('time', descending: true).limit(pagesize));
     print("get_action_list $newest_actionlist");
+    notifyListeners();
+  }
+
+  Future get_someone_action_list(memberid) async {
+    action_someone_value = 1;
+    print("get_someone_action_list $memberid");
+    someone_actionlist = await readremotemongodb(ActionModel.fromJson, 'action',
+        field: mongo.where
+            .eq('memberid', memberid)
+            .sortBy('time', descending: true)
+            .limit(pagesize));
+    print("get_someone_action_list $someone_actionlist");
     notifyListeners();
   }
 
@@ -1188,13 +1204,15 @@ class ChatProvider with ChangeNotifier {
           ..addStage(mongo.Project({
             'member_id': 0,
             'create_time': 0,
+            'list_id': 0,
           }))
-        // ..addStage(mongo.Project({'followlist': 'list_id'}))
-        // ..addStage(mongo.Unwind(mongo.Field('list_id')))
+          // ..addStage(mongo.Unwind(mongo.Field('list_id')))
+          ..addStage(mongo.Unwind(mongo.Field('actionlist')))
+        // ..addStage(mongo.Limit(1))
         ;
     favorite_actionlist =
         await lookupmongodb(FollowActionModel.fromJson, 'follow_log', pipeline);
-    print("get_follow_action_list ${favorite_actionlist![0].actionlist}");
+    print("get_follow_action_list ${favorite_actionlist!}");
     notifyListeners();
   }
 
@@ -1226,12 +1244,28 @@ class ChatProvider with ChangeNotifier {
     if (result is int) {
       print('動態留言.....數量$action_count');
       if (type == 2) {
+        //detail page
         action_count = result;
-      } else {
+      } else if(type == 1){
+        // newest list page 更新
         var index =
             newest_actionlist?.indexWhere((element) => element.id == id);
         if (index is int && index != -1) {
           newest_actionlist![index].msg_num = result;
+        }
+      }else if(type == 3){
+        // favorite list page 更新
+        var index =
+        favorite_actionlist?.indexWhere((element) => element.id == id);
+        if (index is int && index != -1) {
+          favorite_actionlist![index].msg_num = result;
+        }
+      }else if(type == 4){
+        // someone list page 更新
+        var index =
+        someone_actionlist?.indexWhere((element) => element.id == id);
+        if (index is int && index != -1) {
+          someone_actionlist![index].msg_num = result;
         }
       }
     }
@@ -1286,15 +1320,33 @@ class ChatProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future addpage_favorite_action() async {
-    var newpage = await readremotemongodb(DbUserinfoModel.fromJson, 'chatroom',
+  Future addpage_someone_action(memberid) async {
+    var newpage = await readremotemongodb(ActionModel.fromJson, 'action',
         field: mongo.where
-            .eq('type', 0)
-            .sortBy('create_time', descending: true)
-            .skip(groupteamlist_value * pagesize)
+            .eq('memberid', memberid)
+            .sortBy('time', descending: true)
+            .skip(action_someone_value * pagesize)
             .limit(pagesize));
-    groupteamlist!.addAll(newpage);
+    if (newpage is List) {
+      if (newpage.isEmpty) {
+      } else {
+        action_plus_page(3);
+        someone_actionlist!.addAll(newpage);
+      }
+    }
+
     notifyListeners();
+  }
+
+  Future addpage_favorite_action() async {
+    // var newpage = await readremotemongodb(DbUserinfoModel.fromJson, 'chatroom',
+    //     field: mongo.where
+    //         .eq('type', 0)
+    //         .sortBy('create_time', descending: true)
+    //         .skip(groupteamlist_value * pagesize)
+    //         .limit(pagesize));
+    // groupteamlist!.addAll(newpage);
+    // notifyListeners();
   }
 
   Future like_to_action(action_id, index, islike) async {

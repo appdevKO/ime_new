@@ -61,7 +61,19 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
       // myAgoraUid = getUid();
       myAgoraUid = myUid;
     });
-
+    Future(() async {
+      Timer.periodic(Duration(seconds: 3), (timer) {
+        if (myRoomSeatIndex == 0) {
+          timer.cancel();
+        } else {
+          final builder = MqttClientPayloadBuilder();
+          builder.addString("refreshLive," + myRoomSeatIndex.toString());
+          client.publishMessage(
+              "imeSweetRoom/" + sweetRoomId, MqttQos.atLeastOnce, builder.payload!);
+          print('imlive');
+        }
+      });
+    });
     client.subscribe("imeSweetRoom/" + sweetRoomId, MqttQos.atLeastOnce);
 
     this._initEngine();
@@ -82,6 +94,10 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    final builder = MqttClientPayloadBuilder();
+    builder.addString("leaveRoom," + identity.toString());
+    client.publishMessage(
+        "imeSweetRoom/" + sweetRoomId, MqttQos.atLeastOnce, builder.payload!);
     super.dispose();
     // this._deinitEngine();
   }
@@ -165,30 +181,7 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
     ];
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.black),
-            onPressed: () {
-              final builder = MqttClientPayloadBuilder();
-              builder.addString("leaveRoom," + identity.toString());
-              client.publishMessage("imeSweetRoom/" + sweetRoomId,
-                  MqttQos.atLeastOnce, builder.payload!);
-              client.unsubscribe("imeSweetRoom/" + sweetRoomId);
-              client.unsubscribe("imeSweetUser/" + myUid);
-              myUid = getUid();
-              client.subscribe("imeSweetUser/" + myUid, MqttQos.atLeastOnce);
-              print('訂閱新Uid $myUid');
-              Get.back();
-            },
-          ),
-          title: Text(
-            roomName,
-            textAlign: TextAlign.center,
-          ),
-          backgroundColor: Colors.transparent,
-          elevation: 0.0,
-        ),
+        //appBar: AppBar(),
         body: Stack(
           children: [
             Consumer<sweetProvider>(builder: (context, _sweetProvider, child) {
@@ -204,10 +197,133 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
                     : identity! //F= 觀眾 T=主播
                         ? RtcLocalView.SurfaceView()
                         : RtcRemoteView.SurfaceView(
-                            uid: _sweetProvider.seatId1,
+                            uid: _sweetProvider.anchorID,
                             channelId: sweetRoomId,
                           ),
 
+                Positioned(
+                  //共同都有 appbar
+                  top: 28,
+                  left: 0,
+                  right: 0,
+                  child: Container(
+                    height: 120,
+                    child: Stack(
+                      children: [
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                      height: 70,
+                                      width: 200,
+                                      decoration: new BoxDecoration(
+                                          //背景
+                                          color:
+                                              Color.fromARGB(100, 22, 44, 33),
+                                          //设置四周圆角 角度
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(20)),
+                                          //设置四周边框
+                                          border: new Border.all(
+                                            width: 1,
+                                            color: Colors.transparent,
+                                          )),
+                                      child: Text(
+                                        _sweetProvider.anchorName,
+                                        textAlign: TextAlign.left,
+                                        style: TextStyle(fontSize: 25),
+                                      )),
+                                  Container(
+                                    height: 70,
+                                    width: 100,
+                                    decoration: new BoxDecoration(
+                                      //背景
+                                      color: Color.fromARGB(100, 22, 44, 33),
+                                      //设置四周圆角 角度
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(20)),
+                                      //设置四周边框
+                                      border: new Border.all(
+                                        width: 1,
+                                        color: Colors.transparent,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Container(
+                                    height: 50,
+                                    width: 150,
+                                    decoration: new BoxDecoration(
+                                      //背景
+                                      color: Color.fromARGB(100, 22, 44, 33),
+                                      //设置四周圆角 角度
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(20)),
+                                      //设置四周边框
+                                      border: new Border.all(
+                                        width: 1,
+                                        color: Colors.transparent,
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    height: 50,
+                                    width: 150,
+                                    decoration: new BoxDecoration(
+                                      //背景
+                                      color: Color.fromARGB(100, 22, 44, 33),
+                                      //设置四周圆角 角度
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(20)),
+                                      //设置四周边框
+                                      border: new Border.all(
+                                        width: 1,
+                                        color: Colors.transparent,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        Align(
+                          alignment: Alignment.topRight,
+                          child: IconButton(
+                            color: Colors.black,
+                            icon: Icon(Icons.clear,
+                                color: Colors.black), //Icons.arrow_back
+                            onPressed: () {
+                              if (identity==true){
+                                myRoomSeatIndex=0;
+                              }
+                              final builder = MqttClientPayloadBuilder();
+                              builder.addString(
+                                  "leaveRoom," + identity.toString());
+                              client.publishMessage(
+                                  "imeSweetRoom/" + sweetRoomId,
+                                  MqttQos.atLeastOnce,
+                                  builder.payload!);
+                              client.unsubscribe("imeSweetRoom/" + sweetRoomId);
+                              client.unsubscribe("imeSweetUser/" + myUid);
+                              myUid = getUid();
+                              client.subscribe(
+                                  "imeSweetUser/" + myUid, MqttQos.atLeastOnce);
+                              print('訂閱新Uid $myUid');
+                              Get.back();
+                            },
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
                 //共同都有 聊天室 主播更多：美顏 觀眾更多：送禮物
                 Stack(
                   children: <Widget>[

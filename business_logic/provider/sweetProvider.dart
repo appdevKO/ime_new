@@ -30,7 +30,8 @@ class ChatMessage {
 class sweetProvider with ChangeNotifier {
   var rooms;
   var roomId;
-  var seatId1;
+  var anchorID;
+  var anchorName;
   int? roomCount;
   int? AudienceCount;
   String roomNam = '';
@@ -88,8 +89,12 @@ class sweetProvider with ChangeNotifier {
         if ('$pt'.startsWith('anchor')) {
           //主播用
           print('anchor $pt');
-          sweetRoomId = pt.split(',')[1];
-          inRoomAvatar = pt.split(',')[5];
+          Map<String, dynamic> json = jsonDecode("{" + pt.split(',{')[1]);
+          myRoomSeatIndex = 1;
+          sweetRoomId = json["rid"];
+          inRoomAvatar = json["avatarUrl"];
+          anchorName = encodeToString(json['anchorName']);
+          print('anchorName ${anchorName}');
           pushMqtt("imeSweetUser/postChannel", sweetRoomId + ',' + myUid);
           client.subscribe("imeSweetRoom/" + sweetRoomId, MqttQos.atLeastOnce);
 
@@ -99,16 +104,18 @@ class sweetProvider with ChangeNotifier {
           notifyListeners();
         } else if ('$pt'.startsWith('audience,')) {
           //觀眾用
+          //print('audience $pt');
+          Map<String, dynamic> json = jsonDecode("{" + pt.split(',{')[1]);
+          print('json $json');
+          sweetRoomId = json['rid'];
+          inRoomAvatar = json['avatarUrl'];
           pushMqtt("imeSweetUser/postChannel", sweetRoomId + ',' + myUid);
-          print('audience $pt');
-          sweetRoomId = pt.split(',')[1];
-          var sweetRoomName = pt.split(',')[2];
-          inRoomAvatar = pt.split(',')[3];
-          if (pt.split(',')[4] == 'true') {
+          if (json['vdoSta'] == 'true') {
             vdoSta = true;
           }
-          seatId1 = int.parse(pt.split(',')[5]);
-          print('seatId1 $seatId1');
+          anchorID = json['anchorID'];
+          anchorName = encodeToString(json['anchorName']);
+          print('anchor $anchorName');
           client.subscribe("imeSweetRoom/" + sweetRoomId, MqttQos.atLeastOnce);
 
           Get.to(sweetView(
@@ -125,7 +132,7 @@ class sweetProvider with ChangeNotifier {
           AudienceCount = int.parse('$pt'.split(',')[1]);
           notifyListeners();
         } else if ('$pt'.startsWith('leaveRoom,')) {
-          seatId1 = null;
+          anchorID = null;
           vdoSta = false;
           print('leave');
           notifyListeners();
@@ -192,4 +199,10 @@ getUid() {
     s += (randomList[randomNumber]);
   }
   return s;
+}
+
+encodeToString(s) {
+  String encodeName = utf8.decode(s.runes.toList());
+  List<int> resName = base64.decode(base64.normalize(encodeName));
+  return utf8.decode(resName);
 }

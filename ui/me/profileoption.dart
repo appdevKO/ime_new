@@ -15,7 +15,6 @@ import 'package:provider/provider.dart';
 import '../date/square/upgrade_vip.dart';
 import 'list/likeme_list.dart';
 
-
 /**
  *
  * 點左上角頭像進去  設定頁面
@@ -75,61 +74,144 @@ class _ProfileOptionState extends State<ProfileOption> {
     List<SettingOption> item = [
       SettingOption(
           title: '編輯打招呼',
-          icon: CircleAvatar(
-              child: Center(child: Icon(Icons.clean_hands_rounded))),
+          icon: CircleAvatar(backgroundColor: Color(0xffFF9224),
+              radius: 26,
+              child: Center(
+                child: Container(
+                  height: 30,
+                  width: 30,
+                  child: Image.asset(
+                    'assets/icon/button/hi.png',
+                    color: Colors.white,
+                  ),
+                ),
+              )),
           callback: () {
             Navigator.push(
                 context, MaterialPageRoute(builder: (context) => EditHello()));
           }),
       SettingOption(
           title: 'ime收益',
-          icon: CircleAvatar(child: Center(child: Icon(Icons.money))),
+          icon: CircleAvatar(backgroundColor: Color(0xffFF5151),
+              radius: 26,
+              child: Center(
+                child: Container(
+                  height: 30,
+                  width: 30,
+                  child: Image.asset(
+                    'assets/icon/button/income.png',
+                    color: Colors.white,
+                  ),
+                ),
+              )),
           callback: () {}),
       SettingOption(
           title: '我的LEVEL',
-          icon: CircleAvatar(child: Center(child: Icon(Icons.night_shelter))),
+          icon: CircleAvatar(backgroundColor: Color(0xffFF60AF),
+              radius: 26,
+              child: Center(
+                child: Container(
+                  height: 30,
+                  width: 30,
+                  child: Image.asset(
+                    'assets/icon/button/Level.png',
+                    color: Colors.white,
+                  ),
+                ),
+              )),
           callback: () {}),
       SettingOption(
           title: '我的錢包',
-          icon: CircleAvatar(
-              child:
-                  Center(child: Icon(Icons.account_balance_wallet_outlined))),
+          icon: CircleAvatar(backgroundColor: Color(0xffFF95CA),
+              radius: 26,
+              child: Center(
+                child: Container(
+                  height: 30,
+                  width: 30,
+                  child: Image.asset(
+                    'assets/icon/button/wallet.png',
+                    color: Colors.white,
+                  ),
+                ),
+              )),
           callback: () {}),
       SettingOption(
           title: '特務任務',
-          icon: CircleAvatar(child: Center(child: Icon(Icons.now_wallpaper))),
+          icon: CircleAvatar(backgroundColor: Colors.amber,
+              radius: 26,
+              child: Center(
+                child: Container(
+                  height: 30,
+                  width: 30,
+                  child: Image.asset(
+                    'assets/icon/button/mymission.png',
+                    color: Colors.white,
+                  ),
+                ),
+              )),
           callback: () {}),
       SettingOption(
           title: '最愛好友',
-          icon: CircleAvatar(child: Center(child: Icon(Icons.star))),
+          icon: CircleAvatar(backgroundColor: Color(0xffFF77FF),
+              radius: 26,
+              child: Center(
+                child: Container(
+                  height: 30,
+                  width: 30,
+                  child: Image.asset(
+                    'assets/icon/button/myfriend.png',
+                    color: Colors.white,
+                  ),
+                ),
+              )),
           callback: () {}),
-      // SettingOption(
-      //     title: '最愛主播',
-      //     icon: CircleAvatar(child: Center(child: Icon(Icons.star))),
-      //     callback: () {
-      //       Provider.of<ChatProvider>(context, listen: false).getaddress();
-      //     }),
-      // SettingOption(
-      //     title: '遇見直播主',
-      //     icon: CircleAvatar(child: Center(child: Icon(Icons.favorite))),
-      //     callback: () {}),
       SettingOption(
           title: '活動花絮',
-          icon: CircleAvatar(child: Center(child: Icon(Icons.note))),
+          icon: CircleAvatar(backgroundColor: Color(0xffBE77FF),
+              radius: 26,
+              child: Center(
+                child: Container(
+                  height: 30,
+                  width: 30,
+                  child: Image.asset(
+                    'assets/icon/button/meetingpic.png',
+                    color: Colors.white,
+                  ),
+                ),
+              )),
           callback: () {}),
       SettingOption(
           title: '交友設定',
-          icon: CircleAvatar(child: Center(child: Icon(Icons.settings))),
+          icon: CircleAvatar(backgroundColor: Color(0xff4A4AFF),
+              radius: 26,
+              child: Center(
+                child: Container(
+                  height: 30,
+                  width: 30,
+                  child: Image.asset(
+                    'assets/icon/button/friendsetting.png',
+                    color: Colors.white,
+                  ),
+                ),
+              )),
           callback: () {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => DateSetting()));
           }),
       SettingOption(
           title: '直播設定',
-          icon: CircleAvatar(
+          icon: CircleAvatar(backgroundColor: Color(0xff0080FF),
+              radius: 26,
               child: Center(
-            child: Icon(Icons.settings),
-          )),
+                child: Container(
+                  height: 30,
+                  width: 30,
+                  child: Image.asset(
+                    'assets/icon/button/livesetting.png',
+                    color: Colors.white,
+                  ),
+                ),
+              )),
           callback: () {}),
     ];
 
@@ -301,7 +383,6 @@ class _ProfileOptionState extends State<ProfileOption> {
                           Container(
                             width: 20,
                           ),
-
                           GestureDetector(
                             child: Column(
                               children: [
@@ -339,7 +420,6 @@ class _ProfileOptionState extends State<ProfileOption> {
                             width: 1,
                             color: Colors.grey,
                           ),
-
                           Column(
                             children: [
                               Consumer<ChatProvider>(
@@ -474,7 +554,6 @@ class _ProfileOptionState extends State<ProfileOption> {
                               IconButton(
                                   onPressed: () {
                                     // Provider.of<ChatProvider>(context,listen: false).trylookup2();
-
                                   },
                                   icon: Icon(
                                     Icons.mail_outline,

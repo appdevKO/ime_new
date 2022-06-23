@@ -4,48 +4,82 @@ import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:ime_new/business_logic/provider/chat_provider.dart';
 import 'package:ime_new/ui/action/action_detail_page.dart';
-import 'package:ime_new/ui/otherpage/other_profile_page.dart';
+import 'package:ime_new/ui/action/new_actionlist.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
-class FavoriteActionList extends StatefulWidget {
-  const FavoriteActionList({Key? key}) : super(key: key);
+import 'other_profile_page.dart';
+
+class OtherActionPage extends StatefulWidget {
+  OtherActionPage({Key? key, required this.memberid, required this.type})
+      : super(key: key);
+  final memberid;
+  final int type;
 
   @override
-  State<FavoriteActionList> createState() => _FavoriteActionListState();
+  State<OtherActionPage> createState() => _OtherActionPageState();
 }
 
-class _FavoriteActionListState extends State<FavoriteActionList> {
+class _OtherActionPageState extends State<OtherActionPage> {
   RefreshController _refreshController =
       RefreshController(initialRefresh: false);
 
+  void _onRefresh() async {
+    // monitor network fetch
+    await Future.delayed(Duration(milliseconds: 1000));
+
+    _refreshController.refreshCompleted();
+    await Provider.of<ChatProvider>(context, listen: false)
+        .get_someone_action_list(widget.memberid);
+  }
+
+  void _onLoading() async {
+    await Future.delayed(Duration(milliseconds: 1000));
+    if (mounted) setState(() {});
+    _refreshController.loadComplete();
+
+    await Provider.of<ChatProvider>(context, listen: false)
+        .addpage_newest_action();
+  }
+
   @override
   void initState() {
-    initData();
+    initdata();
     super.initState();
+  }
+
+  Future initdata() async {
+    await Provider.of<ChatProvider>(context, listen: false)
+        .get_someone_action_list(widget.memberid);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ChatProvider>(
-      builder: (context, value, child) {
-        return
-            // Container(child: Text('${value.favorite_actionlist}   ${value.favorite_actionlist?.isEmpty}'),);
-
-            SmartRefresher(
-                enablePullDown: true,
-                enablePullUp: true,
-                controller: _refreshController,
-                header:
-                    WaterDropMaterialHeader(backgroundColor: Color(0xffffbbbb)),
-                onRefresh: _onRefresh,
-                onLoading: _onLoading,
-                child: value.favorite_actionlist != null &&
-                        value.favorite_actionlist!.isNotEmpty
+    return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: new Size(MediaQuery.of(context).size.width, 50),
+        child: Container(
+          height: 56,
+          padding: EdgeInsets.only(top: 5),
+          decoration: new BoxDecoration(color: Color(0xffffbbbb)),
+          child: Center(child: Text(widget.type == 1 ? 'XXX的動態' : '我的動態')),
+        ),
+      ),
+      body: Consumer<ChatProvider>(
+        builder: (context, value, child) {
+          return SmartRefresher(
+            enablePullDown: true,
+            enablePullUp: true,
+            controller: _refreshController,
+            header: WaterDropMaterialHeader(backgroundColor: Color(0xffffbbbb)),
+            onRefresh: _onRefresh,
+            onLoading: _onLoading,
+            child: value.someone_actionlist != null
+                ? value.someone_actionlist!.isNotEmpty
                     ? ListView.separated(
                         itemBuilder: (context, index) {
-                          return SingleAction2(
+                          return SingleAction3(
                             index: index,
                           );
                         },
@@ -55,53 +89,34 @@ class _FavoriteActionListState extends State<FavoriteActionList> {
                             thickness: 5,
                           );
                         },
-                        itemCount: value.favorite_actionlist!.length,
+                        itemCount: value.someone_actionlist!.length,
                       )
                     : Container(
                         child: Center(
-                          child: Text('目前關注的人還沒有發布動態'),
+                          child: Text('這個人目前沒有動態'),
                         ),
-                      ));
-      },
+                      )
+                : Container(
+                    child: Center(
+                      child: Text('動態載入中'),
+                    ),
+                  ),
+          );
+        },
+      ),
     );
-  }
-
-  Future initData() async {
-    print('init new action');
-    await Provider.of<ChatProvider>(context, listen: false)
-        .get_follow_action_list();
-  }
-
-  void _onRefresh() async {
-    // monitor network fetch
-    await Future.delayed(Duration(milliseconds: 1000));
-
-    _refreshController.refreshCompleted();
-    await Provider.of<ChatProvider>(context, listen: false)
-        .get_follow_action_list();
-  }
-
-  void _onLoading() async {
-    // monitor network fetch
-    await Future.delayed(Duration(milliseconds: 1000));
-
-    if (mounted) setState(() {});
-    _refreshController.loadComplete();
-
-    await Provider.of<ChatProvider>(context, listen: false)
-        .addpage_favorite_action();
   }
 }
 
-class SingleAction2 extends StatefulWidget {
-  SingleAction2({Key? key, required this.index}) : super(key: key);
+class SingleAction3 extends StatefulWidget {
+  SingleAction3({Key? key, required this.index}) : super(key: key);
   int? index;
 
   @override
-  State<SingleAction2> createState() => _SingleAction2State();
+  State<SingleAction3> createState() => _SingleAction3State();
 }
 
-class _SingleAction2State extends State<SingleAction2> {
+class _SingleAction3State extends State<SingleAction3> {
   final scrollController = ScrollController();
   late TextEditingController _textController;
   final FocusNode _focus = FocusNode();
@@ -127,10 +142,8 @@ class _SingleAction2State extends State<SingleAction2> {
       builder: (context, value, child) {
         return Container(
           width: MediaQuery.of(context).size.width,
-          height: value.favorite_actionlist![widget.index!].action.image_sub !=
-                      '' &&
-                  value.favorite_actionlist![widget.index!].action.image_sub !=
-                      null
+          height: value.someone_actionlist![widget.index!].image_sub != '' &&
+                  value.someone_actionlist![widget.index!].image_sub != null
               ? 340
               : 190,
           child: Column(
@@ -154,19 +167,17 @@ class _SingleAction2State extends State<SingleAction2> {
                               backgroundColor: Colors.grey,
                               radius: 30,
                               backgroundImage: value
-                                              .favorite_actionlist![
+                                              .someone_actionlist![
                                                   widget.index!]
-                                              .action
                                               .avatar ==
                                           '' ||
-                                      value.favorite_actionlist![widget.index!]
-                                              .action.avatar ==
+                                      value.someone_actionlist![widget.index!]
+                                              .avatar ==
                                           null
                                   ? AssetImage('assets/default/sex_man.png')
                                       as ImageProvider
                                   : NetworkImage(value
-                                      .favorite_actionlist![widget.index!]
-                                      .action
+                                      .someone_actionlist![widget.index!]
                                       .avatar),
                             ),
                           ),
@@ -178,17 +189,14 @@ class _SingleAction2State extends State<SingleAction2> {
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Text(
-                                value.favorite_actionlist![widget.index!].action
+                                value.someone_actionlist![widget.index!]
                                                 .nickname ==
                                             null ||
-                                        value
-                                                .favorite_actionlist![
-                                                    widget.index!]
-                                                .action
+                                        value.someone_actionlist![widget.index!]
                                                 .nickname ==
                                             ''
                                     ? '不詳'
-                                    : '${value.favorite_actionlist![widget.index!].action.nickname}',
+                                    : '${value.someone_actionlist![widget.index!].nickname}',
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 16,
@@ -205,17 +213,16 @@ class _SingleAction2State extends State<SingleAction2> {
                                       size: 15,
                                     ),
                                     Text(
-                                      value.favorite_actionlist![widget.index!]
-                                                      .action.area ==
+                                      value.someone_actionlist![widget.index!]
+                                                      .area ==
                                                   null ||
                                               value
-                                                      .favorite_actionlist![
+                                                      .someone_actionlist![
                                                           widget.index!]
-                                                      .action
                                                       .area ==
                                                   ''
                                           ? '不詳'
-                                          : '${value.favorite_actionlist![widget.index!].action.area}',
+                                          : '${value.someone_actionlist![widget.index!].area}',
                                       style: TextStyle(
                                           color: Colors.grey,
                                           fontSize: 12,
@@ -231,8 +238,7 @@ class _SingleAction2State extends State<SingleAction2> {
                       Column(
                         children: [
                           //是我的動態 要可以編輯 或是刪除
-                          value.favorite_actionlist![widget.index!].action
-                                      .memberid ==
+                          value.someone_actionlist![widget.index!].memberid ==
                                   value.remoteUserInfo[0].memberid
                               ? Container(
                                   height: 40, width: 40,
@@ -253,9 +259,8 @@ class _SingleAction2State extends State<SingleAction2> {
                                                   HitTestBehavior.translucent,
                                               onTap: () async {
                                                 value.delete_action(value
-                                                    .favorite_actionlist![
+                                                    .someone_actionlist![
                                                         widget.index!]
-                                                    .action
                                                     .id);
                                                 _controller.hideMenu();
                                               },
@@ -280,10 +285,10 @@ class _SingleAction2State extends State<SingleAction2> {
                                 )
                               : Container(),
                           Text(
-                            value.favorite_actionlist![widget.index!].action
+                            value.someone_actionlist![widget.index!]
                                         .createTime !=
                                     null
-                                ? '${DateFormat('yyyy/MM/dd').format(value.favorite_actionlist![widget.index!].action.createTime)}'
+                                ? '${DateFormat('yyyy/MM/dd').format(value.someone_actionlist![widget.index!].createTime)}'
                                 : '--/--/--',
                             style: TextStyle(color: Colors.grey),
                           ),
@@ -293,8 +298,7 @@ class _SingleAction2State extends State<SingleAction2> {
                   ),
                 ),
                 onTap: () {
-                  if (value
-                          .favorite_actionlist![widget.index!].action.account !=
+                  if (value.someone_actionlist![widget.index!].account !=
                       value.remoteUserInfo[0].account) {
                     //成員橫排 點 單一頭像
                     // 改成先進簡介
@@ -303,8 +307,7 @@ class _SingleAction2State extends State<SingleAction2> {
                         MaterialPageRoute(
                             builder: (context) => OtherProfilePage(
                                   chatroomid: value
-                                      .favorite_actionlist![widget.index!]
-                                      .action
+                                      .someone_actionlist![widget.index!]
                                       .memberid,
                                 )));
                   } else {
@@ -325,11 +328,12 @@ class _SingleAction2State extends State<SingleAction2> {
                       strutStyle: StrutStyle(fontSize: 12.0),
                       text: TextSpan(
                           style: TextStyle(color: Colors.black),
-                          text: value.favorite_actionlist![widget.index!].action.text !=
+                          text: value.someone_actionlist![widget.index!].text !=
                                       '' &&
-                                  value.favorite_actionlist![widget.index!].action.text !=
+                                  value.someone_actionlist![widget.index!]
+                                          .text !=
                                       null
-                              ? '${value.favorite_actionlist![widget.index!].action.text}'
+                              ? '${value.someone_actionlist![widget.index!].text}'
                               : '(無內文)'),
                     ),
                   ),
@@ -339,18 +343,17 @@ class _SingleAction2State extends State<SingleAction2> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => ActionDetailPage(
-                                TheAction: value.favorite_actionlist![widget.index!].action,
+                                TheAction:
+                                    value.someone_actionlist![widget.index!],
                               )));
                 },
               ),
               //圖片
               Padding(
                 padding: const EdgeInsets.only(top: 8),
-                child: value.favorite_actionlist![widget.index!].action
-                                .image_sub !=
+                child: value.someone_actionlist![widget.index!].image_sub !=
                             '' &&
-                        value.favorite_actionlist![widget.index!].action
-                                .image_sub !=
+                        value.someone_actionlist![widget.index!].image_sub !=
                             null
                     ? GestureDetector(
                         child: Container(
@@ -359,7 +362,7 @@ class _SingleAction2State extends State<SingleAction2> {
                               color: Colors.grey,
                               image: DecorationImage(
                                   image: NetworkImage(
-                                      '${value.favorite_actionlist![widget.index!].action.image_sub}'),
+                                      '${value.someone_actionlist![widget.index!].image_sub}'),
                                   fit: BoxFit.cover)),
                         ),
                         onTap: () {
@@ -367,8 +370,8 @@ class _SingleAction2State extends State<SingleAction2> {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => ActionDetailPage(
-                                        TheAction: value.favorite_actionlist![
-                                            widget.index!].action,
+                                        TheAction: value
+                                            .someone_actionlist![widget.index!],
                                       )));
                         },
                       )
@@ -390,7 +393,8 @@ class _SingleAction2State extends State<SingleAction2> {
                             icon: Icon(
                               Icons.favorite,
                               size: 18,
-                              color: value.favorite_actionlist![widget.index!].action.like_list
+                              color: value.someone_actionlist![widget.index!]
+                                      .like_list
                                       .contains(
                                           value.remoteUserInfo[0].memberid)
                                   ? Colors.red
@@ -398,20 +402,18 @@ class _SingleAction2State extends State<SingleAction2> {
                             ),
                             onPressed: () {
                               if (value
-                                  .favorite_actionlist![widget.index!].action.like_list
+                                  .someone_actionlist![widget.index!].like_list
                                   .contains(value.remoteUserInfo[0].memberid)) {
                                 print('有在list ->點擊就是取消喜歡');
                                 value.like_to_action(
-                                    value
-                                        .favorite_actionlist![widget.index!].action.id,
+                                    value.someone_actionlist![widget.index!].id,
                                     widget.index,
                                     true);
                               } else {
                                 print('沒有在list ->點擊喜歡');
 
                                 value.like_to_action(
-                                    value
-                                        .favorite_actionlist![widget.index!].action.id,
+                                    value.someone_actionlist![widget.index!].id,
                                     widget.index,
                                     false);
                               }
@@ -419,15 +421,12 @@ class _SingleAction2State extends State<SingleAction2> {
                         Padding(
                           padding: const EdgeInsets.only(left: 3.0),
                           child: Text(
-                            value
-                                            .favorite_actionlist![widget.index!].action
-                                            .like_num !=
+                            value.someone_actionlist![widget.index!].like_num !=
                                         '' &&
-                                    value
-                                            .favorite_actionlist![widget.index!].action
+                                    value.someone_actionlist![widget.index!]
                                             .like_num !=
                                         null
-                                ? '${value.favorite_actionlist![widget.index!].action.like_num}'
+                                ? '${value.someone_actionlist![widget.index!].like_num}'
                                 : '-',
                             style: TextStyle(fontSize: 12),
                           ),
@@ -449,7 +448,10 @@ class _SingleAction2State extends State<SingleAction2> {
                             onPressed: () async {
                               await Provider.of<ChatProvider>(context,
                                       listen: false)
-                                  .get_action_msg(value.favorite_actionlist![widget.index!].action.id);
+                                  .get_action_msg(value
+                                      .someone_actionlist![widget.index!]
+                                      .action
+                                      .id);
                               showModalBottomSheet<void>(
                                 isScrollControlled: true,
                                 context: context,
@@ -538,8 +540,8 @@ class _SingleAction2State extends State<SingleAction2> {
                                                                           ? true
                                                                           : false,
                                                                       actionid: value
-                                                                          .favorite_actionlist![
-                                                                              widget.index!].action
+                                                                          .someone_actionlist![
+                                                                              widget.index!]
                                                                           .id,
                                                                     );
                                                                   },
@@ -621,7 +623,7 @@ class _SingleAction2State extends State<SingleAction2> {
                                                                             false)
                                                                     .upload_action_msg(
                                                                         value
-                                                                            .favorite_actionlist![widget
+                                                                            .someone_actionlist![widget
                                                                                 .index!]
                                                                             .id,
                                                                         _textController
@@ -635,7 +637,7 @@ class _SingleAction2State extends State<SingleAction2> {
                                                                         listen:
                                                                             false)
                                                                     .get_action_msg(value
-                                                                        .favorite_actionlist![
+                                                                        .someone_actionlist![
                                                                             widget.index!]
                                                                         .id);
 
@@ -646,9 +648,9 @@ class _SingleAction2State extends State<SingleAction2> {
                                                                             false)
                                                                     .get_action_msg_count(
                                                                         value
-                                                                            .favorite_actionlist![widget.index!]
+                                                                            .someone_actionlist![widget.index!]
                                                                             .id,
-                                                                        3);
+                                                                        4);
                                                               } else {
                                                                 print('空空');
                                                               }
@@ -697,7 +699,7 @@ class _SingleAction2State extends State<SingleAction2> {
                                                                   listen: false)
                                                               .upload_action_msg(
                                                                   value
-                                                                      .favorite_actionlist![
+                                                                      .someone_actionlist![
                                                                           widget
                                                                               .index!]
                                                                       .id,
@@ -731,7 +733,7 @@ class _SingleAction2State extends State<SingleAction2> {
                                                                   context,
                                                                   listen: false)
                                                               .get_action_msg(value
-                                                                  .favorite_actionlist![
+                                                                  .someone_actionlist![
                                                                       widget
                                                                           .index!]
                                                                   .id);
@@ -742,11 +744,11 @@ class _SingleAction2State extends State<SingleAction2> {
                                                                   listen: false)
                                                               .get_action_msg_count(
                                                                   value
-                                                                      .favorite_actionlist![
+                                                                      .someone_actionlist![
                                                                           widget
                                                                               .index!]
                                                                       .id,
-                                                                  3);
+                                                                  4);
                                                         } else {
                                                           print('空空');
                                                         }
@@ -767,15 +769,13 @@ class _SingleAction2State extends State<SingleAction2> {
                           Padding(
                             padding: const EdgeInsets.only(left: 3.0),
                             child: Text(
-                              value
-                                              .favorite_actionlist![widget.index!].action
+                              value.someone_actionlist![widget.index!]
                                               .msg_num !=
                                           '' &&
-                                      value
-                                              .favorite_actionlist![widget.index!].action
+                                      value.someone_actionlist![widget.index!]
                                               .msg_num !=
                                           null
-                                  ? '${value.favorite_actionlist![widget.index!].action.msg_num}'
+                                  ? '${value.someone_actionlist![widget.index!].msg_num}'
                                   : '-',
                               style: TextStyle(fontSize: 12),
                             ),

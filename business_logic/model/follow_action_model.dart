@@ -9,23 +9,16 @@ String followActionModelToJson(FollowActionModel data) =>
     json.encode(data.toJson());
 
 class FollowActionModel {
-  FollowActionModel({this.list_id, this.actionlist});
+  FollowActionModel({this.action});
 
-  List? list_id;
-  List? actionlist;
+  var action;
 
   factory FollowActionModel.fromJson(Map<String, dynamic> json) {
-    var datalist = [];
-    Map<String, dynamic> map;
-    json["actionlist"].forEach((v) {
-      map = Map<String, dynamic>.from(v);
-      datalist.add(ActionModel.fromJson(map));
-    });
-    return FollowActionModel(list_id: json["list_id"], actionlist: datalist);
+    return FollowActionModel(
+        action: ActionModel.fromJson(json["actionlist"]));
   }
 
   Map<String, dynamic> toJson() => {
-        "list_id": list_id,
-        "actionlist": actionlist,
+        "actionlist": action,
       };
 }

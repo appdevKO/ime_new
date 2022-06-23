@@ -400,13 +400,6 @@ class MongoDB {
     datalist = [];
     var coll = db.collection(collname);
     Map<String, dynamic> map;
-    // final pipeline = AggregationPipelineBuilder()
-    //   ..addStage(project)
-    //   ..addStage(match)
-    //   ..addStage(lookup)
-    //   ..addStage(mongo.Unwind(Field('list_id')))
-    //   ..addStage(mongo.Project({'member_id': 0, 'create_time': 0}));
-
     try {
       await coll.modernAggregate(pipeline).forEach((v) {
         print("lookup 回傳單一資料 $v");
