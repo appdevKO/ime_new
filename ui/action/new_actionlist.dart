@@ -411,7 +411,8 @@ class _SingleActionState extends State<SingleAction> {
                                       value
                                           .newest_actionlist![widget.index!].id,
                                       widget.index,
-                                      true);
+                                      true,value
+                                      .newest_actionlist![widget.index!]);
                                 } else {
                                   print('沒有在list ->點擊喜歡');
 
@@ -419,7 +420,8 @@ class _SingleActionState extends State<SingleAction> {
                                       value
                                           .newest_actionlist![widget.index!].id,
                                       widget.index,
-                                      false);
+                                      false, value
+                                      .newest_actionlist![widget.index!]);
                                 }
                               }),
                           Padding(

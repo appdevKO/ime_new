@@ -1,4 +1,4 @@
-  class Room {
+class Room {
   Room({
     required this.id,
     required this.status,
@@ -12,10 +12,7 @@
     required this.live3,
     required this.live4,
     required this.count,
-    required this.avatarUrl1,
-    required this.avatarUrl2,
-    required this.avatarUrl3,
-    required this.avatarUrl4,
+    required this.avatarUrlList,
   });
   late final String? id;
   late final String? status;
@@ -30,10 +27,7 @@
   late final String? live2;
   late final String? live3;
   late final String? live4;
-  late final String? avatarUrl1;
-  late final String? avatarUrl2;
-  late final String? avatarUrl3;
-  late final String? avatarUrl4;
+  late List? avatarUrlList;
 
   late final int count;
 
@@ -52,10 +46,7 @@
     live3 = json['live3'];
     live4 = json['live4'];
     count = json['count'];
-    avatarUrl1 = json['avatarUrl1'];
-    avatarUrl2 = json['avatarUrl2'];
-    avatarUrl3 = json['avatarUrl3'];
-    avatarUrl4 = json['avatarUrl4'];
+    avatarUrlList = json['avatarUrlList'];
   }
 
   Map<String, dynamic> toJson() {
@@ -72,10 +63,7 @@
     _data['live1'] = live1;
     _data['live2'] = live2;
     _data['count'] = count;
-    _data['avatarUrl1'] = avatarUrl1;
-    _data['avatarUrl2'] = avatarUrl2;
-    _data['avatarUrl3'] = avatarUrl3;
-    _data['avatarUrl4'] = avatarUrl4;
+    _data['avatarUrlList'] = avatarUrlList;
 
     return _data;
   }

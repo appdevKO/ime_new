@@ -1790,9 +1790,13 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                         ),
                       ),
                     ),
-                    FaceunityUI(cameraCallback: () => engine!.switchCamera()),
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Container(height: 54.0),
+                    )
                   ],
                 ),
+                FaceunityUI(cameraCallback: () => engine!.switchCamera()),
               ]);
             })
           ],

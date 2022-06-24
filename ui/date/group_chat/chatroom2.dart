@@ -90,19 +90,6 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
     Provider.of<ChatProvider>(context, listen: false)
         .findindex(widget.chatroomid.toHexString());
 
-    ///method channel backbutton
-    Future<dynamic> handler(MethodCall call) async {
-      switch (call.method) {
-        case 'backAction':
-          print('1234 backaction');
-          // Get.back();
-          Navigator.pop(context);
-          break;
-      }
-    }
-
-    flutterChannel.setMethodCallHandler(handler);
-
     super.initState();
   }
 
@@ -159,6 +146,8 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
                             .getgroupperson();
                         await Provider.of<ChatProvider>(context, listen: false)
                             .getgroupteam();
+                        Provider.of<ChatProvider>(context, listen: false)
+                            .change_redpoint(2);
                         Navigator.pop(context);
                       }),
                   Center(
@@ -569,26 +558,43 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
                                             child: Image.asset(
                                                 'assets/icon/button/takepicture.png'),
                                           ),
+                                          onTap: () {
+                                            Provider.of<ChatProvider>(context,
+                                                    listen: false)
+                                                .sendimgwithcamera_group(
+                                                    widget.chatroomid,
+                                                    'ime_group_chat');
+                                          },
                                         ),
                                       ),
                                       Padding(
                                         padding:
                                             const EdgeInsets.only(left: 12.0),
-                                        child: Container(
-                                          height: 30,
-                                          width: 30,
-                                          child: Image.asset(
-                                              'assets/icon/button/sendtexture.png'),
+                                        child: GestureDetector(
+                                          child: Container(
+                                            height: 30,
+                                            width: 30,
+                                            child: Image.asset(
+                                                'assets/icon/button/sendtexture.png'),
+                                          ),
+                                          onTap: () {
+                                            stickerautoopen();
+                                          },
                                         ),
                                       ),
                                       Padding(
                                         padding:
                                             const EdgeInsets.only(left: 12.0),
-                                        child: Container(
-                                          height: 30,
-                                          width: 30,
-                                          child: Image.asset(
-                                              'assets/icon/button/sendrecord.png'),
+                                        child: GestureDetector(
+                                          child: Container(
+                                            height: 30,
+                                            width: 30,
+                                            child: Image.asset(
+                                                'assets/icon/button/sendrecord.png'),
+                                          ),
+                                          onTap: () {
+                                            audioautoopen();
+                                          },
                                         ),
                                       ),
                                       // IconButton(
@@ -658,6 +664,7 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
       onWillPop: () async {
         Provider.of<ChatProvider>(context, listen: false).getgroupteam();
         Provider.of<ChatProvider>(context, listen: false).getgroupperson();
+        Provider.of<ChatProvider>(context, listen: false).change_redpoint(2);
         return true;
       },
     );
@@ -1313,7 +1320,7 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
                           children: [
                             Padding(
                               padding: const EdgeInsets.symmetric(vertical: 4),
-                              child: Text('${msg.fromid} '),
+                              child: Text('${msg.nickname} '),
                             ),
                             msg.type == 3
                                 ? Container(

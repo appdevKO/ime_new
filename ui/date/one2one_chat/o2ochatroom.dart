@@ -131,6 +131,7 @@ class _O2OChatroomState extends State<O2OChatroom> {
                         }
                         Provider.of<ChatProvider>(context, listen: false)
                             .geto2ochatroomlist();
+                        Provider.of<ChatProvider>(context, listen: false).change_redpoint(1);
                         Navigator.pop(context);
                       },
                     ),
@@ -607,6 +608,7 @@ class _O2OChatroomState extends State<O2OChatroom> {
               .msg = [];
         }
         Provider.of<ChatProvider>(context, listen: false).geto2ochatroomlist();
+        Provider.of<ChatProvider>(context, listen: false).change_redpoint(1);
         return true;
       },
     );

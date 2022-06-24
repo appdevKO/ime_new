@@ -408,14 +408,14 @@ class _SingleAction3State extends State<SingleAction3> {
                                 value.like_to_action(
                                     value.someone_actionlist![widget.index!].id,
                                     widget.index,
-                                    true);
+                                    true, value.someone_actionlist![widget.index!]);
                               } else {
                                 print('沒有在list ->點擊喜歡');
 
                                 value.like_to_action(
                                     value.someone_actionlist![widget.index!].id,
                                     widget.index,
-                                    false);
+                                    false, value.someone_actionlist![widget.index!]);
                               }
                             }),
                         Padding(
@@ -450,7 +450,7 @@ class _SingleAction3State extends State<SingleAction3> {
                                       listen: false)
                                   .get_action_msg(value
                                       .someone_actionlist![widget.index!]
-                                      .action
+
                                       .id);
                               showModalBottomSheet<void>(
                                 isScrollControlled: true,

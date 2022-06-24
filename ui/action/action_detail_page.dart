@@ -22,7 +22,8 @@ class _ActionDetailPageState extends State<ActionDetailPage>
     with TickerProviderStateMixin {
   final FocusNode _focus = FocusNode();
   late TextEditingController _textController;
-  int? index = -1;
+
+  // int? index = -1;
 
   // late Animation<double> _myAnimation;
   // late AnimationController _controller;
@@ -57,11 +58,11 @@ class _ActionDetailPageState extends State<ActionDetailPage>
 
     await Provider.of<ChatProvider>(context, listen: false)
         .get_action_msg_count(widget.TheAction.id, 2);
-    setState(() {
-      index = Provider.of<ChatProvider>(context, listen: false)
-          .newest_actionlist
-          ?.indexWhere((element) => element.id == widget.TheAction.id);
-    });
+    // setState(() {
+    //   index = Provider.of<ChatProvider>(context, listen: false)
+    //       .newest_actionlist
+    //       ?.indexWhere((element) => element.id == widget.TheAction.id);
+    // });
   }
 
   @override
@@ -191,307 +192,246 @@ class _ActionDetailPageState extends State<ActionDetailPage>
                             top: 8.0, right: 15, left: 15),
                         height: 40,
                         color: Colors.white,
-                        child: index == -1
-                            ? Container()
-                            : Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      IconButton(
-                                          icon: Icon(
-                                            Icons.favorite,
-                                            size: 18,
-                                            color: value
-                                                    .newest_actionlist![index!]
-                                                    .like_list
-                                                    .contains(value
-                                                        .remoteUserInfo[0]
-                                                        .memberid)
-                                                ? Colors.red
-                                                : Colors.grey,
-                                          ),
-                                          onPressed: () {
-                                            if (value.newest_actionlist![index!]
-                                                .like_list
-                                                .contains(value
-                                                    .remoteUserInfo[0]
-                                                    .memberid)) {
-                                              print('有在list ->點擊就是取消喜歡');
-                                              value.like_to_action(
-                                                  value
-                                                      .newest_actionlist![
-                                                          index!]
-                                                      .id,
-                                                  index,
-                                                  true);
-                                            } else {
-                                              print('沒有在list ->點擊喜歡');
-
-                                              value.like_to_action(
-                                                  value
-                                                      .newest_actionlist![
-                                                          index!]
-                                                      .id,
-                                                  index,
-                                                  false);
-                                            }
-                                          }),
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 3.0),
-                                        child: Text(
-                                          value.newest_actionlist![index!]
-                                                          .like_num !=
-                                                      '' &&
-                                                  value
-                                                          .newest_actionlist![
-                                                              index!]
-                                                          .like_num !=
-                                                      null
-                                              ? '${value.newest_actionlist![index!].like_num}'
-                                              : '-',
-                                          style: TextStyle(fontSize: 12),
-                                        ),
-                                      )
-                                    ],
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                IconButton(
+                                    icon: Icon(
+                                      Icons.favorite,
+                                      size: 18,
+                                      color: widget.TheAction.like_list!
+                                              .contains(value
+                                                  .remoteUserInfo[0].memberid)
+                                          ? Colors.red
+                                          : Colors.grey,
+                                    ),
+                                    onPressed: () {
+                                      if (widget.TheAction.like_list!.contains(
+                                          value.remoteUserInfo[0].memberid)) {
+                                        print('有在list ->點擊就是取消喜歡');
+                                        value.like_to_action(
+                                            widget.TheAction.id,
+                                            2,
+                                            true,
+                                            widget.TheAction);
+                                      } else {
+                                        print('沒有在list ->點擊喜歡');
+                                        value.like_to_action(
+                                          widget.TheAction.id,
+                                          3,
+                                          false,
+                                          widget.TheAction,
+                                        );
+                                      }
+                                    }),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 3.0),
+                                  child: Text(
+                                    widget.TheAction.like_num != '' &&
+                                            widget.TheAction.like_num != null
+                                        ? '${widget.TheAction.like_num}'
+                                        : '-',
+                                    style: TextStyle(fontSize: 12),
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 20.0),
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        IconButton(
-                                          icon: Icon(
-                                            Icons.message,
-                                            size: 18,
-                                            color: Colors.green,
-                                          ),
-                                          onPressed: () async {
-                                            await Provider.of<ChatProvider>(
-                                                    context,
-                                                    listen: false)
-                                                .get_action_msg_count(
-                                                    widget.TheAction.id, 2);
-                                            showModalBottomSheet<void>(
-                                              isScrollControlled: true,
-                                              context: context,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.only(
-                                                    topLeft:
-                                                        Radius.circular(20),
-                                                    topRight:
-                                                        Radius.circular(20)),
-                                              ),
-                                              builder: (BuildContext context) {
-                                                return Padding(
-                                                    padding:
-                                                        MediaQuery.of(context)
-                                                            .viewInsets,
-                                                    child: Container(
-                                                      child:
-                                                          SingleChildScrollView(
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            //標題
-                                                            Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceBetween,
-                                                              children: [
-                                                                Container(
-                                                                  width: 35,
-                                                                  child:
-                                                                      IconButton(
-                                                                    icon: Icon(
-                                                                        Icons
-                                                                            .close,
-                                                                        size:
-                                                                            30,
-                                                                        color: Colors
-                                                                            .red),
-                                                                    onPressed:
-                                                                        () {
-                                                                      Navigator.pop(
-                                                                          context);
-                                                                    },
-                                                                  ),
-                                                                ),
-                                                                Text(
-                                                                  "留言",
-                                                                  style: TextStyle(
-                                                                      fontSize:
-                                                                          20,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w700,
-                                                                      height:
-                                                                          1),
-                                                                ),
-                                                                GestureDetector(
-                                                                  child:
-                                                                      Container(
-                                                                    width: 35,
-                                                                    child: Text(
-                                                                      '儲存',
-                                                                      style: TextStyle(
-                                                                          color:
-                                                                              Colors.transparent),
-                                                                    ),
-                                                                  ),
-                                                                  onTap: () {},
-                                                                )
-                                                              ],
+                                )
+                              ],
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 20.0),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(
+                                      Icons.message,
+                                      size: 18,
+                                      color: Colors.green,
+                                    ),
+                                    onPressed: () async {
+                                      await Provider.of<ChatProvider>(context,
+                                              listen: false)
+                                          .get_action_msg_count(
+                                              widget.TheAction.id, 2);
+                                      showModalBottomSheet<void>(
+                                        isScrollControlled: true,
+                                        context: context,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(20),
+                                              topRight: Radius.circular(20)),
+                                        ),
+                                        builder: (BuildContext context) {
+                                          return Padding(
+                                              padding: MediaQuery.of(context)
+                                                  .viewInsets,
+                                              child: Container(
+                                                child: SingleChildScrollView(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      //標題
+                                                      Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          Container(
+                                                            width: 35,
+                                                            child: IconButton(
+                                                              icon: Icon(
+                                                                  Icons.close,
+                                                                  size: 30,
+                                                                  color: Colors
+                                                                      .red),
+                                                              onPressed: () {
+                                                                Navigator.pop(
+                                                                    context);
+                                                              },
                                                             ),
-                                                            Divider(
-                                                              height: 1,
-                                                            ),
-
-                                                            Container(
-                                                                height: 300,
-                                                                width: MediaQuery.of(
-                                                                        context)
-                                                                    .size
-                                                                    .width,
-                                                                child: Consumer<
-                                                                    ChatProvider>(
-                                                                  builder:
-                                                                      (context,
-                                                                          value,
-                                                                          child) {
-                                                                    return value.actionmsglist !=
-                                                                            null
-                                                                        ? value.actionmsglist!
-                                                                                .isNotEmpty
-                                                                            ?
-                                                                            // SmartRefresher(
-                                                                            //             enablePullDown:
-                                                                            //                 true,
-                                                                            //             enablePullUp:
-                                                                            //                 true,
-                                                                            //             header:
-                                                                            //                 WaterDropMaterialHeader(),
-                                                                            //             controller:
-                                                                            //                 _refreshController,
-                                                                            //             onRefresh:
-                                                                            //                 _onRefresh,
-                                                                            //             onLoading:
-                                                                            //                 _onLoading,
-                                                                            //             child: )
-                                                                            ListView
-                                                                                .separated(
-                                                                                controller: scrollController,
-                                                                                itemBuilder: (context, index) {
-                                                                                  return SingleActionMsg(
-                                                                                    index: index,
-                                                                                    isme: value.actionmsglist![index].memberid == value.remoteUserInfo[0].memberid ? true : false,
-                                                                                    actionid: widget.TheAction.id,
-                                                                                  );
-                                                                                },
-                                                                                separatorBuilder: (context, index) {
-                                                                                  return Padding(
-                                                                                    padding: EdgeInsets.symmetric(vertical: 5),
-                                                                                  );
-                                                                                },
-                                                                                itemCount: value.actionmsglist!.length,
-                                                                              )
-                                                                            : Center(
-                                                                                child: Text(
-                                                                                    '此動態尚無留言'))
-                                                                        : Center(
-                                                                            child:
-                                                                                Text('此動態尚無留言'));
-                                                                  },
-                                                                )),
-                                                            // 輸入匡
-                                                            Container(
-                                                              height: 70,
-                                                              width:
-                                                                  MediaQuery.of(
-                                                                          context)
-                                                                      .size
-                                                                      .width,
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                color: Color(
-                                                                    0xffF9F9F9),
-                                                                boxShadow: [
-                                                                  BoxShadow(
+                                                          ),
+                                                          Text(
+                                                            "留言",
+                                                            style: TextStyle(
+                                                                fontSize: 20,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w700,
+                                                                height: 1),
+                                                          ),
+                                                          GestureDetector(
+                                                            child: Container(
+                                                              width: 35,
+                                                              child: Text(
+                                                                '儲存',
+                                                                style: TextStyle(
                                                                     color: Colors
-                                                                        .grey
-                                                                        .withOpacity(
-                                                                            0.5),
-                                                                    spreadRadius:
-                                                                        1,
-                                                                    blurRadius:
-                                                                        7,
-                                                                    offset: Offset(
-                                                                        0,
-                                                                        -2), // changes position of shadow
-                                                                  ),
-                                                                ],
+                                                                        .transparent),
                                                               ),
-                                                              child: Row(
-                                                                children: [
-                                                                  Flexible(
-                                                                    child: Container(
-                                                                        constraints: BoxConstraints(minHeight: 60.0, maxHeight: 150.0),
-                                                                        padding: const EdgeInsets.only(top: 10, bottom: 10, right: 2, left: 15),
-                                                                        child: TextField(
-                                                                          focusNode:
-                                                                              _focus,
-                                                                          //限制輸入文字多長
-                                                                          // maxLength: 75,
-                                                                          //換行
-                                                                          // maxLines: null,
-                                                                          keyboardType:
-                                                                              TextInputType.text,
-                                                                          onSubmitted:
-                                                                              (val) async {
-                                                                            if (_textController.text !=
-                                                                                '') {
-                                                                              await Provider.of<ChatProvider>(context, listen: false).upload_action_msg(widget.TheAction.id, _textController.text);
-                                                                              _textController.clear();
+                                                            ),
+                                                            onTap: () {},
+                                                          )
+                                                        ],
+                                                      ),
+                                                      Divider(
+                                                        height: 1,
+                                                      ),
 
-                                                                              await Provider.of<ChatProvider>(context, listen: false).get_action_msg(widget.TheAction.id);
-                                                                            }
-                                                                            _focus.unfocus();
-                                                                          },
-                                                                          textInputAction:
-                                                                              TextInputAction.done,
+                                                      Container(
+                                                          height: 300,
+                                                          width: MediaQuery.of(
+                                                                  context)
+                                                              .size
+                                                              .width,
+                                                          child: Consumer<
+                                                              ChatProvider>(
+                                                            builder: (context,
+                                                                value, child) {
+                                                              return value.actionmsglist !=
+                                                                      null
+                                                                  ? value.actionmsglist!
+                                                                          .isNotEmpty
+                                                                      ?
+                                                                      // SmartRefresher(
+                                                                      //             enablePullDown:
+                                                                      //                 true,
+                                                                      //             enablePullUp:
+                                                                      //                 true,
+                                                                      //             header:
+                                                                      //                 WaterDropMaterialHeader(),
+                                                                      //             controller:
+                                                                      //                 _refreshController,
+                                                                      //             onRefresh:
+                                                                      //                 _onRefresh,
+                                                                      //             onLoading:
+                                                                      //                 _onLoading,
+                                                                      //             child: )
+                                                                      ListView
+                                                                          .separated(
                                                                           controller:
-                                                                              _textController,
-                                                                          decoration:
-                                                                              InputDecoration(
-                                                                            border:
-                                                                                OutlineInputBorder(borderSide: BorderSide.none, borderRadius: BorderRadius.circular(20)),
-                                                                            fillColor:
-                                                                                Colors.white,
-                                                                            filled:
-                                                                                true,
-                                                                            hintText:
-                                                                                '輸入留言',
-                                                                            contentPadding:
-                                                                                EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                                                                          ),
-                                                                          style:
-                                                                              TextStyle(height: 1),
-                                                                        )),
-                                                                  ),
-                                                                  //傳送 發送 文字 箭頭 送出
-                                                                  IconButton(
-                                                                    icon: Icon(
-                                                                        Icons
-                                                                            .send),
-                                                                    onPressed:
-                                                                        () async {
+                                                                              scrollController,
+                                                                          itemBuilder:
+                                                                              (context, index) {
+                                                                            return SingleActionMsg(
+                                                                              index: index,
+                                                                              isme: value.actionmsglist![index].memberid == value.remoteUserInfo[0].memberid ? true : false,
+                                                                              actionid: widget.TheAction.id,
+                                                                            );
+                                                                          },
+                                                                          separatorBuilder:
+                                                                              (context, index) {
+                                                                            return Padding(
+                                                                              padding: EdgeInsets.symmetric(vertical: 5),
+                                                                            );
+                                                                          },
+                                                                          itemCount: value
+                                                                              .actionmsglist!
+                                                                              .length,
+                                                                        )
+                                                                      : Center(
+                                                                          child: Text(
+                                                                              '此動態尚無留言'))
+                                                                  : Center(
+                                                                      child: Text(
+                                                                          '此動態尚無留言'));
+                                                            },
+                                                          )),
+                                                      // 輸入匡
+                                                      Container(
+                                                        height: 70,
+                                                        width: MediaQuery.of(
+                                                                context)
+                                                            .size
+                                                            .width,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color:
+                                                              Color(0xffF9F9F9),
+                                                          boxShadow: [
+                                                            BoxShadow(
+                                                              color: Colors.grey
+                                                                  .withOpacity(
+                                                                      0.5),
+                                                              spreadRadius: 1,
+                                                              blurRadius: 7,
+                                                              offset: Offset(0,
+                                                                  -2), // changes position of shadow
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        child: Row(
+                                                          children: [
+                                                            Flexible(
+                                                              child: Container(
+                                                                  constraints: BoxConstraints(
+                                                                      minHeight:
+                                                                          60.0,
+                                                                      maxHeight:
+                                                                          150.0),
+                                                                  padding: const EdgeInsets
+                                                                          .only(
+                                                                      top: 10,
+                                                                      bottom:
+                                                                          10,
+                                                                      right: 2,
+                                                                      left: 15),
+                                                                  child:
+                                                                      TextField(
+                                                                    focusNode:
+                                                                        _focus,
+                                                                    //限制輸入文字多長
+                                                                    // maxLength: 75,
+                                                                    //換行
+                                                                    // maxLines: null,
+                                                                    keyboardType:
+                                                                        TextInputType
+                                                                            .text,
+                                                                    onSubmitted:
+                                                                        (val) async {
                                                                       if (_textController
                                                                               .text !=
                                                                           '') {
@@ -500,85 +440,158 @@ class _ActionDetailPageState extends State<ActionDetailPage>
                                                                             _textController.text);
                                                                         _textController
                                                                             .clear();
-                                                                        Timer(
-                                                                            Duration(milliseconds: 500),
-                                                                            () {
-                                                                          print(
-                                                                              'maxamx${scrollController.position.maxScrollExtent}');
-                                                                          //滾動到最下面
-                                                                          scrollController
-                                                                              .animateTo(
-                                                                            scrollController.position.maxScrollExtent,
-                                                                            duration:
-                                                                                Duration(seconds: 2),
-                                                                            curve:
-                                                                                Curves.fastOutSlowIn,
-                                                                          );
-                                                                        });
 
                                                                         await Provider.of<ChatProvider>(context, listen: false).get_action_msg(widget
                                                                             .TheAction
                                                                             .id);
-
-                                                                        await Provider.of<ChatProvider>(context, listen: false).get_action_msg_count(
-                                                                            widget.TheAction.id,
-                                                                            2);
-                                                                      } else {
-                                                                        print(
-                                                                            '空空');
                                                                       }
                                                                       _focus
                                                                           .unfocus();
                                                                     },
-                                                                  )
-                                                                ],
-                                                              ),
+                                                                    textInputAction:
+                                                                        TextInputAction
+                                                                            .done,
+                                                                    controller:
+                                                                        _textController,
+                                                                    decoration:
+                                                                        InputDecoration(
+                                                                      border: OutlineInputBorder(
+                                                                          borderSide: BorderSide
+                                                                              .none,
+                                                                          borderRadius:
+                                                                              BorderRadius.circular(20)),
+                                                                      fillColor:
+                                                                          Colors
+                                                                              .white,
+                                                                      filled:
+                                                                          true,
+                                                                      hintText:
+                                                                          '輸入留言',
+                                                                      contentPadding: EdgeInsets.symmetric(
+                                                                          horizontal:
+                                                                              12,
+                                                                          vertical:
+                                                                              5),
+                                                                    ),
+                                                                    style: TextStyle(
+                                                                        height:
+                                                                            1),
+                                                                  )),
+                                                            ),
+                                                            //傳送 發送 文字 箭頭 送出
+                                                            IconButton(
+                                                              icon: Icon(
+                                                                  Icons.send),
+                                                              onPressed:
+                                                                  () async {
+                                                                if (_textController
+                                                                        .text !=
+                                                                    '') {
+                                                                  await Provider.of<
+                                                                              ChatProvider>(
+                                                                          context,
+                                                                          listen:
+                                                                              false)
+                                                                      .upload_action_msg(
+                                                                          widget
+                                                                              .TheAction
+                                                                              .id,
+                                                                          _textController
+                                                                              .text);
+                                                                  _textController
+                                                                      .clear();
+                                                                  Timer(
+                                                                      Duration(
+                                                                          milliseconds:
+                                                                              500),
+                                                                      () {
+                                                                    print(
+                                                                        'maxamx${scrollController.position.maxScrollExtent}');
+                                                                    //滾動到最下面
+                                                                    scrollController
+                                                                        .animateTo(
+                                                                      scrollController
+                                                                          .position
+                                                                          .maxScrollExtent,
+                                                                      duration: Duration(
+                                                                          seconds:
+                                                                              2),
+                                                                      curve: Curves
+                                                                          .fastOutSlowIn,
+                                                                    );
+                                                                  });
+
+                                                                  await Provider.of<
+                                                                              ChatProvider>(
+                                                                          context,
+                                                                          listen:
+                                                                              false)
+                                                                      .get_action_msg(widget
+                                                                          .TheAction
+                                                                          .id);
+
+                                                                  await Provider.of<
+                                                                              ChatProvider>(
+                                                                          context,
+                                                                          listen:
+                                                                              false)
+                                                                      .get_action_msg_count(
+                                                                          widget
+                                                                              .TheAction
+                                                                              .id,
+                                                                          2);
+                                                                } else {
+                                                                  print('空空');
+                                                                }
+                                                                _focus
+                                                                    .unfocus();
+                                                              },
                                                             )
                                                           ],
                                                         ),
-                                                      ),
-                                                    ));
-                                              },
-                                            );
-                                          },
-                                        ),
-                                        Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 3.0),
-                                            child: Consumer<ChatProvider>(
-                                              builder: (context, value, child) {
-                                                return Text(
-                                                    '${value.action_count}');
-                                              },
-                                            ))
-                                      ],
-                                    ),
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                              ));
+                                        },
+                                      );
+                                    },
                                   ),
                                   Padding(
-                                    padding: const EdgeInsets.only(left: 38.0),
-                                    child: Row(
-                                      children: [
-                                        Icon(
-                                          Icons.share,
-                                          size: 15,
-                                          color: Colors.transparent,
-                                        ),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 3.0),
-                                          child: Text(
-                                            '分享',
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.transparent,
-                                            ),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
+                                      padding: const EdgeInsets.only(left: 3.0),
+                                      child: Consumer<ChatProvider>(
+                                        builder: (context, value, child) {
+                                          return Text('${value.action_count}');
+                                        },
+                                      ))
                                 ],
                               ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 38.0),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.share,
+                                    size: 15,
+                                    color: Colors.transparent,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 3.0),
+                                    child: Text(
+                                      '分享',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.transparent,
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       );
                     }),
                     //圖片

@@ -405,7 +405,8 @@ class _SingleAction2State extends State<SingleAction2> {
                                     value
                                         .favorite_actionlist![widget.index!].action.id,
                                     widget.index,
-                                    true);
+                                    true,value
+                                    .favorite_actionlist![widget.index!].action);
                               } else {
                                 print('沒有在list ->點擊喜歡');
 
@@ -413,7 +414,8 @@ class _SingleAction2State extends State<SingleAction2> {
                                     value
                                         .favorite_actionlist![widget.index!].action.id,
                                     widget.index,
-                                    false);
+                                    false,value
+                                    .favorite_actionlist![widget.index!].action);
                               }
                             }),
                         Padding(
@@ -646,7 +648,7 @@ class _SingleAction2State extends State<SingleAction2> {
                                                                             false)
                                                                     .get_action_msg_count(
                                                                         value
-                                                                            .favorite_actionlist![widget.index!]
+                                                                            .favorite_actionlist![widget.index!].action
                                                                             .id,
                                                                         3);
                                                               } else {
@@ -699,8 +701,8 @@ class _SingleAction2State extends State<SingleAction2> {
                                                                   value
                                                                       .favorite_actionlist![
                                                                           widget
-                                                                              .index!]
-                                                                      .id,
+                                                                              .index!].
+                                                                      action.id,
                                                                   _textController
                                                                       .text);
                                                           _textController
@@ -733,7 +735,7 @@ class _SingleAction2State extends State<SingleAction2> {
                                                               .get_action_msg(value
                                                                   .favorite_actionlist![
                                                                       widget
-                                                                          .index!]
+                                                                          .index!].action
                                                                   .id);
 
                                                           await Provider.of<
@@ -744,7 +746,7 @@ class _SingleAction2State extends State<SingleAction2> {
                                                                   value
                                                                       .favorite_actionlist![
                                                                           widget
-                                                                              .index!]
+                                                                              .index!].action
                                                                       .id,
                                                                   3);
                                                         } else {

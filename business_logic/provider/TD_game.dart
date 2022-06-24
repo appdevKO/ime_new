@@ -144,6 +144,7 @@ class TD_game with ChangeNotifier {
 
       if ('${c[0].topic}' == 'imedot/info') {
         RoomListController rx = Get.put(RoomListController());
+
         Iterable l = json.decode('$pt');
         var rooms = RxList<Room>.from(l.map((model) => Room.fromJson(model)));
         rx.roomsList.clear();
@@ -162,8 +163,7 @@ class TD_game with ChangeNotifier {
           var encode = utf8.decode(('$pt'.split(',')[3]).runes.toList());
           List<int> res = base64.decode(base64.normalize(encode));
           roomName = (utf8.decode(res));
-
-          pushMqtt("imedotUser/postChannel", myRoomId + ',' + myUid);
+          pushMqtt("imedotUser/" + myUid, "getToken," + myRoomId);
           client.subscribe("imedotRoom/" + myRoomId, MqttQos.atLeastOnce);
           client.subscribe(
               "imedotRoom/" + myRoomId + "/game", MqttQos.atLeastOnce);
@@ -203,7 +203,7 @@ class TD_game with ChangeNotifier {
           text_view_notify_king = false;
           firstOut = true;
           notifyListeners();
-        } else if ('$pt'.startsWith('getToken,')) {
+        } else if ('$pt'.startsWith('postToken,')) {
           channelToken = '$pt'.split(',')[1];
           print('getToken $channelToken');
         }

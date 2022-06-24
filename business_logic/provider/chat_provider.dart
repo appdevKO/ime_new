@@ -232,6 +232,7 @@ class ChatProvider with ChangeNotifier {
                 print(
                     "ime_group_chat ${json.decode(utf8.decode(payload.codeUnits))}");
                 findindex(topic);
+                navigator_redpoint_group = true;
                 if (topicindex == -1) {
                   // findindex(topic);
                   print("test -- 222221111 ime_group_chat");
@@ -345,17 +346,24 @@ class ChatProvider with ChangeNotifier {
                     -1) {
                   print('在黑名單');
                 } else {
-                  print('不在黑名單');
+                  //收到私聊
+                  navigator_redpoint_o2o = true;
                   //查詢
-                  o2ofindindex(
+                  o2omsglist_findindex(
                       json.decode(utf8.decode(payload.codeUnits))["memberid"]);
+
                   // 用memberid來 辨別 不同人訊息 分類
                   ///是否在黑名單
                   ///沒有就正常add
-                  //查別人的id index
+                  //查別人的id index在msglist中的
                   if (topicindex == -1) {
+                    //刷新聊天室列表
                     geto2ochatroomlist();
                     print('還沒有存過這個人的傳的私信');
+                    //list index 變紅點
+                    // o2ochatroomlist_findindex(
+                    //     json.decode(utf8.decode(payload.codeUnits))["memberid"],
+                    //     false);
                     o2o_msglist?.add(O2OChatMsg(
                         msg: [
                           MqttMsg(
@@ -397,6 +405,10 @@ class ChatProvider with ChangeNotifier {
                             .toString()));
                   } else {
                     print('這個人曾經私訊過有存過::$topicindex ');
+                    //list index 變紅點
+                    // o2ochatroomlist_findindex(
+                    //     json.decode(utf8.decode(payload.codeUnits))["memberid"],
+                    //     false);
                     o2o_msglist?[topicindex].msg!.insert(
                           0,
                           MqttMsg(
@@ -441,6 +453,7 @@ class ChatProvider with ChangeNotifier {
 
   var topicindex;
   var lasttopicindex;
+  var o2ochatlist_index;
 
   findindex(id) {
     topicindex = msglist?.indexWhere((element) => element.topicid == id);
@@ -449,11 +462,20 @@ class ChatProvider with ChangeNotifier {
     print("topic topic $id  $topicindex last $lasttopicindex");
   }
 
-  o2ofindindex(id) {
+  o2omsglist_findindex(id) {
     print('idididid   $id');
     topicindex = o2o_msglist?.indexWhere((element) => element.memberid == id);
-    print("o2o id index $id  $topicindex");
+    print("o2o msglist find id index $id  $topicindex");
   }
+
+  // o2ochatroomlist_findindex(id, isreaded) {
+  //   print('room member idididid   $id');
+  //   o2ochatlist_index = o2ochatroomlist?.indexWhere(
+  //       (element) => element.chatto_id == mongo.ObjectId.fromHexString(id));
+  //   print("o2o chatroomlist find id index $id  $o2ochatlist_index");
+  //   o2ochatroomlist![o2ochatlist_index].readed = isreaded;
+  //   notifyListeners();
+  // }
 
   //解除訂閱
   Future mqttunlistener(topic) async {
@@ -561,7 +583,7 @@ class ChatProvider with ChangeNotifier {
     mqttpublish(text, topic, account_id, msgtype, '', "sys_notify", note: note);
   }
 
-  //私聊 私訊
+  //私聊 私訊 我發送私訊給別人
   Future o2ochat(
       text, totopic, receiverid, msgtype, memberid, nickname, chatto_avatar,
       {note}) async {
@@ -570,7 +592,7 @@ class ChatProvider with ChangeNotifier {
         note: note, chatto_avatar: chatto_avatar);
     print(
         'o2ochat test ::${account_id} // $text // $msgtype // totopic $totopic //receiverid $receiverid //memberid $memberid  nickname $nickname');
-    o2ofindindex(totopic.toHexString());
+    o2omsglist_findindex(totopic.toHexString());
     if (topicindex != -1) {
       print('曾經私訊這個人過有存過::$topicindex');
 
@@ -611,18 +633,14 @@ class ChatProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  //打招呼按鈕
   Future easyhi(chatroomid, nickname, avatar) async {
     if (remoteUserInfo[0].default_chat_text != null &&
         remoteUserInfo[0].default_chat_text != '') {
       print('${remoteUserInfo[0].default_chat_text} $chatroomid');
-      o2ochat(
-          remoteUserInfo[0].default_chat_text,
-          chatroomid,
-          remoteUserInfo[0].memberid,
-          1,
-          remoteUserInfo[0].memberid,
-          nickname,
-          avatar);
+      mqttpublish(remoteUserInfo[0].default_chat_text, chatroomid,
+          remoteUserInfo[0].memberid, 1, nickname, "ime_o2o_chat",
+          chatto_avatar: avatar);
     } else {
       print('未設置打招呼');
     }
@@ -1233,7 +1251,7 @@ class ChatProvider with ChangeNotifier {
 
   int action_count = 0;
 
-  Future get_action_msg_count(id, type) async {
+  Future get_action_msg_count(id, type,) async {
     print('獲得動態留言數量 $id');
     var result = await getcount(
       'action_msg',
@@ -1242,10 +1260,11 @@ class ChatProvider with ChangeNotifier {
     );
 
     if (result is int) {
-      print('動態留言.....數量$action_count');
+
       if (type == 2) {
         //detail page
         action_count = result;
+        print('動態留言數量..detail page內..$action_count');
       } else if (type == 1) {
         // newest list page 更新
         var index =
@@ -1256,9 +1275,9 @@ class ChatProvider with ChangeNotifier {
       } else if (type == 3) {
         // favorite list page 更新
         var index =
-            favorite_actionlist?.indexWhere((element) => element.id == id);
+            favorite_actionlist?.indexWhere((element) => element.action.id == id);
         if (index is int && index != -1) {
-          favorite_actionlist![index].msg_num = result;
+          favorite_actionlist![index].action.msg_num = result;
         }
       } else if (type == 4) {
         // someone list page 更新
@@ -1339,6 +1358,7 @@ class ChatProvider with ChangeNotifier {
   }
 
   Future addpage_favorite_action() async {
+    ///
     // var newpage = await readremotemongodb(DbUserinfoModel.fromJson, 'chatroom',
     //     field: mongo.where
     //         .eq('type', 0)
@@ -1349,7 +1369,7 @@ class ChatProvider with ChangeNotifier {
     // notifyListeners();
   }
 
-  Future like_to_action(action_id, index, islike) async {
+  Future like_to_action(action_id, index, islike,TheAction) async {
     print('action id $action_id,${remoteUserInfo[0].memberid}');
     if (islike) {
       print(" 要做的動作->取消喜歡 動態");
@@ -1363,10 +1383,15 @@ class ChatProvider with ChangeNotifier {
       );
       // like 數-1
       await _mongoDB.plus_num('action', "_id", action_id, 'like_num', -1);
-      newest_actionlist![index!].like_list.remove(
-            remoteUserInfo[0].memberid,
-          );
-      newest_actionlist![index!].like_num--;
+
+      TheAction.like_list.remove(
+        remoteUserInfo[0].memberid,
+      );
+      TheAction.like_num--;
+      // newest_actionlist![index!].like_list.remove(
+      //       remoteUserInfo[0].memberid,
+      //     );
+      // newest_actionlist![index!].like_num--;
     } else {
       print("要做的動作->喜歡動態 ");
       //資料庫更新 member
@@ -1380,10 +1405,14 @@ class ChatProvider with ChangeNotifier {
       // like 數+1
       await _mongoDB.plus_num('action', "_id", action_id, 'like_num', 1);
 
-      newest_actionlist![index!].like_list.add(
-            remoteUserInfo[0].memberid,
-          );
-      newest_actionlist![index!].like_num++;
+      TheAction.like_list.add(
+        remoteUserInfo[0].memberid,
+      );
+      TheAction.like_num++;
+      // newest_actionlist![index!].like_list.add(
+      //       remoteUserInfo[0].memberid,
+      //     );
+      // newest_actionlist![index!].like_num++;
     }
     notifyListeners();
   }
@@ -1734,6 +1763,21 @@ class ChatProvider with ChangeNotifier {
         break;
     }
 
+    notifyListeners();
+  }
+
+  bool navigator_redpoint_o2o = false;
+  bool navigator_redpoint_group = false;
+
+  change_redpoint(type) {
+    switch (type) {
+      case 1:
+        navigator_redpoint_o2o = false;
+        break;
+      case 2:
+        navigator_redpoint_group = false;
+        break;
+    }
     notifyListeners();
   }
 

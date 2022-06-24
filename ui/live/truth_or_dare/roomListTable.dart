@@ -1,12 +1,14 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ime_new/business_logic/model/TD_room.dart';
 import 'package:ime_new/business_logic/provider/TD_game.dart';
 import 'package:ime_new/business_logic/provider/chat_provider.dart';
 import 'package:mqtt_client/mqtt_client.dart';
+import 'package:ime_new/business_logic/model/TD_room.dart';
+import 'dart:convert';
+import 'package:mongo_dart/mongo_dart.dart' as mongo;
+import 'package:ime_new/business_logic/provider/chat_provider.dart';
 import 'package:provider/provider.dart';
 
 class RoomListController extends GetxController {
@@ -23,10 +25,10 @@ class roomListTable extends StatefulWidget {
 }
 
 class _roomListTableState extends State<roomListTable> {
+  List len = [0, 0, 0, 0];
   String avatar =
       "https://180dc.org/wp-content/uploads/2022/04/Blank-Avatar.png";
   final scaffoldKey = GlobalKey<ScaffoldState>();
-
   @override
   void initState() {
     Provider.of<TD_game>(context, listen: false).connect();
@@ -105,26 +107,25 @@ class _roomListTableState extends State<roomListTable> {
                         child: Obx(() => ListView.builder(
                               itemCount: rx.roomsList.length,
                               itemBuilder: (context, index) {
-                                var encodeName = utf8.decode(
-                                    (rx.roomsList[index].name)!.runes.toList());
-                                List<int> resName =
-                                    base64.decode(base64.normalize(encodeName));
-                                var name = utf8.decode(resName);
+                                double count = 0;
+                                for (int i = 0; i < 4; i++) {
+                                  if ((rx.roomsList[index].avatarUrlList![i]
+                                          .length) >
+                                      1) {
+                                    len[i] = count;
+                                    count += 20;
+                                  }
+                                  print(len);
+                                }
+                                var name =
+                                    encodeToString(rx.roomsList[index].name);
+                                var explain =
+                                    encodeToString(rx.roomsList[index].explain);
 
-                                var encodeExplain = utf8.decode(
-                                    (rx.roomsList[index].explain)!
-                                        .runes
-                                        .toList());
-                                List<int> resExplain = base64
-                                    .decode(base64.normalize(encodeExplain));
-                                var explain = utf8.decode(resExplain);
-                                //print('encodeName $name');
-                                //print('encodeExplain $encodeExplain');
-                                //print('Explain $explain');
                                 return Card(
                                     child: ListTile(
                                   title: Text(
-                                    '${utf8.decode(resName)}',
+                                    '${name}',
                                     textAlign: TextAlign.right,
                                   ),
                                   subtitle: Text(
@@ -136,44 +137,21 @@ class _roomListTableState extends State<roomListTable> {
                                         0.4,
                                     child: Stack(
                                       children: [
-                                        rx.roomsList[index].count > 0
-                                            ? Positioned(
-                                                child: CircleAvatar(
+                                        for (int i = 0; i < 4; i++)
+                                          if ((rx.roomsList[index]
+                                                  .avatarUrlList![i].length) >
+                                              1) ...[
+                                            Positioned(
+                                              left: len[i],
+                                              child: CircleAvatar(
                                                 backgroundImage: NetworkImage(rx
                                                     .roomsList[index]
-                                                    .avatarUrl1!),
-                                              ))
-                                            : Container(width: 0, height: 0),
-                                        rx.roomsList[index].count > 1
-                                            ? Positioned(
-                                                left: 20,
-                                                child: CircleAvatar(
-                                                  backgroundImage: NetworkImage(
-                                                      rx.roomsList[index]
-                                                          .avatarUrl2!),
-                                                ),
-                                              )
-                                            : Container(width: 0, height: 0),
-                                        rx.roomsList[index].count > 2
-                                            ? Positioned(
-                                                left: 40,
-                                                child: CircleAvatar(
-                                                  backgroundImage: NetworkImage(
-                                                      rx.roomsList[index]
-                                                          .avatarUrl3!),
-                                                ),
-                                              )
-                                            : Container(width: 0, height: 0),
-                                        rx.roomsList[index].count > 3
-                                            ? Positioned(
-                                                left: 60,
-                                                child: CircleAvatar(
-                                                  backgroundImage: NetworkImage(
-                                                      rx.roomsList[index]
-                                                          .avatarUrl4!),
-                                                ),
-                                              )
-                                            : Container(width: 0, height: 0),
+                                                    .avatarUrlList![i]),
+                                              ),
+                                            )
+                                          ]
+
+                                        //: Container(width: 0, height: 0),
                                       ],
                                     ),
                                   ),
@@ -344,4 +322,10 @@ Future<Future<String?>> enterRoom(
       );
     },
   );
+}
+
+encodeToString(s) {
+  String encodeName = utf8.decode(s.runes.toList());
+  List<int> resName = base64.decode(base64.normalize(encodeName));
+  return utf8.decode(resName);
 }

@@ -18,7 +18,7 @@ class _DateSquareState extends State<DateSquare>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   SwipeableCardSectionController _cardController =
-  SwipeableCardSectionController();
+      SwipeableCardSectionController();
 
   // List<SwipeItem> _swipeItems = <SwipeItem>[];
   //
@@ -74,108 +74,157 @@ class _DateSquareState extends State<DateSquare>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: PreferredSize(
-          preferredSize: new Size(MediaQuery.of(context).size.width, 50),
-          child: Container(
-            height: 35,
-            decoration: new BoxDecoration(color: Colors.white),
-            child: TabBar(
-              controller: _tabController,
-              unselectedLabelColor: Colors.grey,
-              labelColor: Colors.red,
-              labelStyle: TextStyle(fontSize: 12),
-              unselectedLabelStyle: TextStyle(fontSize: 10),
-              indicatorColor: Colors.red,
-              tabs: [
-                Tab(
-                  text: '推薦會員',
-                ),
-                Tab(
-                  text: '最近登入',
-                ),
-                Tab(
-                  text: '最新註冊',
-                ),
-                Tab(
-                  text: '附近會員',
-                ),
-              ],
-            ),
-          ),
-        ),
-        body: CustomScrollView(slivers: <Widget>[
-          SliverFillRemaining(
-              child: TabBarView(
-            controller: _tabController,
-            children: [
-              DateRecommend(),
-              Datelastlogin(),
-              DateNewRegister(),
-              DateNear(),
-            ],
-          )),
-        ]));
-
     // return Scaffold(
-    //     body:
-    //       Column(
-    //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    //         children: [
-    //       SwipeableCardsSection(
-    //         cardController: _cardController,
-    //         context: context,
-    //         //add the first 3 cards (widgets)
-    //         items: [
-    //           Container(
-    //             height: 400,
-    //             width: 300,
-    //             color: Colors.blue,
-    //             child: Text('111'),
-    //           ),
-    //           Container(
-    //             height: 400,
-    //             width: 300,
-    //             color: Colors.pink,
-    //             child: Text('222'),
-    //           ),
-    //           Container(
-    //             height: 400,
-    //             width: 300,
-    //             color: Colors.red,
-    //             child: Text('333'),
-    //           ),
-    //           Container(
-    //             height: 400,
-    //             width: 300,
-    //             color: Colors.yellow,
-    //             child: Text('555'),
-    //           ),
-    //           // CardView(text: "First card"),
-    //           // CardView(text: "Second card"),
-    //           // CardView(text: "Third card"),
-    //         ],
-    //         //Get card swipe event callbacks
-    //         onCardSwiped: (dir, index, widget) {
-    //           //Add the next card using _cardController
-    //           _cardController.addItem(
-    //             Container(
-    //               height: 400,
-    //               width: 300,
-    //               color: Colors.blue,
-    //               child: Text('下一章'),
+    //     appBar: PreferredSize(
+    //       preferredSize: new Size(MediaQuery.of(context).size.width, 50),
+    //       child: Container(
+    //         height: 35,
+    //         decoration: new BoxDecoration(color: Colors.white),
+    //         child: TabBar(
+    //           controller: _tabController,
+    //           unselectedLabelColor: Colors.grey,
+    //           labelColor: Colors.red,
+    //           labelStyle: TextStyle(fontSize: 12),
+    //           unselectedLabelStyle: TextStyle(fontSize: 10),
+    //           indicatorColor: Colors.red,
+    //           tabs: [
+    //             Tab(
+    //               text: '推薦會員',
     //             ),
-    //           );
-    //
-    //           //Take action on the swiped widget based on the direction of swipe
-    //           //Return false to not animate cards
-    //         },
-    //         //
-    //         enableSwipeUp: true,
-    //         enableSwipeDown: false,
+    //             Tab(
+    //               text: '最近登入',
+    //             ),
+    //             Tab(
+    //               text: '最新註冊',
+    //             ),
+    //             Tab(
+    //               text: '附近會員',
+    //             ),
+    //           ],
+    //         ),
     //       ),
-    //       //other children
+    //     ),
+    //     body: CustomScrollView(slivers: <Widget>[
+    //       SliverFillRemaining(
+    //           child: TabBarView(
+    //         controller: _tabController,
+    //         children: [
+    //           DateRecommend(),
+    //           Datelastlogin(),
+    //           DateNewRegister(),
+    //           DateNear(),
+    //         ],
+    //       )),
     //     ]));
+
+    return Scaffold(
+        body: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+          SwipeableCardsSection(
+            cardController: _cardController,
+            context: context,
+            //add the first 3 cards (widgets)
+            items: [
+              Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    color: Colors.blue,
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.black.withOpacity(.5),
+                          offset: Offset(0.0, 2.0), //陰影y軸偏移量
+                          blurRadius: 1, //陰影模糊程度
+                          spreadRadius: 1 //陰影擴散程度
+                          )
+                    ]),
+                height: 400,
+                width: 300,
+                child: Text('111'),
+              ),
+              Container(
+                height: 400,
+                width: 300,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    color: Colors.pink,
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.black.withOpacity(.5),
+                          offset: Offset(0.0, 2.0), //陰影y軸偏移量
+                          blurRadius: 1, //陰影模糊程度
+                          spreadRadius: 1 //陰影擴散程度
+                          )
+                    ]),
+                child: Text('222'),
+              ),
+              Container(
+                height: 400,
+                width: 300,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    color: Colors.red,
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.black.withOpacity(.5),
+                          offset: Offset(0.0, 2.0), //陰影y軸偏移量
+                          blurRadius: 1, //陰影模糊程度
+                          spreadRadius: 1 //陰影擴散程度
+                          )
+                    ]),
+                child: Text('333'),
+              ),
+              Container(
+                height: 400,
+                width: 300,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    color: Colors.yellow,
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.black.withOpacity(.5),
+                          offset: Offset(0.0, 2.0), //陰影y軸偏移量
+                          blurRadius: 1, //陰影模糊程度
+                          spreadRadius: 1 //陰影擴散程度
+                          )
+                    ]),
+                child: Text('555'),
+              ),
+              // CardView(text: "First card"),
+              // CardView(text: "Second card"),
+              // CardView(text: "Third card"),
+            ],
+            //Get card swipe event callbacks
+            onCardSwiped: (dir, index, widget) {
+              //Add the next card using _cardController
+              _cardController.addItem(
+                Container(
+                  height: 400,
+                  width: 300,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: Colors.blue,
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.black.withOpacity(.5),
+                            offset: Offset(0.0, 2.0), //陰影y軸偏移量
+                            blurRadius: 1, //陰影模糊程度
+                            spreadRadius: 1 //陰影擴散程度
+                            )
+                      ]),
+                  child: Text('下一章'),
+                ),
+              );
+
+              //Take action on the swiped widget based on the direction of swipe
+              //Return false to not animate cards
+            },
+            //
+            enableSwipeUp: true,
+            enableSwipeDown: false,
+          ),
+          //other children
+        ]));
   }
 }
 

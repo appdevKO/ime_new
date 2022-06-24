@@ -123,9 +123,9 @@ class _OneChatState extends State<OneChat> {
                                     CircleAvatar(
                                       backgroundColor: newmsgindex != -1
                                           ? value.o2o_msglist![newmsgindex!]
-                                                  .msg!.isNotEmpty
-                                              ? Colors.red
-                                              : Colors.transparent
+                                          .msg!.isNotEmpty
+                                          ? Colors.red
+                                          : Colors.transparent
                                           : Colors.transparent,
                                       radius: 5,
                                     ),
