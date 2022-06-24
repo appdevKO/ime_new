@@ -44,8 +44,8 @@ class _ProfileSettingState extends State<ProfileSetting> {
                               color: Colors.white,
                             ),
                             onPressed: () {
-                              value.little_profile_pic = [];
-                              value.profile_pic = [];
+                              value.little_profile_pic = value.remoteUserInfo[0].little_profilepic_list;
+                              value.profile_pic = value.remoteUserInfo[0].profilepic_list;
                               // Navigator.pop(context);
                               Get.back();
                             }),

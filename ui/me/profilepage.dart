@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:ime_new/business_logic/provider/chat_provider.dart';
 import 'package:ime_new/ui/otherpage/other_action_page.dart';
@@ -15,6 +16,8 @@ class MyProfilePage extends StatefulWidget {
 
 class _MyProfilePageState extends State<MyProfilePage> {
   late TabController _tabController;
+  int _current = 0;
+  final CarouselController _controller = CarouselController();
 
   @override
   void initState() {
@@ -60,25 +63,63 @@ class _MyProfilePageState extends State<MyProfilePage> {
               children: [
                 Stack(
                   children: [
+                    //最底下 決定範圍
                     Container(
                       height: MediaQuery.of(context).size.height,
                       width: MediaQuery.of(context).size.width,
-                      color: Colors.red,
+                      color: Colors.grey,
                     ),
                     Positioned(
                       top: 0,
                       child: Consumer<ChatProvider>(
                         builder: (context, value, child) {
+                          // return Container(
+                          //   height: MediaQuery.of(context).size.height * .5,
+                          //   width: MediaQuery.of(context).size.width,
+                          //   decoration: BoxDecoration(
+                          //     color: Colors.grey,
+                          //     image: DecorationImage(
+                          //       image: NetworkImage(
+                          //           '${value.remoteUserInfo[0].avatar_sub}'),
+                          //       fit: BoxFit.cover,
+                          //     ),
+                          //   ),child: Text('${value.remoteUserInfo[0].profilepic_list}'),
+                          // );
                           return Container(
                             height: MediaQuery.of(context).size.height * .5,
                             width: MediaQuery.of(context).size.width,
-                            decoration: BoxDecoration(
-                              color: Colors.grey,
-                              image: DecorationImage(
-                                image: NetworkImage(
-                                    '${value.remoteUserInfo[0].avatar_sub}'),
-                                fit: BoxFit.cover,
+                            child: CarouselSlider.builder(
+                              options: CarouselOptions(
+                                  height: 400.0,
+                                  viewportFraction: 1.0, //放最大
+                                  onPageChanged: (index, reason) {
+                                    setState(() {
+                                      _current = index;
+                                    });
+                                  }),
+                              carouselController: _controller,
+                              itemBuilder: (BuildContext context, int itemIndex,
+                                      int pageViewIndex) =>
+                                  Container(
+                                height: 400,
+                                width: MediaQuery.of(context).size.width,
+                                color: Colors.grey,
+                                child: ClipRRect(
+                                  child: value.remoteUserInfo[0]
+                                                  .little_profilepic_list[
+                                              itemIndex] !=
+                                          ''
+                                      ? Image.network(
+                                          value.remoteUserInfo[0]
+                                                  .little_profilepic_list[
+                                              itemIndex],
+                                          fit: BoxFit.cover,
+                                        )
+                                      : Center(child: Text('無照片')),
+                                ),
                               ),
+                              itemCount: value.remoteUserInfo[0]
+                                  .little_profilepic_list.length,
                             ),
                           );
                         },
@@ -472,10 +513,13 @@ class _MyProfilePageState extends State<MyProfilePage> {
                         ),
                       ),
                     ),
-
                   ],
                 ),
-                OtherActionPage(memberid:Provider.of<ChatProvider>(context,listen: false).remoteUserInfo[0].memberid,type:2)
+                OtherActionPage(
+                    memberid: Provider.of<ChatProvider>(context, listen: false)
+                        .remoteUserInfo[0]
+                        .memberid,
+                    type: 2)
               ],
             ),
             Container(
@@ -495,11 +539,10 @@ class _MyProfilePageState extends State<MyProfilePage> {
                       }),
                   Center(
                       child: Text(
-                        '',
-                        style: TextStyle(
-                            color: Colors.transparent, fontWeight: FontWeight.w700),
-                      )),
-
+                    '',
+                    style: TextStyle(
+                        color: Colors.transparent, fontWeight: FontWeight.w700),
+                  )),
                 ],
               ),
             ),

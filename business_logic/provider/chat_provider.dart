@@ -1246,24 +1246,24 @@ class ChatProvider with ChangeNotifier {
       if (type == 2) {
         //detail page
         action_count = result;
-      } else if(type == 1){
+      } else if (type == 1) {
         // newest list page 更新
         var index =
             newest_actionlist?.indexWhere((element) => element.id == id);
         if (index is int && index != -1) {
           newest_actionlist![index].msg_num = result;
         }
-      }else if(type == 3){
+      } else if (type == 3) {
         // favorite list page 更新
         var index =
-        favorite_actionlist?.indexWhere((element) => element.id == id);
+            favorite_actionlist?.indexWhere((element) => element.id == id);
         if (index is int && index != -1) {
           favorite_actionlist![index].msg_num = result;
         }
-      }else if(type == 4){
+      } else if (type == 4) {
         // someone list page 更新
         var index =
-        someone_actionlist?.indexWhere((element) => element.id == id);
+            someone_actionlist?.indexWhere((element) => element.id == id);
         if (index is int && index != -1) {
           someone_actionlist![index].msg_num = result;
         }
@@ -1598,8 +1598,6 @@ class ChatProvider with ChangeNotifier {
 
   ///
   String? account_id;
-
-  // int fake_sex = 1;
   bool finishinfo = false;
 
   Future getaccountinfo() async {
@@ -1622,7 +1620,7 @@ class ChatProvider with ChangeNotifier {
         } else {
           finishinfo = true;
           print("remoteUserInfo$remoteUserInfo");
-          // set_profile_pic();
+          set_profile_pic();
           set_interest();
 
           notifyListeners();
@@ -2266,26 +2264,26 @@ class ChatProvider with ChangeNotifier {
       /// !!!!!!! 預設都是男的 需要在找性別 !!帶改 第三方登入要求資料
       /// role 1 玩家 2直播主
       // 存在即不更新
-
+      //  = 第一次才會建立
       await _mongoDB.updateData_single2("member", 'account', account.uid, {
         'create_time': DateTime.now().add(
           Duration(hours: 8),
         ),
-        // 'sex': Random().nextBool() ? '男' : '女',
-        // 'age': fakeage == 1
-        //     ? 18
-        //     : fakeage == 2
-        //         ? 28
-        //         : 38,
         'follow_num': 0,
         'nickname': account.displayName,
         'avatar': account.photoURL,
         'avatar_sub': account.photoURL,
         'introduction': '',
-        'little_profile_pic': [],
+        'little_profile_pic': [
+          account.photoURL,
+          '',
+          '',
+        ],
+        'profile_pic': [account.photoURL, '', ''],
         'role': 1,
         'default_chat': '',
       });
+
       // 每次登入都刷新
       print('每次登入都刷新');
       // if (location != null && placemarks.isNotEmpty) {
@@ -2337,7 +2335,7 @@ class ChatProvider with ChangeNotifier {
   //雙方私聊紀錄 資訊
   Future createo2olog(chatto_id, chatto_nickname, chatto_avatar) async {
     print("createo2olog  $chatto_id");
-    //紀錄 我的對象訊
+    //紀錄 我的對象訊息
     await _mongoDB.upsertData("o2olog", 'member_id', remoteUserInfo[0].memberid,
         'chatto_id', chatto_id, {
       'nickname': chatto_nickname,
@@ -2773,7 +2771,7 @@ class ChatProvider with ChangeNotifier {
         },
       );
 
-      print('change_profile ${nickname}');
+      print('註冊填寫 簡單資料 ${nickname}');
       return true;
     } catch (e) {
       print('填寫註冊基本資料時錯誤 error exception  $e');
