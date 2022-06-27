@@ -109,6 +109,15 @@ class _LoginPageState extends State<LoginPage> {
                         },
                       ),
                     ),
+                    GestureDetector(child: Container(child: Text('fake'),),onTap: (){
+                      Provider.of<ChatProvider>(context,listen: false). set_accountid('nzYox6rbIkSUW5Fnj5w0hmYYSXE3');
+                      Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  WaitingPage()),
+                              (route) => route == null);
+                    },),
                     // Row(
                     //   children: [
                     //     Text('facebook 登入'),

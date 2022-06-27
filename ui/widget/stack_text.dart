@@ -30,9 +30,7 @@ class StackText extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           strutStyle: StrutStyle(fontSize: 12.0),
           text: TextSpan(
-              style: style != null
-                  ? style
-                  : TextStyle(fontSize: size, color: Colors.white),
+              style: TextStyle(fontSize: size, color: Colors.white),
               text: '$text'),
         ),
       ],

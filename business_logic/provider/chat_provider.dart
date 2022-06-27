@@ -641,8 +641,10 @@ class ChatProvider with ChangeNotifier {
       mqttpublish(remoteUserInfo[0].default_chat_text, chatroomid,
           remoteUserInfo[0].memberid, 1, nickname, "ime_o2o_chat",
           chatto_avatar: avatar);
+      return true;
     } else {
       print('未設置打招呼');
+      return false;
     }
   }
 
@@ -2134,16 +2136,16 @@ class ChatProvider with ChangeNotifier {
 
   Future deleteAllRoom() async {
     print('all delete');
-    // await _mongoDB.deletealltable('chatmsg');
-    // await _mongoDB.deletealltable('action');
-    // await _mongoDB.deletealltable('action_msg');
-    // await _mongoDB.deletealltable('groupchatmsg');
-    // await _mongoDB.deletealltable('o2ochatmsg');
-    // await _mongoDB.deletealltable('o2olog');
-    // await _mongoDB.deletealltable('block_log');
-    // await _mongoDB.deletealltable('follow_log');
-    // await _mongoDB.deletealltable('chatroom');
-    // await _mongoDB.deletealltable('member');
+    await _mongoDB.deletealltable('chatmsg');
+    await _mongoDB.deletealltable('action');
+    await _mongoDB.deletealltable('action_msg');
+    await _mongoDB.deletealltable('groupchatmsg');
+    await _mongoDB.deletealltable('o2ochatmsg');
+    await _mongoDB.deletealltable('o2olog');
+    await _mongoDB.deletealltable('block_log');
+    await _mongoDB.deletealltable('follow_log');
+    await _mongoDB.deletealltable('chatroom');
+    await _mongoDB.deletealltable('member');
   }
 
   void dbclose() {
@@ -3007,7 +3009,7 @@ class ChatProvider with ChangeNotifier {
     last_login_memberlist = await readremotemongodb(
         DbUserinfoModel.fromJson, 'member',
         field: mongo.where
-            .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女')
+            // .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女')
             .limit(pagesize)
             .sortBy('lastlogin', descending: true));
     print("find_last_login $last_login_memberlist");
@@ -3018,6 +3020,7 @@ class ChatProvider with ChangeNotifier {
   }
 
   Future addpage_find_last_login_people() async {
+
     var newpage = await readremotemongodb(DbUserinfoModel.fromJson, 'member',
         field: mongo.where
             .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女')
@@ -3026,6 +3029,7 @@ class ChatProvider with ChangeNotifier {
             .sortBy('lastlogin', descending: true));
     newpage?.removeWhere(
         (element) => element.memberid == remoteUserInfo[0].memberid);
+    print('last newpage ${newpage}');
     last_login_memberlist!.addAll(newpage);
     notifyListeners();
   }

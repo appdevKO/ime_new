@@ -25,7 +25,7 @@ class RoomController extends GetxController {
 
 int myRoomSeatIndex = 0;
 String T_D_player = "";
-const appId = '27e69b885f864b0da5a75265e8c96cdb';
+const appId = '4981f60af0874faa9381f782c93706bf';
 
 class theRoom extends StatefulWidget {
   const theRoom({Key? key, required this.title}) : super(key: key);
@@ -44,7 +44,7 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
   bool startPreview_2 = false;
   bool startPreview_3 = false;
   bool startPreview_4 = false;
-  bool isSelfMute = false;
+  bool isSelfMute = true;
   bool isSelfHide = false;
   List<int> remoteUid = [];
   final _gridViewKey = GlobalKey();
@@ -78,7 +78,7 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
           builder.addString("refreshLive," + myRoomSeatIndex.toString());
           client.publishMessage(
               "imedotRoom/" + myRoomId, MqttQos.atLeastOnce, builder.payload!);
-          print('imlive');
+          //print('imlive');
         }
       });
     });
@@ -90,6 +90,7 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
 
   @override
   void deactivate() {
+    myRoomSeatIndex = 0;
     engine!.muteAllRemoteVideoStreams(true);
     engine!.muteAllRemoteAudioStreams(true);
     engine!.disableVideo();
@@ -100,7 +101,7 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
     startPreview_3 = false;
     startPreview_4 = false;
     final builder = MqttClientPayloadBuilder();
-    builder.addString("leaveRoom," + myRoomSeatIndex.toString());
+    builder.addString("leaveRoom," + myRoomSeatIndex.toString() + ",false");
     client.publishMessage(
         "imedotRoom/" + myRoomId, MqttQos.atLeastOnce, builder.payload!);
 
@@ -124,23 +125,27 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
       await [Permission.microphone, Permission.camera].request();
     }
     engine = await RtcEngine.create(appId);
+
     engine!.setRemoteDefaultVideoStreamType(VideoStreamType.Low);
     // engine!.enableDualStreamMode(true);
     engine!.disableVideo();
     engine!.setEventHandler(
         RtcEngineEventHandler(joinChannelSuccess: (channel, uid, elapsed) {
-      log('joinChannelSuccess $channel $uid $elapsed');
+      //print('joinChannelSuccess $channel $uid $elapsed');
+      //log('joinChannelSuccess $channel $uid $elapsed');
       setState(() {
         isJoined = true;
       });
     }, userJoined: (uid, elapsed) {
-      log('userJoined  $uid $elapsed');
+      //print('userJoined  $uid $elapsed');
+      //log('userJoined  $uid $elapsed');
       setState(() {
         remoteUid.add(uid);
         engine!.muteAllRemoteVideoStreams(false);
       });
     }, userOffline: (uid, reason) {
-      log('userJoined  $uid $reason');
+      //print('userJoined  $uid $reason');
+      //log('userJoined  $uid $reason');
       setState(() {
         remoteUid.removeWhere((element) => element == uid);
       });
@@ -164,8 +169,10 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
       await AgoraRtcRawdata.registerVideoFrameObserver(handle);
     }
 
-    await engine!
-        .joinChannel(channelToken, myRoomId, null, int.parse(myAgoraUid));
+    // await engine!
+    //     .joinChannel(channelToken, myRoomId, null, int.parse(myAgoraUid));
+
+    await engine!.joinChannel(null, myRoomId, null, int.parse(myAgoraUid));
 
     //关闭本地声音
     await engine!.muteLocalAudioStream(false);
@@ -198,9 +205,11 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
             icon: Icon(Icons.arrow_back, color: Colors.black),
             onPressed: () {
               final builder = MqttClientPayloadBuilder();
-              builder.addString("leaveRoom," + myRoomSeatIndex.toString());
+              builder.addString(
+                  "leaveRoom," + myRoomSeatIndex.toString() + ",false");
               client.publishMessage("imedotRoom/" + myRoomId,
                   MqttQos.atLeastOnce, builder.payload!);
+              Get.back();
             },
           ),
           title: Text(
@@ -309,78 +318,83 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                         alignment:
                                                             Alignment.center,
                                                       ),
-                                            MqttListen1.hat_view_1
-                                                ? Align(
-                                                    alignment:
-                                                        Alignment.topLeft,
-                                                    child: Image.asset(
-                                                      'assets/images/tdGame/hat.png',
-                                                      width: 40,
-                                                      height: 40,
+                                            Align(
+                                                alignment: Alignment.topLeft,
+                                                child: Row(
+                                                  children: [
+                                                    Image.asset(
+                                                      'assets/images/tdGame/1.png',
+                                                      width: 20,
+                                                      height: 20,
                                                     ),
-                                                  )
-                                                : Container(
-                                                    width: 0, height: 0),
-                                            MqttListen1.crown_view_1
-                                                ? Align(
-                                                    alignment:
-                                                        Alignment.topLeft,
-                                                    child: Image.asset(
-                                                      'assets/images/tdGame/crown.png',
-                                                      width: 40,
-                                                      height: 40,
-                                                    ),
-                                                  )
-                                                : Container(
-                                                    width: 0, height: 0),
+                                                    MqttListen1.hat_view_1
+                                                        ? Image.asset(
+                                                            'assets/images/tdGame/hat.png',
+                                                            width: 40,
+                                                            height: 40,
+                                                          )
+                                                        : Container(
+                                                            width: 0,
+                                                            height: 0),
+                                                    MqttListen1.crown_view_1
+                                                        ? Image.asset(
+                                                            'assets/images/tdGame/crown.png',
+                                                            width: 40,
+                                                            height: 40,
+                                                          )
+                                                        : Container(
+                                                            width: 0,
+                                                            height: 0),
+                                                  ],
+                                                )),
                                             MqttListen1.pass_view_1
                                                 ? Positioned(
-                                                    left: 15.0,
-                                                    bottom: 80.0,
-                                                    child: Align(
-                                                      alignment: Alignment
-                                                          .bottomCenter,
-                                                      child: ButtonBar(
-                                                        alignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: <Widget>[
-                                                          IconButton(
-                                                            icon: Image.asset(
-                                                                'assets/images/tdGame/ok.png'),
-                                                            iconSize: 60,
-                                                            onPressed: () {
-                                                              pushMqtt(
-                                                                  "imedotRoom/" +
-                                                                      (myRoomId),
-                                                                  'next_game,');
-                                                            },
-                                                          ),
-                                                          IconButton(
-                                                            icon: Image.asset(
-                                                                'assets/images/tdGame/punish.png'),
-                                                            iconSize: 60,
-                                                            onPressed: () {
-                                                              pushMqtt(
-                                                                  "imedotRoom/" +
-                                                                      (myRoomId) +
-                                                                      "/game",
-                                                                  'backend_punish,' +
-                                                                      T_D_player);
-                                                            },
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ))
+                                                    right:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width *
+                                                            0.03,
+                                                    bottom: 30.0,
+                                                    child: ButtonBar(
+                                                      alignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: <Widget>[
+                                                        IconButton(
+                                                          icon: Image.asset(
+                                                              'assets/images/tdGame/ok.png'),
+                                                          iconSize: 60,
+                                                          onPressed: () {
+                                                            pushMqtt(
+                                                                "imedotRoom/" +
+                                                                    (myRoomId),
+                                                                'next_game,');
+                                                          },
+                                                        ),
+                                                        IconButton(
+                                                          icon: Image.asset(
+                                                              'assets/images/tdGame/punish.png'),
+                                                          iconSize: 60,
+                                                          onPressed: () {
+                                                            pushMqtt(
+                                                                "imedotRoom/" +
+                                                                    (myRoomId) +
+                                                                    "/game",
+                                                                'backend_punish,' +
+                                                                    T_D_player);
+                                                          },
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  )
                                                 : Container(
                                                     width: 0, height: 0),
                                             MqttListen1.truth_dare_view_1
-                                                ? Positioned(
-                                                    left: 15.0,
-                                                    bottom: 80.0,
-                                                    child: Align(
-                                                      alignment: Alignment
-                                                          .bottomCenter,
+                                                ? Align(
+                                                    alignment:
+                                                        Alignment.bottomCenter,
+                                                    child: Positioned(
+                                                      bottom: 20.0,
                                                       child: ButtonBar(
                                                         alignment:
                                                             MainAxisAlignment
@@ -424,14 +438,15 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                           ),
                                                         ],
                                                       ),
-                                                    ))
+                                                    ),
+                                                  )
                                                 : Container(
                                                     width: 0, height: 0),
                                             MqttListen1.choose_button_view_1
                                                 ? Stack(
                                                     children: [
                                                       Positioned(
-                                                        bottom: 80.0,
+                                                        bottom: 10.0,
                                                         child: Align(
                                                           alignment: Alignment
                                                               .bottomCenter,
@@ -496,14 +511,6 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                   )
                                                 : Container(
                                                     width: 0, height: 0),
-                                            Align(
-                                              alignment: Alignment.topCenter,
-                                              child: Image.asset(
-                                                'assets/images/tdGame/1.png',
-                                                width: 20,
-                                                height: 20,
-                                              ),
-                                            ),
                                           ],
                                         ),
                                       ),
@@ -587,7 +594,7 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                             pushMqtt(
                                                                 "imedotRoom/" +
                                                                     myRoomId,
-                                                                "leaveRoom,2");
+                                                                "leaveRoom,2,true");
                                                             MqttListen1
                                                                     .out_view_2 =
                                                                 false;
@@ -604,56 +611,56 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                   ),
                                             MqttListen1.pass_view_2
                                                 ? Positioned(
-                                                    left: 15.0,
-                                                    bottom: 80.0,
-                                                    child: Align(
-                                                      alignment: Alignment
-                                                          .bottomCenter,
-                                                      child: ButtonBar(
-                                                        alignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: <Widget>[
-                                                          IconButton(
-                                                            icon: Image.asset(
-                                                                'assets/images/tdGame/ok.png'),
-                                                            iconSize: 60,
-                                                            onPressed: () {
-                                                              setState(() {
-                                                                pushMqtt(
-                                                                    "imedotRoom/" +
-                                                                        (myRoomId),
-                                                                    'next_game,');
-                                                              });
-                                                            },
-                                                          ),
-                                                          IconButton(
-                                                            icon: Image.asset(
-                                                                'assets/images/tdGame/punish.png'),
-                                                            iconSize: 60,
-                                                            onPressed: () {
-                                                              setState(() {
-                                                                pushMqtt(
-                                                                    "imedotRoom/" +
-                                                                        (myRoomId) +
-                                                                        "/game",
-                                                                    'backend_punish,' +
-                                                                        T_D_player);
-                                                              });
-                                                            },
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ))
+                                                    right:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width *
+                                                            0.03,
+                                                    bottom: 30.0,
+                                                    child: ButtonBar(
+                                                      alignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: <Widget>[
+                                                        IconButton(
+                                                          icon: Image.asset(
+                                                              'assets/images/tdGame/ok.png'),
+                                                          iconSize: 60,
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              pushMqtt(
+                                                                  "imedotRoom/" +
+                                                                      (myRoomId),
+                                                                  'next_game,');
+                                                            });
+                                                          },
+                                                        ),
+                                                        IconButton(
+                                                          icon: Image.asset(
+                                                              'assets/images/tdGame/punish.png'),
+                                                          iconSize: 60,
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              pushMqtt(
+                                                                  "imedotRoom/" +
+                                                                      (myRoomId) +
+                                                                      "/game",
+                                                                  'backend_punish,' +
+                                                                      T_D_player);
+                                                            });
+                                                          },
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  )
                                                 : Container(
                                                     width: 0, height: 0),
                                             MqttListen1.truth_dare_view_2
-                                                ? Positioned(
-                                                    left: 15.0,
-                                                    bottom: 80.0,
-                                                    child: Align(
-                                                      alignment: Alignment
-                                                          .bottomCenter,
+                                                ? Align(
+                                                    alignment:
+                                                        Alignment.bottomCenter,
+                                                    child: Positioned(
+                                                      bottom: 20.0,
                                                       child: ButtonBar(
                                                         alignment:
                                                             MainAxisAlignment
@@ -697,29 +704,6 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                           ),
                                                         ],
                                                       ),
-                                                    ))
-                                                : Container(
-                                                    width: 0, height: 0),
-                                            MqttListen1.hat_view_2
-                                                ? Align(
-                                                    alignment:
-                                                        Alignment.topLeft,
-                                                    child: Image.asset(
-                                                      'assets/images/tdGame/hat.png',
-                                                      width: 40,
-                                                      height: 40,
-                                                    ),
-                                                  )
-                                                : Container(
-                                                    width: 0, height: 0),
-                                            MqttListen1.crown_view_2
-                                                ? Align(
-                                                    alignment:
-                                                        Alignment.topLeft,
-                                                    child: Image.asset(
-                                                      'assets/images/tdGame/crown.png',
-                                                      width: 40,
-                                                      height: 40,
                                                     ),
                                                   )
                                                 : Container(
@@ -728,7 +712,7 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                 ? Stack(
                                                     children: [
                                                       Positioned(
-                                                        bottom: 80.0,
+                                                        bottom: 10.0,
                                                         child: Align(
                                                           alignment: Alignment
                                                               .bottomCenter,
@@ -794,16 +778,34 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                 : Container(
                                                     width: 0, height: 0),
                                             Align(
-                                              alignment: Alignment.topCenter,
-                                              child: Align(
-                                                alignment: Alignment.topCenter,
-                                                child: Image.asset(
-                                                  'assets/images/tdGame/2.png',
-                                                  width: 20,
-                                                  height: 20,
-                                                ),
-                                              ),
-                                            ),
+                                                alignment: Alignment.topLeft,
+                                                child: Row(
+                                                  children: [
+                                                    Image.asset(
+                                                      'assets/images/tdGame/2.png',
+                                                      width: 20,
+                                                      height: 20,
+                                                    ),
+                                                    MqttListen1.hat_view_2
+                                                        ? Image.asset(
+                                                            'assets/images/tdGame/hat.png',
+                                                            width: 40,
+                                                            height: 40,
+                                                          )
+                                                        : Container(
+                                                            width: 0,
+                                                            height: 0),
+                                                    MqttListen1.crown_view_2
+                                                        ? Image.asset(
+                                                            'assets/images/tdGame/crown.png',
+                                                            width: 40,
+                                                            height: 40,
+                                                          )
+                                                        : Container(
+                                                            width: 0,
+                                                            height: 0),
+                                                  ],
+                                                )),
                                           ],
                                         ),
                                       ),
@@ -897,7 +899,7 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                             pushMqtt(
                                                                 "imedotRoom/" +
                                                                     myRoomId,
-                                                                "leaveRoom,3");
+                                                                "leaveRoom,3,true");
                                                             MqttListen1
                                                                     .out_view_3 =
                                                                 false;
@@ -914,56 +916,55 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                   ),
                                             MqttListen1.pass_view_3
                                                 ? Positioned(
-                                                    left: 15.0,
-                                                    bottom: 80.0,
-                                                    child: Align(
-                                                      alignment: Alignment
-                                                          .bottomCenter,
-                                                      child: ButtonBar(
-                                                        alignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: <Widget>[
-                                                          IconButton(
-                                                            icon: Image.asset(
-                                                                'assets/images/tdGame/ok.png'),
-                                                            iconSize: 60,
-                                                            onPressed: () {
-                                                              setState(() {
-                                                                pushMqtt(
-                                                                    "imedotRoom/" +
-                                                                        (myRoomId),
-                                                                    'next_game,');
-                                                              });
-                                                            },
-                                                          ),
-                                                          IconButton(
-                                                            icon: Image.asset(
-                                                                'assets/images/tdGame/punish.png'),
-                                                            iconSize: 60,
-                                                            onPressed: () {
-                                                              setState(() {
-                                                                pushMqtt(
-                                                                    "imedotRoom/" +
-                                                                        (myRoomId) +
-                                                                        "/game",
-                                                                    'backend_punish,' +
-                                                                        T_D_player);
-                                                              });
-                                                            },
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ))
+                                                    left: MediaQuery.of(context)
+                                                            .size
+                                                            .width *
+                                                        0.045,
+                                                    bottom: 30.0,
+                                                    child: ButtonBar(
+                                                      alignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: <Widget>[
+                                                        IconButton(
+                                                          icon: Image.asset(
+                                                              'assets/images/tdGame/ok.png'),
+                                                          iconSize: 60,
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              pushMqtt(
+                                                                  "imedotRoom/" +
+                                                                      (myRoomId),
+                                                                  'next_game,');
+                                                            });
+                                                          },
+                                                        ),
+                                                        IconButton(
+                                                          icon: Image.asset(
+                                                              'assets/images/tdGame/punish.png'),
+                                                          iconSize: 60,
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              pushMqtt(
+                                                                  "imedotRoom/" +
+                                                                      (myRoomId) +
+                                                                      "/game",
+                                                                  'backend_punish,' +
+                                                                      T_D_player);
+                                                            });
+                                                          },
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  )
                                                 : Container(
                                                     width: 0, height: 0),
                                             MqttListen1.truth_dare_view_3
-                                                ? Positioned(
-                                                    left: 15.0,
-                                                    bottom: 20.0,
-                                                    child: Align(
-                                                      alignment: Alignment
-                                                          .bottomCenter,
+                                                ? Align(
+                                                    alignment:
+                                                        Alignment.bottomCenter,
+                                                    child: Positioned(
+                                                      bottom: 20.0,
                                                       child: ButtonBar(
                                                         alignment:
                                                             MainAxisAlignment
@@ -1007,33 +1008,6 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                           ),
                                                         ],
                                                       ),
-                                                    ))
-                                                : Container(
-                                                    width: 0, height: 0),
-                                            MqttListen1.hat_view_3
-                                                ? Align(
-                                                    alignment:
-                                                        Alignment.topLeft,
-                                                    child: Image.asset(
-                                                      'assets/images/tdGame/hat.png',
-                                                      width: 40,
-                                                      height: 40,
-                                                    ),
-                                                  )
-                                                : Container(
-                                                    width: 0, height: 0),
-                                            MqttListen1.crown_view_3
-                                                ? Visibility(
-                                                    visible: MqttListen1
-                                                        .crown_view_3,
-                                                    child: Align(
-                                                      alignment:
-                                                          Alignment.topLeft,
-                                                      child: Image.asset(
-                                                        'assets/images/tdGame/crown.png',
-                                                        width: 40,
-                                                        height: 40,
-                                                      ),
                                                     ),
                                                   )
                                                 : Container(
@@ -1042,6 +1016,7 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                 ? Stack(
                                                     children: [
                                                       Positioned(
+                                                        bottom: 30.0,
                                                         child: Align(
                                                           alignment: Alignment
                                                               .bottomCenter,
@@ -1107,16 +1082,34 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                 : Container(
                                                     width: 0, height: 0),
                                             Align(
-                                              alignment: Alignment.topCenter,
-                                              child: Align(
-                                                alignment: Alignment.topCenter,
-                                                child: Image.asset(
-                                                  'assets/images/tdGame/3.png',
-                                                  width: 20,
-                                                  height: 20,
-                                                ),
-                                              ),
-                                            ),
+                                                alignment: Alignment.topLeft,
+                                                child: Row(
+                                                  children: [
+                                                    Image.asset(
+                                                      'assets/images/tdGame/3.png',
+                                                      width: 20,
+                                                      height: 20,
+                                                    ),
+                                                    MqttListen1.hat_view_3
+                                                        ? Image.asset(
+                                                            'assets/images/tdGame/hat.png',
+                                                            width: 40,
+                                                            height: 40,
+                                                          )
+                                                        : Container(
+                                                            width: 0,
+                                                            height: 0),
+                                                    MqttListen1.crown_view_3
+                                                        ? Image.asset(
+                                                            'assets/images/tdGame/crown.png',
+                                                            width: 40,
+                                                            height: 40,
+                                                          )
+                                                        : Container(
+                                                            width: 0,
+                                                            height: 0),
+                                                  ],
+                                                )),
                                           ],
                                         ),
                                       ),
@@ -1200,7 +1193,7 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                             pushMqtt(
                                                                 "imedotRoom/" +
                                                                     myRoomId,
-                                                                "leaveRoom,4");
+                                                                "leaveRoom,4,true"); //true=踢人 false=自己離開
                                                             MqttListen1
                                                                     .out_view_4 =
                                                                 false;
@@ -1217,56 +1210,52 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                   ),
                                             MqttListen1.pass_view_4
                                                 ? Positioned(
-                                                    left: 15.0,
-                                                    bottom: 80.0,
-                                                    child: Align(
-                                                      alignment: Alignment
-                                                          .bottomCenter,
-                                                      child: ButtonBar(
-                                                        alignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: <Widget>[
-                                                          IconButton(
-                                                            icon: Image.asset(
-                                                                'assets/images/tdGame/ok.png'),
-                                                            iconSize: 60,
-                                                            onPressed: () {
-                                                              setState(() {
-                                                                pushMqtt(
-                                                                    "imedotRoom/" +
-                                                                        (myRoomId),
-                                                                    'next_game,');
-                                                              });
-                                                            },
-                                                          ),
-                                                          IconButton(
-                                                            icon: Image.asset(
-                                                                'assets/images/tdGame/punish.png'),
-                                                            iconSize: 60,
-                                                            onPressed: () {
-                                                              setState(() {
-                                                                pushMqtt(
-                                                                    "imedotRoom/" +
-                                                                        (myRoomId) +
-                                                                        "/game",
-                                                                    'backend_punish,' +
-                                                                        T_D_player);
-                                                              });
-                                                            },
-                                                          ),
-                                                        ],
-                                                      ),
+                                                    right:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width *
+                                                            0.03,
+                                                    bottom: 30.0,
+                                                    child: ButtonBar(
+                                                      children: <Widget>[
+                                                        IconButton(
+                                                          icon: Image.asset(
+                                                              'assets/images/tdGame/ok.png'),
+                                                          iconSize: 60,
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              pushMqtt(
+                                                                  "imedotRoom/" +
+                                                                      (myRoomId),
+                                                                  'next_game,');
+                                                            });
+                                                          },
+                                                        ),
+                                                        IconButton(
+                                                          icon: Image.asset(
+                                                              'assets/images/tdGame/punish.png'),
+                                                          iconSize: 60,
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              pushMqtt(
+                                                                  "imedotRoom/" +
+                                                                      (myRoomId) +
+                                                                      "/game",
+                                                                  'backend_punish,' +
+                                                                      T_D_player);
+                                                            });
+                                                          },
+                                                        ),
+                                                      ],
                                                     ))
                                                 : Container(
                                                     width: 0, height: 0),
                                             MqttListen1.truth_dare_view_4
-                                                ? Positioned(
-                                                    left: 15.0,
-                                                    bottom: 20.0,
-                                                    child: Align(
-                                                      alignment: Alignment
-                                                          .bottomCenter,
+                                                ? Align(
+                                                    alignment:
+                                                        Alignment.bottomCenter,
+                                                    child: Positioned(
+                                                      bottom: 20.0,
                                                       child: ButtonBar(
                                                         alignment:
                                                             MainAxisAlignment
@@ -1310,29 +1299,6 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                           ),
                                                         ],
                                                       ),
-                                                    ))
-                                                : Container(
-                                                    width: 0, height: 0),
-                                            MqttListen1.hat_view_4
-                                                ? Align(
-                                                    alignment:
-                                                        Alignment.topLeft,
-                                                    child: Image.asset(
-                                                      'assets/images/tdGame/hat.png',
-                                                      width: 40,
-                                                      height: 40,
-                                                    ),
-                                                  )
-                                                : Container(
-                                                    width: 0, height: 0),
-                                            MqttListen1.crown_view_4
-                                                ? Align(
-                                                    alignment:
-                                                        Alignment.topLeft,
-                                                    child: Image.asset(
-                                                      'assets/images/tdGame/crown.png',
-                                                      width: 40,
-                                                      height: 40,
                                                     ),
                                                   )
                                                 : Container(
@@ -1341,7 +1307,7 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                 ? Stack(
                                                     children: [
                                                       Positioned(
-                                                        bottom: 20.0,
+                                                        bottom: 30.0,
                                                         child: Align(
                                                           alignment: Alignment
                                                               .bottomCenter,
@@ -1407,16 +1373,34 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                 : Container(
                                                     width: 0, height: 0),
                                             Align(
-                                              alignment: Alignment.topCenter,
-                                              child: Align(
-                                                alignment: Alignment.topCenter,
-                                                child: Image.asset(
-                                                  'assets/images/tdGame/4.png',
-                                                  width: 20,
-                                                  height: 20,
-                                                ),
-                                              ),
-                                            ),
+                                                alignment: Alignment.topLeft,
+                                                child: Row(
+                                                  children: [
+                                                    Image.asset(
+                                                      'assets/images/tdGame/4.png',
+                                                      width: 20,
+                                                      height: 20,
+                                                    ),
+                                                    MqttListen1.hat_view_4
+                                                        ? Image.asset(
+                                                            'assets/images/tdGame/hat.png',
+                                                            width: 40,
+                                                            height: 40,
+                                                          )
+                                                        : Container(
+                                                            width: 0,
+                                                            height: 0),
+                                                    MqttListen1.crown_view_4
+                                                        ? Image.asset(
+                                                            'assets/images/tdGame/crown.png',
+                                                            width: 40,
+                                                            height: 40,
+                                                          )
+                                                        : Container(
+                                                            width: 0,
+                                                            height: 0),
+                                                  ],
+                                                )),
                                           ],
                                         ),
                                       ),
@@ -1449,40 +1433,56 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                   MqttListen1.choose_button_view_1
                                       ? Align(
                                           alignment: Alignment.center,
-                                          child: Image.asset(
-                                            'assets/images/tdGame/chooseOne.png',
+                                          child: Container(
+                                            height: 40,
                                             width: 250,
-                                            height: 250,
+                                            child: Image.asset(
+                                              'assets/images/tdGame/chooseOne.png',
+                                              width: 250,
+                                              height: 250,
+                                            ),
                                           ),
                                         )
                                       : Container(width: 0, height: 0),
                                   MqttListen1.choose_button_view_2
                                       ? Align(
                                           alignment: Alignment.center,
-                                          child: Image.asset(
-                                            'assets/images/tdGame/chooseOne.png',
+                                          child: Container(
+                                            height: 40,
                                             width: 250,
-                                            height: 250,
+                                            child: Image.asset(
+                                              'assets/images/tdGame/chooseOne.png',
+                                              width: 250,
+                                              height: 250,
+                                            ),
                                           ),
                                         )
                                       : Container(width: 0, height: 0),
                                   MqttListen1.choose_button_view_3
                                       ? Align(
                                           alignment: Alignment.center,
-                                          child: Image.asset(
-                                            'assets/images/tdGame/chooseOne.png',
+                                          child: Container(
+                                            height: 40,
                                             width: 250,
-                                            height: 250,
+                                            child: Image.asset(
+                                              'assets/images/tdGame/chooseOne.png',
+                                              width: 250,
+                                              height: 250,
+                                            ),
                                           ),
                                         )
                                       : Container(width: 0, height: 0),
                                   MqttListen1.choose_button_view_4
                                       ? Align(
                                           alignment: Alignment.center,
-                                          child: Image.asset(
-                                            'assets/images/tdGame/chooseOne.png',
+                                          child: Container(
+                                            height: 40,
                                             width: 250,
-                                            height: 250,
+                                            child: Image.asset(
+                                              'assets/images/tdGame/chooseOne.png',
+                                              width: 250,
+                                              height: 250,
+                                            ),
                                           ),
                                         )
                                       : Container(width: 0, height: 0),
@@ -1512,7 +1512,7 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                   if (MqttListen1.BeChosen ==
                                                       '1') ...[
                                                     Image.asset(
-                                                      'assets/images/tdGame/1.png',
+                                                      'assets/images/tdGame/pink1.png',
                                                       width: 30,
                                                       height: 30,
                                                     ),
@@ -1520,7 +1520,7 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                           .BeChosen ==
                                                       '2') ...[
                                                     Image.asset(
-                                                      'assets/images/tdGame/2.png',
+                                                      'assets/images/tdGame/pink2.png',
                                                       width: 30,
                                                       height: 30,
                                                     ),
@@ -1528,7 +1528,7 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                           .BeChosen ==
                                                       '3') ...[
                                                     Image.asset(
-                                                      'assets/images/tdGame/3.png',
+                                                      'assets/images/tdGame/pink3.png',
                                                       width: 30,
                                                       height: 30,
                                                     ),
@@ -1536,15 +1536,20 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                           .BeChosen ==
                                                       '4') ...[
                                                     Image.asset(
-                                                      'assets/images/tdGame/4.png',
+                                                      'assets/images/tdGame/pink4.png',
                                                       width: 30,
                                                       height: 30,
                                                     ),
                                                   ],
-                                                  Image.asset(
-                                                    'assets/images/tdGame/beChoose.png',
+                                                  Container(
                                                     width: 200,
-                                                    height: 200,
+                                                    height: 30,
+                                                    //color: Colors.red,
+                                                    child: Image.asset(
+                                                      'assets/images/tdGame/beChoose.png',
+                                                      width: 200,
+                                                      height: 200,
+                                                    ),
                                                   )
                                                 ],
                                               )),
@@ -1563,7 +1568,7 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                   if (MqttListen1.BeChosen ==
                                                       '1') ...[
                                                     Image.asset(
-                                                      'assets/images/tdGame/1.png',
+                                                      'assets/images/tdGame/pink1.png',
                                                       width: 30,
                                                       height: 30,
                                                     ),
@@ -1571,7 +1576,7 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                           .BeChosen ==
                                                       '2') ...[
                                                     Image.asset(
-                                                      'assets/images/tdGame/2.png',
+                                                      'assets/images/tdGame/pink2.png',
                                                       width: 30,
                                                       height: 30,
                                                     ),
@@ -1579,7 +1584,7 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                           .BeChosen ==
                                                       '3') ...[
                                                     Image.asset(
-                                                      'assets/images/tdGame/3.png',
+                                                      'assets/images/tdGame/pink3.png',
                                                       width: 30,
                                                       height: 30,
                                                     ),
@@ -1587,15 +1592,18 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                           .BeChosen ==
                                                       '4') ...[
                                                     Image.asset(
-                                                      'assets/images/tdGame/4.png',
+                                                      'assets/images/tdGame/pink4.png',
                                                       width: 30,
                                                       height: 30,
                                                     ),
                                                   ],
-                                                  Image.asset(
-                                                    'assets/images/tdGame/chooseT.png',
-                                                    width: 250,
-                                                    height: 250,
+                                                  Container(
+                                                    height: 30,
+                                                    child: Image.asset(
+                                                      'assets/images/tdGame/chooseT.png',
+                                                      width: 250,
+                                                      height: 250,
+                                                    ),
                                                   )
                                                 ],
                                               )),
@@ -1614,7 +1622,7 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                   if (MqttListen1.BeChosen ==
                                                       '1') ...[
                                                     Image.asset(
-                                                      'assets/images/tdGame/1.png',
+                                                      'assets/images/tdGame/pink1.png',
                                                       width: 30,
                                                       height: 30,
                                                     ),
@@ -1622,7 +1630,7 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                           .BeChosen ==
                                                       '2') ...[
                                                     Image.asset(
-                                                      'assets/images/tdGame/2.png',
+                                                      'assets/images/tdGame/pink2.png',
                                                       width: 30,
                                                       height: 30,
                                                     ),
@@ -1630,7 +1638,7 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                           .BeChosen ==
                                                       '3') ...[
                                                     Image.asset(
-                                                      'assets/images/tdGame/3.png',
+                                                      'assets/images/tdGame/pink3.png',
                                                       width: 30,
                                                       height: 30,
                                                     ),
@@ -1638,15 +1646,18 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                           .BeChosen ==
                                                       '4') ...[
                                                     Image.asset(
-                                                      'assets/images/tdGame/4.png',
+                                                      'assets/images/tdGame/pink4.png',
                                                       width: 30,
                                                       height: 30,
                                                     ),
                                                   ],
-                                                  Image.asset(
-                                                    'assets/images/tdGame/chooseD.png',
-                                                    width: 250,
-                                                    height: 250,
+                                                  Container(
+                                                    height: 50,
+                                                    child: Image.asset(
+                                                      'assets/images/tdGame/chooseD.png',
+                                                      width: 250,
+                                                      height: 250,
+                                                    ),
                                                   )
                                                 ],
                                               )),

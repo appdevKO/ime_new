@@ -33,7 +33,7 @@ class sweetProvider with ChangeNotifier {
   var anchorID;
   var anchorName;
   int? roomCount;
-  int? AudienceCount;
+  String audienceCount = '0';
   String roomNam = '';
   String roomExplain = '';
   String inRoomAvatar = '';
@@ -95,7 +95,6 @@ class sweetProvider with ChangeNotifier {
           inRoomAvatar = json["avatarUrl"];
           anchorName = encodeToString(json['anchorName']);
           print('anchorName ${anchorName}');
-          pushMqtt("imeSweetUser/postChannel", sweetRoomId + ',' + myUid);
           client.subscribe("imeSweetRoom/" + sweetRoomId, MqttQos.atLeastOnce);
 
           Get.to(sweetView(
@@ -107,29 +106,28 @@ class sweetProvider with ChangeNotifier {
           //print('audience $pt');
           Map<String, dynamic> json = jsonDecode("{" + pt.split(',{')[1]);
           print('json $json');
-          sweetRoomId = json['rid'];
-          inRoomAvatar = json['avatarUrl'];
-          pushMqtt("imeSweetUser/postChannel", sweetRoomId + ',' + myUid);
-          if (json['vdoSta'] == 'true') {
+          sweetRoomId = json["rid"];
+          client.subscribe("imeSweetRoom/" + sweetRoomId, MqttQos.atLeastOnce);
+          inRoomAvatar = json["avatarUrl"];
+
+          if (json["vdoSta"] == 'true') {
             vdoSta = true;
           }
-          anchorID = json['anchorID'];
-          anchorName = encodeToString(json['anchorName']);
-          print('anchor $anchorName');
-          client.subscribe("imeSweetRoom/" + sweetRoomId, MqttQos.atLeastOnce);
+          anchorID = json["anchor"];
+          anchorName = (json["nickname"]);
 
           Get.to(sweetView(
             title: sweetRoomId,
           ));
           notifyListeners();
-        } else if ('$pt'.startsWith('getToken,')) {
-          channelToken = '$pt'.split(',')[1];
-          print('getToken $channelToken');
         }
       } else if ('${c[0].topic}' == ('imeSweetRoom/' + sweetRoomId)) {
         // 從MQTT收新人入房消息，改變瀏覽器網址
-        if ('$pt'.startsWith('postAudienceCount,')) {
-          AudienceCount = int.parse('$pt'.split(',')[1]);
+        if ('$pt'.startsWith('post/audience/list')) {
+          Map<String, dynamic> json = jsonDecode("{" + pt.split(',{')[1]);
+          print('json $json');
+          audienceCount = json["count"];
+          print('audienceCount $audienceCount');
           notifyListeners();
         } else if ('$pt'.startsWith('leaveRoom,')) {
           anchorID = null;
@@ -137,6 +135,7 @@ class sweetProvider with ChangeNotifier {
           print('leave');
           notifyListeners();
         } else if ('$pt'.startsWith('vdoHide,')) {
+          myRoomSeatIndex = 0;
           String _vdosta = '$pt'.split(',')[1];
           print('vdoHide $_vdosta');
           if (_vdosta == 'true') {

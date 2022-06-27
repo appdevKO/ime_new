@@ -115,7 +115,6 @@ class _roomListTableState extends State<roomListTable> {
                                     len[i] = count;
                                     count += 20;
                                   }
-                                  print(len);
                                 }
                                 var name =
                                     encodeToString(rx.roomsList[index].name);
@@ -142,6 +141,7 @@ class _roomListTableState extends State<roomListTable> {
                                                   .avatarUrlList![i].length) >
                                               1) ...[
                                             Positioned(
+                                              top: 7.5,
                                               left: len[i],
                                               child: CircleAvatar(
                                                 backgroundImage: NetworkImage(rx

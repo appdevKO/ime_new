@@ -130,7 +130,7 @@ class TD_game with ChangeNotifier {
     try {
       await client.connect('sayhong_test', 'HoolyHi168888');
     } catch (e) {
-      print('Exception: $e');
+      //print('Exception: $e');
       client.disconnect();
     }
 
@@ -154,9 +154,9 @@ class TD_game with ChangeNotifier {
       } else if ('${c[0].topic}' == 'imedotUser/' + myUid) {
         // print('$pt');
         if ('$pt' == 'joinFail') {
-          print('沒位子');
+          //print('沒位子');
         } else if ('$pt'.startsWith('join,')) {
-          print('data $pt');
+          //print('data $pt');
           myRoomSeatIndex = int.parse('$pt'.split(',')[2]);
           myRoomId = '$pt'.split(',')[1];
 
@@ -205,13 +205,13 @@ class TD_game with ChangeNotifier {
           notifyListeners();
         } else if ('$pt'.startsWith('postToken,')) {
           channelToken = '$pt'.split(',')[1];
-          print('getToken $channelToken');
+          //print('getToken $channelToken');
         }
       } else if ('${c[0].topic}' == ('imedotRoom/' + myRoomId)) {
         // 從MQTT收新人入房消息，改變瀏覽器網址
         if ('$pt'.startsWith('getid,')) {
           var dataList = '$pt'.split(',');
-          print('dataList $dataList');
+          //print('dataList $dataList');
           if (dataList[2] != 'null') {
             TDseatId1 = int.parse(dataList[2].replaceAll(' ', ''));
             avatarUrl1 = dataList[10];
@@ -248,10 +248,11 @@ class TD_game with ChangeNotifier {
               vdoSta_4 = false;
             }
           }
-          print('更新房間 $pt');
+          //print('更新房間 $pt');
           notifyListeners();
         } else if ('$pt'.startsWith('leaveRoom,')) {
           var getSeatIndex = '$pt'.split(',')[1];
+          String kicked = '$pt'.split(',')[2];
           if (myRoomSeatIndex.toString() == getSeatIndex) {
             TDseatId1 = null;
             TDseatId2 = null;
@@ -262,8 +263,7 @@ class TD_game with ChangeNotifier {
             avatarUrl3 = '';
             avatarUrl4 = '';
 
-            if (firstOut == true) {
-              firstOut = false;
+            if (kicked == 'true') {
               Get.back();
             }
           } else {
@@ -349,7 +349,7 @@ class TD_game with ChangeNotifier {
           text_view_notify_king = false;
           notifyListeners();
           king = '$pt'.split(',')[1]; //測試用
-          print('開始遊戲 $king');
+          //print('開始遊戲 $king');
           if (king == '0') {
             pos = 13.75;
           } else if (king == '1') {
@@ -413,9 +413,9 @@ class TD_game with ChangeNotifier {
           notifyListeners();
         } else if ('$pt'.startsWith('vdoHide,')) {
           String hidePlayer = '$pt'.split(',')[1];
-          print('hidePlayer $hidePlayer');
-          print('myRoomSeatIndex $myRoomSeatIndex');
-          print('$pt'.split(',')[2]);
+          //print('hidePlayer $hidePlayer');
+          //print('myRoomSeatIndex $myRoomSeatIndex');
+          //print('$pt'.split(',')[2]);
           if (myRoomSeatIndex.toString() != hidePlayer) {
             var val = '$pt'.split(',')[2];
             if (val == 'false') {

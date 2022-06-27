@@ -20,7 +20,7 @@ import 'package:mqtt_client/mqtt_client.dart';
 
 int myRoomSeatIndex = 0;
 String T_D_player = "";
-const appId = '27e69b885f864b0da5a75265e8c96cdb';
+const appId = '4981f60af0874faa9381f782c93706bf';
 
 class sweetView extends StatefulWidget {
   const sweetView({Key? key, required this.title}) : super(key: key);
@@ -68,12 +68,13 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
         } else {
           final builder = MqttClientPayloadBuilder();
           builder.addString("refreshLive," + myRoomSeatIndex.toString());
-          client.publishMessage(
-              "imeSweetRoom/" + sweetRoomId, MqttQos.atLeastOnce, builder.payload!);
+          client.publishMessage("imeSweetRoom/" + sweetRoomId,
+              MqttQos.atLeastOnce, builder.payload!);
           print('imlive');
         }
       });
     });
+
     client.subscribe("imeSweetRoom/" + sweetRoomId, MqttQos.atLeastOnce);
 
     this._initEngine();
@@ -94,10 +95,6 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    final builder = MqttClientPayloadBuilder();
-    builder.addString("leaveRoom," + identity.toString());
-    client.publishMessage(
-        "imeSweetRoom/" + sweetRoomId, MqttQos.atLeastOnce, builder.payload!);
     super.dispose();
     // this._deinitEngine();
   }
@@ -137,8 +134,7 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
       await AgoraRtcRawdata.registerVideoFrameObserver(handle);
     }
 
-    await engine!
-        .joinChannel(channelToken, sweetRoomId, null, int.parse(myAgoraUid));
+    await engine!.joinChannel(null, sweetRoomId, null, int.parse(myAgoraUid));
 
     //关闭本地声音
     await engine!.muteLocalAudioStream(false);
@@ -181,9 +177,8 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
     ];
     return MaterialApp(
       home: Scaffold(
-        //appBar: AppBar(),
         body: Stack(
-          children: [
+          children: <Widget>[
             Consumer<sweetProvider>(builder: (context, _sweetProvider, child) {
               return Stack(children: <Widget>[
                 _sweetProvider.vdoSta == false
@@ -203,7 +198,7 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
 
                 Positioned(
                   //共同都有 appbar
-                  top: 28,
+                  top: MediaQuery.of(context).padding.top,
                   left: 0,
                   right: 0,
                   child: Container(
@@ -231,11 +226,13 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
                                             width: 1,
                                             color: Colors.transparent,
                                           )),
-                                      child: Text(
+                                      child: Center(
+                                          child: Text(
                                         _sweetProvider.anchorName,
-                                        textAlign: TextAlign.left,
-                                        style: TextStyle(fontSize: 25),
-                                      )),
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                            fontSize: 30, color: Colors.white),
+                                      ))),
                                   Container(
                                     height: 70,
                                     width: 100,
@@ -251,7 +248,16 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
                                         color: Colors.transparent,
                                       ),
                                     ),
-                                  ),
+                                    child: TextButton(
+                                      onPressed: () async {
+                                        (await _showUserList(context));
+                                      },
+                                      child: Text(_sweetProvider.audienceCount,
+                                          style: TextStyle(
+                                              fontSize: 30,
+                                              color: Colors.black)),
+                                    ),
+                                  )
                                 ],
                               ),
                               Row(
@@ -300,9 +306,6 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
                             icon: Icon(Icons.clear,
                                 color: Colors.black), //Icons.arrow_back
                             onPressed: () {
-                              if (identity==true){
-                                myRoomSeatIndex=0;
-                              }
                               final builder = MqttClientPayloadBuilder();
                               builder.addString(
                                   "leaveRoom," + identity.toString());
@@ -744,5 +747,26 @@ Future<Future<String?>> userInfo(BuildContext context, account) async {
         ],
       );
     },
+  );
+}
+
+_showUserList(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    builder: (context) => Container(
+      child: ListView(
+          children: List.generate(
+        10,
+        (index) => InkWell(
+            child: Container(
+                alignment: Alignment.center,
+                height: 60.0,
+                child: Text('Item ${index + 1}')),
+            onTap: () {
+              //Navigator.pop(context);
+            }),
+      )),
+      //height: 500,
+    ),
   );
 }

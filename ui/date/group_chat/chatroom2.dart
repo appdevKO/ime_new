@@ -127,7 +127,7 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  //拿來對齊
+                  //拿來對齊 出去
                   IconButton(
                       icon: Icon(
                         Icons.arrow_back,
@@ -662,6 +662,13 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
         ),
       ),
       onWillPop: () async {
+        //離開群聊聊天室時
+        Provider.of<ChatProvider>(context, listen: false)
+            .msglist![topicindex!]
+            .msg = [];
+        // 清空memberlist
+        Provider.of<ChatProvider>(context, listen: false)
+            .memberlist = [];
         Provider.of<ChatProvider>(context, listen: false).getgroupteam();
         Provider.of<ChatProvider>(context, listen: false).getgroupperson();
         Provider.of<ChatProvider>(context, listen: false).change_redpoint(2);

@@ -22,6 +22,7 @@ class _SweetLiveListState extends State<SweetLiveList> {
   var count;
   String avatar = "https://i.ibb.co/cFFSzdK/sex-man.png";
   String nickName = "";
+  String memberId = "";
   @override
   Widget build(BuildContext context) {
     return Consumer<sweetProvider>(builder: (context, _sweetProvider, child) {
@@ -40,8 +41,9 @@ class _SweetLiveListState extends State<SweetLiveList> {
             }
           } else {
             avatar = ChatProvider1.remoteUserInfo[0].avatar;
-            nickName = ChatProvider1.remoteUserInfo[0].nickname;
           }
+          nickName = ChatProvider1.remoteUserInfo[0].nickname;
+          memberId = ChatProvider1.remoteUserInfo[0].id;
         } catch (err) {}
         return count != 0
             ? Stack(
@@ -76,6 +78,8 @@ class _SweetLiveListState extends State<SweetLiveList> {
                                         ('"${avatar}"');
                                     audienceJson['"nickname"'] =
                                         ('"${nickName}"');
+                                    audienceJson['"memberId"'] =
+                                        ('"${memberId}"');
                                     //print(' audienceJson$audienceJson');
                                     sweetRoomId =
                                         _sweetProvider.rooms[index].id;

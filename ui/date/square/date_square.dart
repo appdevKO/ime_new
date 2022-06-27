@@ -3,8 +3,11 @@ import 'package:ime_new/ui/date/square/square_near.dart';
 import 'package:ime_new/ui/date/square/square_new_login.dart';
 import 'package:ime_new/ui/date/square/square_new_register.dart';
 import 'package:ime_new/ui/date/square/square_recommend.dart';
-
-import 'package:swipeable_card_stack/swipeable_card_stack.dart';
+import 'package:ime_new/ui/otherpage/other_profile_page.dart';
+import 'package:ime_new/ui/widget/stack_text.dart';
+import 'package:provider/provider.dart';
+import 'package:ime_new/business_logic/provider/chat_provider.dart';
+import 'package:swiping_card_deck/swiping_card_deck.dart';
 
 //交友廣場 方塊
 class DateSquare extends StatefulWidget {
@@ -17,53 +20,19 @@ class DateSquare extends StatefulWidget {
 class _DateSquareState extends State<DateSquare>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  SwipeableCardSectionController _cardController =
-      SwipeableCardSectionController();
 
-  // List<SwipeItem> _swipeItems = <SwipeItem>[];
-  //
-  // MatchEngine? _matchEngine;
-  // GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
-  // List<String> _names = ["Red", "Blue", "Green", "Yellow", "Orange"];
-  // List<Color> _colors = [
-  //   Colors.red,
-  //   Colors.blue,
-  //   Colors.green,
-  //   Colors.yellow,
-  //   Colors.orange
-  // ];
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
 
   @override
   void initState() {
     _tabController = TabController(length: 4, vsync: this, initialIndex: 0);
-    // for (int i = 0; i < _names.length; i++) {
-    //   _swipeItems.add(SwipeItem(
-    //       content: Content(text: _names[i], color: _colors[i]),
-    //       likeAction: () {
-    //         _scaffoldKey.currentState?.showSnackBar(SnackBar(
-    //           content: Text("Liked ${_names[i]}"),
-    //           duration: Duration(milliseconds: 500),
-    //         ));
-    //       },
-    //       nopeAction: () {
-    //         _scaffoldKey.currentState?.showSnackBar(SnackBar(
-    //           content: Text("Nope ${_names[i]}"),
-    //           duration: Duration(milliseconds: 500),
-    //         ));
-    //       },
-    //       superlikeAction: () {
-    //         _scaffoldKey.currentState?.showSnackBar(SnackBar(
-    //           content: Text("Superliked ${_names[i]}"),
-    //           duration: Duration(milliseconds: 500),
-    //         ));
-    //       },
-    //       onSlideUpdate: (SlideRegion? region) async {
-    //         print("Region $region");
-    //       }));
-    // }
-    //
-    // _matchEngine = MatchEngine(swipeItems: _swipeItems);
+    initData();
     super.initState();
+  }
+
+  Future initData() async {
+    await Provider.of<ChatProvider>(context, listen: false)
+        .find_last_login_people();
   }
 
   @override
@@ -74,157 +43,178 @@ class _DateSquareState extends State<DateSquare>
 
   @override
   Widget build(BuildContext context) {
-    // return Scaffold(
-    //     appBar: PreferredSize(
-    //       preferredSize: new Size(MediaQuery.of(context).size.width, 50),
-    //       child: Container(
-    //         height: 35,
-    //         decoration: new BoxDecoration(color: Colors.white),
-    //         child: TabBar(
-    //           controller: _tabController,
-    //           unselectedLabelColor: Colors.grey,
-    //           labelColor: Colors.red,
-    //           labelStyle: TextStyle(fontSize: 12),
-    //           unselectedLabelStyle: TextStyle(fontSize: 10),
-    //           indicatorColor: Colors.red,
-    //           tabs: [
-    //             Tab(
-    //               text: '推薦會員',
-    //             ),
-    //             Tab(
-    //               text: '最近登入',
-    //             ),
-    //             Tab(
-    //               text: '最新註冊',
-    //             ),
-    //             Tab(
-    //               text: '附近會員',
-    //             ),
-    //           ],
-    //         ),
-    //       ),
-    //     ),
-    //     body: CustomScrollView(slivers: <Widget>[
-    //       SliverFillRemaining(
-    //           child: TabBarView(
-    //         controller: _tabController,
-    //         children: [
-    //           DateRecommend(),
-    //           Datelastlogin(),
-    //           DateNewRegister(),
-    //           DateNear(),
-    //         ],
-    //       )),
-    //     ]));
-
     return Scaffold(
-        body: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-          SwipeableCardsSection(
-            cardController: _cardController,
-            context: context,
-            //add the first 3 cards (widgets)
-            items: [
-              Container(
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    color: Colors.blue,
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.black.withOpacity(.5),
-                          offset: Offset(0.0, 2.0), //陰影y軸偏移量
-                          blurRadius: 1, //陰影模糊程度
-                          spreadRadius: 1 //陰影擴散程度
-                          )
-                    ]),
-                height: 400,
-                width: 300,
-                child: Text('111'),
-              ),
-              Container(
-                height: 400,
-                width: 300,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    color: Colors.pink,
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.black.withOpacity(.5),
-                          offset: Offset(0.0, 2.0), //陰影y軸偏移量
-                          blurRadius: 1, //陰影模糊程度
-                          spreadRadius: 1 //陰影擴散程度
-                          )
-                    ]),
-                child: Text('222'),
-              ),
-              Container(
-                height: 400,
-                width: 300,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    color: Colors.red,
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.black.withOpacity(.5),
-                          offset: Offset(0.0, 2.0), //陰影y軸偏移量
-                          blurRadius: 1, //陰影模糊程度
-                          spreadRadius: 1 //陰影擴散程度
-                          )
-                    ]),
-                child: Text('333'),
-              ),
-              Container(
-                height: 400,
-                width: 300,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    color: Colors.yellow,
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.black.withOpacity(.5),
-                          offset: Offset(0.0, 2.0), //陰影y軸偏移量
-                          blurRadius: 1, //陰影模糊程度
-                          spreadRadius: 1 //陰影擴散程度
-                          )
-                    ]),
-                child: Text('555'),
-              ),
-              // CardView(text: "First card"),
-              // CardView(text: "Second card"),
-              // CardView(text: "Third card"),
-            ],
-            //Get card swipe event callbacks
-            onCardSwiped: (dir, index, widget) {
-              //Add the next card using _cardController
-              _cardController.addItem(
-                Container(
-                  height: 400,
-                  width: 300,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      color: Colors.blue,
-                      boxShadow: [
-                        BoxShadow(
-                            color: Colors.black.withOpacity(.5),
-                            offset: Offset(0.0, 2.0), //陰影y軸偏移量
-                            blurRadius: 1, //陰影模糊程度
-                            spreadRadius: 1 //陰影擴散程度
-                            )
-                      ]),
-                  child: Text('下一章'),
-                ),
-              );
-
-              //Take action on the swiped widget based on the direction of swipe
-              //Return false to not animate cards
-            },
-            //
-            enableSwipeUp: true,
-            enableSwipeDown: false,
-          ),
-          //other children
-        ]));
+        body: Consumer<ChatProvider>(builder: (context, value, child) {
+      return Container(
+          child: value.last_login_memberlist != null
+              //    卡牌
+              ? SwipingCardDeck(
+                  message: Container(
+                    height: 20,
+                    width: 20,
+                    color: Colors.transparent,
+                  ),
+                  cardDeck: List<Card>.generate(
+                      value.last_login_memberlist!.length,
+                      (i) => Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(20)),
+                            ),
+                            child: GestureDetector(
+                              child: Container(
+                                  height:
+                                      MediaQuery.of(context).size.height * .75,
+                                  width: MediaQuery.of(context).size.width - 50,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
+                                    color: Colors.grey,
+                                    image: DecorationImage(
+                                        image: NetworkImage(
+                                            '${value.last_login_memberlist![i].avatar}'),
+                                        fit: BoxFit.cover),
+                                  ),
+                                  child: Center(
+                                      child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Container(
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                .27,
+                                        width:
+                                            MediaQuery.of(context).size.width -
+                                                50,
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                              colors: [
+                                                Colors.black,
+                                                Colors.transparent,
+                                              ],
+                                              begin: Alignment.bottomCenter,
+                                              end: Alignment.topCenter),
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(20)),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 25.0),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Container(
+                                                height: MediaQuery.of(context)
+                                                        .size
+                                                        .height *
+                                                    .064,
+                                              ),
+                                              Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.end,
+                                                children: [
+                                                  Text(
+                                                    value
+                                                                    .last_login_memberlist![
+                                                                        i]
+                                                                    .nickname ==
+                                                                null ||
+                                                            value.last_login_memberlist![i]
+                                                                    .nickname ==
+                                                                ''
+                                                        ? '不詳'
+                                                        : '${value.last_login_memberlist![i].nickname}',
+                                                    style: TextStyle(
+                                                        fontSize: 30,
+                                                        color: Colors.white,
+                                                        fontWeight:
+                                                            FontWeight.w700),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 20.0),
+                                                    child: Text(
+                                                      value
+                                                                      .last_login_memberlist![
+                                                                          i]
+                                                                      .birthday ==
+                                                                  null ||
+                                                              value.last_login_memberlist![i]
+                                                                      .birthday ==
+                                                                  ''
+                                                          ? '不詳'
+                                                          : '${DateTime.now().year - value.last_login_memberlist![i].birthday.year}',
+                                                      style: TextStyle(
+                                                        fontSize: 26,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              Text(
+                                                value.last_login_memberlist![i]
+                                                                .area ==
+                                                            null ||
+                                                        value.last_login_memberlist![i]
+                                                                .area ==
+                                                            ''
+                                                    ? '不詳'
+                                                    : '${value.last_login_memberlist![i].area}',
+                                                style: TextStyle(
+                                                  fontSize: 26,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ))),
+                              onTap: () {
+                                if (value.last_login_memberlist![i].account !=
+                                    value.remoteUserInfo[0].account) {
+                                  //成員橫排 點 單一頭像
+                                  // 改成先進簡介
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              OtherProfilePage(
+                                                chatroomid: value
+                                                    .last_login_memberlist![i]
+                                                    .memberid,
+                                              )));
+                                } else {
+                                  print('同一人');
+                                }
+                              },
+                            ),
+                          )),
+                  //原本是滑完觸發 改為 最後第三張 觸發 補卡片
+                  onDeckEmpty: () =>
+                      Provider.of<ChatProvider>(context, listen: false)
+                          .addpage_find_last_login_people(),
+                  onLeftSwipe:
+                      (Card card, List<Card> cardDeck, int cardsSwiped) =>
+                          debugPrint("Swiped left!"),
+                  onRightSwipe:
+                      (Card card, List<Card> cardDeck, int cardsSwiped) =>
+                          debugPrint("Swiped right!"),
+                  swipeThreshold: MediaQuery.of(context).size.width / 4,
+                  minimumVelocity: 1000,
+                  cardWidth: 200,
+                  rotationFactor: 0.8 / 3.14,
+                  swipeAnimationDuration: const Duration(milliseconds: 100),
+                )
+              : Container(
+                  child: Center(
+                    child: Text('目前沒有人'),
+                  ),
+                ));
+    }));
   }
 }
 

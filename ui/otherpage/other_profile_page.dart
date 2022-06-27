@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:ime_new/business_logic/provider/chat_provider.dart';
 import 'package:ime_new/ui/date/one2one_chat/o2ochatroom.dart';
@@ -23,6 +24,8 @@ class OtherProfilePage extends StatefulWidget {
 
 class _OtherProfilePagePageState extends State<OtherProfilePage> {
   late TabController _tabController;
+  int _current = 0;
+  final CarouselController _controller = CarouselController();
 
   @override
   void initState() {
@@ -54,64 +57,111 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
       child: Scaffold(
         body: Stack(
           children: [
-            TabBarView( physics: NeverScrollableScrollPhysics(),
+            TabBarView(
+              physics: NeverScrollableScrollPhysics(),
               controller: _tabController,
               children: [
                 Stack(
                   children: [
-                    //背景
+                    //最底下 決定範圍 背景
                     Container(
-                      height: MediaQuery.of(context).size.height-66,
+                      height: MediaQuery.of(context).size.height - 66,
                       width: MediaQuery.of(context).size.width,
                       color: Colors.grey,
                       // child: Text('封面 ${widget.chatroomid}'),
                     ),
+                    //背景照片
                     Positioned(
                       top: 0,
                       child: Consumer<ChatProvider>(
                         builder: (context, value, child) {
                           return Container(
-                            height:
-                                MediaQuery.of(context).size.height * .5,
+                            height: MediaQuery.of(context).size.height * .5,
                             width: MediaQuery.of(context).size.width,
-                            child: CachedNetworkImage(
-                              width: 100,
-                              height: 50,
-                              fit: BoxFit.cover,
-                              imageUrl: default_cover,
-                              imageBuilder: (context, imageProvider) =>
+                            child: CarouselSlider.builder(
+                              options: CarouselOptions(
+                                  height: 400.0,
+                                  viewportFraction: 1.0, //放最大
+                                  onPageChanged: (index, reason) {
+                                    setState(() {
+                                      _current = index;
+                                    });
+                                  }),
+                              carouselController: _controller,
+                              itemBuilder: (BuildContext context, int itemIndex,
+                                      int pageViewIndex) =>
                                   Container(
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    image: value.o2omemberlist != null &&
-                                            value.o2omemberlist!
-                                                .isNotEmpty &&
-                                            value.o2omemberlist![0]
-                                                    .avatar_sub !=
-                                                null &&
-                                            value.o2omemberlist![0]
-                                                    .avatar_sub !=
-                                                ''
-                                        ? NetworkImage(
-                                            '${value.o2omemberlist![0].avatar_sub}')
-                                        : AssetImage(
-                                                'assets/default/sex_man.png')
-                                            as ImageProvider,
-                                    fit: BoxFit.cover,
-                                  ),
+                                height: 400,
+                                width: MediaQuery.of(context).size.width,
+                                color: Colors.grey,
+                                child: ClipRRect(
+                                  child: value.o2omemberlist![0]
+                                                  .little_profilepic_list[
+                                              itemIndex] !=
+                                          ''
+                                      ? Image.network(
+                                          value.o2omemberlist![0]
+                                                  .little_profilepic_list[
+                                              itemIndex],
+                                          fit: BoxFit.cover,
+                                        )
+                                      : Center(child: Text('無照片')),
                                 ),
                               ),
-                              progressIndicatorBuilder: (context, url,
-                                      downloadProgress) =>
-                                  CircularProgressIndicator(
-                                      value: downloadProgress.progress),
-                              // errorWidget: (context, url, error) =>
-                              //     Text('沒有封面圖'),
+                              itemCount: value.o2omemberlist![0]
+                                  .little_profilepic_list.length,
                             ),
                           );
                         },
                       ),
                     ),
+                    // Positioned(
+                    //   top: 0,
+                    //   child: Consumer<ChatProvider>(
+                    //     builder: (context, value, child) {
+                    //       return Container(
+                    //         height:
+                    //             MediaQuery.of(context).size.height * .5,
+                    //         width: MediaQuery.of(context).size.width,
+                    //         child: CachedNetworkImage(
+                    //           width: 100,
+                    //           height: 50,
+                    //           fit: BoxFit.cover,
+                    //           imageUrl: default_cover,
+                    //           imageBuilder: (context, imageProvider) =>
+                    //               Container(
+                    //             decoration: BoxDecoration(
+                    //               image: DecorationImage(
+                    //                 image: value.o2omemberlist != null &&
+                    //                         value.o2omemberlist!
+                    //                             .isNotEmpty &&
+                    //                         value.o2omemberlist![0]
+                    //                                 .avatar !=
+                    //                             null &&
+                    //                         value.o2omemberlist![0]
+                    //                                 .avatar !=
+                    //                             ''
+                    //                     ? NetworkImage(
+                    //                         '${value.o2omemberlist![0].avatar}')
+                    //                     : AssetImage(
+                    //                             'assets/default/sex_man.png')
+                    //                         as ImageProvider,
+                    //                 fit: BoxFit.cover,
+                    //               ),
+                    //             ),
+                    //           ),
+                    //           progressIndicatorBuilder: (context, url,
+                    //                   downloadProgress) =>
+                    //               CircularProgressIndicator(
+                    //                   value: downloadProgress.progress),
+                    //           // errorWidget: (context, url, error) =>
+                    //           //     Text('沒有封面圖'),
+                    //         ),
+                    //       );
+                    //     },
+                    //   ),
+                    // ),
+
                     Positioned(
                       top: MediaQuery.of(context).size.height * .42,
                       child: Container(
@@ -125,15 +175,14 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                             )),
                         child: Padding(
                           padding: const EdgeInsets.only(
-                            top: 60.0,
+                            top: 20.0,
                             left: 15,
                             right: 15,
-                            bottom: 50.0,
+                            bottom: 80.0,
                           ),
                           child: SingleChildScrollView(
                             child: Column(
-                              crossAxisAlignment:
-                                  CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
                                   children: [
@@ -141,20 +190,18 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                                       child: Text(
                                         '名字: ',
                                         style: TextStyle(
-                                            color: Colors.brown,
-                                            fontSize: 16),
+                                            color: Colors.brown, fontSize: 16),
                                       ),
                                       onTap: () {
                                         Provider.of<ChatProvider>(context,
                                                 listen: false)
-                                            .getuserInfo(
-                                                widget.chatroomid);
+                                            .getuserInfo(widget.chatroomid);
                                       },
                                     ),
                                     Consumer<ChatProvider>(
                                         builder: (context, value, child) {
-                                      return Text(value.o2omemberlist![0]
-                                                  .nickname !=
+                                      return Text(value
+                                                  .o2omemberlist![0].nickname !=
                                               null
                                           ? '${value.o2omemberlist![0].nickname}'
                                           : '不詳');
@@ -166,8 +213,7 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Padding(
-                                      padding:
-                                          const EdgeInsets.only(top: 8.0),
+                                      padding: const EdgeInsets.only(top: 8.0),
                                       child: Row(
                                         children: [
                                           Text(
@@ -176,10 +222,9 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                                                 color: Colors.brown,
                                                 fontSize: 16),
                                           ),
-                                          Consumer<ChatProvider>(builder:
-                                              (context, value, child) {
-                                            return Text(value
-                                                        .o2omemberlist![0]
+                                          Consumer<ChatProvider>(
+                                              builder: (context, value, child) {
+                                            return Text(value.o2omemberlist![0]
                                                         .introduction !=
                                                     null
                                                 ? '${value.o2omemberlist![0].introduction}'
@@ -195,12 +240,10 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                                           size: 15,
                                           color: Colors.grey,
                                         ),
-                                        Consumer<ChatProvider>(builder:
-                                            (context, value, child) {
+                                        Consumer<ChatProvider>(
+                                            builder: (context, value, child) {
                                           return Text(
-                                            value.o2omemberlist![0]
-                                                        .area !=
-                                                    null
+                                            value.o2omemberlist![0].area != null
                                                 ? '${ChineseHelper.convertToTraditionalChinese(value.o2omemberlist![0].area)}'
                                                 : '不詳',
                                             style: TextStyle(
@@ -216,8 +259,7 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                                   height: 10,
                                 ),
                                 Padding(
-                                  padding:
-                                      const EdgeInsets.only(top: 8.0),
+                                  padding: const EdgeInsets.only(top: 8.0),
                                   child: Row(
                                     children: [
                                       Icon(
@@ -226,33 +268,28 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                                       ),
                                       Text('誰喜歡我'),
                                       Padding(
-                                        padding: const EdgeInsets.only(
-                                            left: 8.0),
+                                        padding:
+                                            const EdgeInsets.only(left: 8.0),
                                         child: Consumer<ChatProvider>(
-                                            builder:
-                                                (context, value, child) {
-                                          return Text(
-                                              '${value.num_likeme}');
+                                            builder: (context, value, child) {
+                                          return Text('${value.num_likeme}');
                                         }),
                                       )
                                     ],
                                   ),
                                 ),
                                 Padding(
-                                  padding:
-                                      const EdgeInsets.only(top: 8.0),
+                                  padding: const EdgeInsets.only(top: 8.0),
                                   child: Row(
                                     children: [
                                       Text(
                                         '體型: ',
-                                        style: TextStyle(
-                                            color: Colors.brown),
+                                        style: TextStyle(color: Colors.brown),
                                       ),
-                                      Consumer<ChatProvider>(builder:
-                                          (context, value, child) {
+                                      Consumer<ChatProvider>(
+                                          builder: (context, value, child) {
                                         return Text(value
-                                                    .o2omemberlist![0]
-                                                    .size !=
+                                                    .o2omemberlist![0].size !=
                                                 null
                                             ? '${value.o2omemberlist![0].size}'
                                             : '不詳');
@@ -261,19 +298,16 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                                   ),
                                 ),
                                 Padding(
-                                  padding:
-                                      const EdgeInsets.only(top: 8.0),
+                                  padding: const EdgeInsets.only(top: 8.0),
                                   child: Row(
                                     children: [
                                       Text(
                                         '個性: ',
-                                        style: TextStyle(
-                                            color: Colors.brown),
+                                        style: TextStyle(color: Colors.brown),
                                       ),
-                                      Consumer<ChatProvider>(builder:
-                                          (context, value, child) {
-                                        return Text(value
-                                                    .o2omemberlist![0]
+                                      Consumer<ChatProvider>(
+                                          builder: (context, value, child) {
+                                        return Text(value.o2omemberlist![0]
                                                     .personality !=
                                                 null
                                             ? '${value.o2omemberlist![0].personality}'
@@ -283,19 +317,16 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                                   ),
                                 ),
                                 Padding(
-                                  padding:
-                                      const EdgeInsets.only(top: 8.0),
+                                  padding: const EdgeInsets.only(top: 8.0),
                                   child: Row(
                                     children: [
                                       Text(
                                         '職業: ',
-                                        style: TextStyle(
-                                            color: Colors.brown),
+                                        style: TextStyle(color: Colors.brown),
                                       ),
-                                      Consumer<ChatProvider>(builder:
-                                          (context, value, child) {
-                                        return Text(value
-                                                    .o2omemberlist![0]
+                                      Consumer<ChatProvider>(
+                                          builder: (context, value, child) {
+                                        return Text(value.o2omemberlist![0]
                                                     .profession !=
                                                 null
                                             ? '${value.o2omemberlist![0].profession}'
@@ -305,20 +336,17 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                                   ),
                                 ),
                                 Padding(
-                                  padding:
-                                      const EdgeInsets.only(top: 8.0),
+                                  padding: const EdgeInsets.only(top: 8.0),
                                   child: Row(
                                     children: [
                                       Text(
                                         '居住地區: ',
-                                        style: TextStyle(
-                                            color: Colors.brown),
+                                        style: TextStyle(color: Colors.brown),
                                       ),
-                                      Consumer<ChatProvider>(builder:
-                                          (context, value, child) {
+                                      Consumer<ChatProvider>(
+                                          builder: (context, value, child) {
                                         return Text(value
-                                                    .o2omemberlist![0]
-                                                    .area !=
+                                                    .o2omemberlist![0].area !=
                                                 null
                                             ? '${ChineseHelper.convertToTraditionalChinese(value.o2omemberlist![0].area)}'
                                             : '不詳');
@@ -327,20 +355,17 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                                   ),
                                 ),
                                 Padding(
-                                  padding:
-                                      const EdgeInsets.only(top: 8.0),
+                                  padding: const EdgeInsets.only(top: 8.0),
                                   child: Row(
                                     children: [
                                       Text(
                                         '我的約會安排: ',
-                                        style: TextStyle(
-                                            color: Colors.brown),
+                                        style: TextStyle(color: Colors.brown),
                                       ),
-                                      Consumer<ChatProvider>(builder:
-                                          (context, value, child) {
+                                      Consumer<ChatProvider>(
+                                          builder: (context, value, child) {
                                         return Text(value
-                                                    .o2omemberlist![0]
-                                                    .date !=
+                                                    .o2omemberlist![0].date !=
                                                 null
                                             ? '${value.o2omemberlist![0].date}'
                                             : '不詳');
@@ -349,20 +374,17 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                                   ),
                                 ),
                                 Padding(
-                                  padding:
-                                      const EdgeInsets.only(top: 8.0),
+                                  padding: const EdgeInsets.only(top: 8.0),
                                   child: Row(
                                     children: [
                                       Text(
                                         '零用錢預算:',
-                                        style: TextStyle(
-                                            color: Colors.brown),
+                                        style: TextStyle(color: Colors.brown),
                                       ),
-                                      Consumer<ChatProvider>(builder:
-                                          (context, value, child) {
+                                      Consumer<ChatProvider>(
+                                          builder: (context, value, child) {
                                         return Text(value
-                                                    .o2omemberlist![0]
-                                                    .money !=
+                                                    .o2omemberlist![0].money !=
                                                 null
                                             ? '${value.o2omemberlist![0].money}'
                                             : '不詳');
@@ -371,19 +393,16 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                                   ),
                                 ),
                                 Padding(
-                                  padding:
-                                      const EdgeInsets.only(top: 8.0),
+                                  padding: const EdgeInsets.only(top: 8.0),
                                   child: Row(
                                     children: [
                                       Text(
                                         '我在尋找: ',
-                                        style: TextStyle(
-                                            color: Colors.brown),
+                                        style: TextStyle(color: Colors.brown),
                                       ),
-                                      Consumer<ChatProvider>(builder:
-                                          (context, value, child) {
-                                        return Text(value
-                                                    .o2omemberlist![0]
+                                      Consumer<ChatProvider>(
+                                          builder: (context, value, child) {
+                                        return Text(value.o2omemberlist![0]
                                                     .lookfor !=
                                                 null
                                             ? '${value.o2omemberlist![0].lookfor}'
@@ -393,19 +412,16 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                                   ),
                                 ),
                                 Padding(
-                                  padding:
-                                      const EdgeInsets.only(top: 8.0),
+                                  padding: const EdgeInsets.only(top: 8.0),
                                   child: Row(
                                     children: [
                                       Text(
                                         '學歷:',
-                                        style: TextStyle(
-                                            color: Colors.brown),
+                                        style: TextStyle(color: Colors.brown),
                                       ),
-                                      Consumer<ChatProvider>(builder:
-                                          (context, value, child) {
-                                        return Text(value
-                                                    .o2omemberlist![0]
+                                      Consumer<ChatProvider>(
+                                          builder: (context, value, child) {
+                                        return Text(value.o2omemberlist![0]
                                                     .education !=
                                                 null
                                             ? '${value.o2omemberlist![0].education}'
@@ -415,19 +431,16 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                                   ),
                                 ),
                                 Padding(
-                                  padding:
-                                      const EdgeInsets.only(top: 8.0),
+                                  padding: const EdgeInsets.only(top: 8.0),
                                   child: Row(
                                     children: [
                                       Text(
                                         '慣用語言:',
-                                        style: TextStyle(
-                                            color: Colors.brown),
+                                        style: TextStyle(color: Colors.brown),
                                       ),
-                                      Consumer<ChatProvider>(builder:
-                                          (context, value, child) {
-                                        return Text(value
-                                                    .o2omemberlist![0]
+                                      Consumer<ChatProvider>(
+                                          builder: (context, value, child) {
+                                        return Text(value.o2omemberlist![0]
                                                     .language !=
                                                 null
                                             ? '${value.o2omemberlist?[0].language}'
@@ -437,20 +450,17 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                                   ),
                                 ),
                                 Padding(
-                                  padding:
-                                      const EdgeInsets.only(top: 8.0),
+                                  padding: const EdgeInsets.only(top: 8.0),
                                   child: Row(
                                     children: [
                                       Text(
                                         '吸菸習慣:',
-                                        style: TextStyle(
-                                            color: Colors.brown),
+                                        style: TextStyle(color: Colors.brown),
                                       ),
-                                      Consumer<ChatProvider>(builder:
-                                          (context, value, child) {
+                                      Consumer<ChatProvider>(
+                                          builder: (context, value, child) {
                                         return Text(value
-                                                    .o2omemberlist![0]
-                                                    .smoke !=
+                                                    .o2omemberlist![0].smoke !=
                                                 null
                                             ? '${value.o2omemberlist![0].smoke}'
                                             : '不詳');
@@ -459,20 +469,17 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                                   ),
                                 ),
                                 Padding(
-                                  padding:
-                                      const EdgeInsets.only(top: 8.0),
+                                  padding: const EdgeInsets.only(top: 8.0),
                                   child: Row(
                                     children: [
                                       Text(
                                         '飲酒習慣:',
-                                        style: TextStyle(
-                                            color: Colors.brown),
+                                        style: TextStyle(color: Colors.brown),
                                       ),
-                                      Consumer<ChatProvider>(builder:
-                                          (context, value, child) {
+                                      Consumer<ChatProvider>(
+                                          builder: (context, value, child) {
                                         return Text(value
-                                                    .o2omemberlist![0]
-                                                    .drink !=
+                                                    .o2omemberlist![0].drink !=
                                                 null
                                             ? '${value.o2omemberlist![0].drink}'
                                             : '不詳');
@@ -512,10 +519,17 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                                               listen: false)
                                           .easyhi(
                                               widget.chatroomid,
-                                              value.o2omemberlist![0]
-                                                  .nickname,
-                                              value.o2omemberlist![0]
-                                                  .avatar_sub);
+                                              value.o2omemberlist![0].nickname,
+                                              value
+                                                  .o2omemberlist![0].avatar_sub)
+                                          .then((value) {
+                                        if (!value) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(SnackBar(
+                                            content: Text("快到交友設定設置你的打招呼"),
+                                          ));
+                                        }
+                                      });
                                     });
                               }),
                             ),
@@ -550,8 +564,7 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                             Consumer<ChatProvider>(
                                 builder: (context, value, child) {
                               return Padding(
-                                padding:
-                                    const EdgeInsets.only(right: 15.0),
+                                padding: const EdgeInsets.only(right: 15.0),
                                 child: GestureDetector(
                                   child: CircleAvatar(
                                       child: Container(
@@ -572,8 +585,7 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                                       Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                              builder: (context) =>
-                                                  O2OChatroom(
+                                              builder: (context) => O2OChatroom(
                                                     memberid: value
                                                         .remoteUserInfo[0]
                                                         .memberid,
@@ -598,15 +610,12 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                                 builder: (context, value, child) {
                               return GestureDetector(
                                 child: CircleAvatar(
-                                  backgroundColor: value.myfollowlog !=
-                                          null
-                                      ? value.myfollowlog[0].list_id !=
-                                              null
+                                  backgroundColor: value.myfollowlog != null
+                                      ? value.myfollowlog[0].list_id != null
                                           ? value.myfollowlog[0].list_id
                                                       .indexWhere((element) =>
                                                           element ==
-                                                          widget
-                                                              .chatroomid) !=
+                                                          widget.chatroomid) !=
                                                   -1
                                               ? Color(0xfffff2b0)
                                               : Color(0xffe3e3e3)
@@ -615,14 +624,12 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                                   child: Icon(
                                     Icons.favorite,
                                     color: value.myfollowlog != null
-                                        ? value.myfollowlog[0].list_id !=
-                                                null
+                                        ? value.myfollowlog[0].list_id != null
                                             ? value.myfollowlog[0].list_id
-                                                        .indexWhere(
-                                                            (element) =>
-                                                                element ==
-                                                                widget
-                                                                    .chatroomid) !=
+                                                        .indexWhere((element) =>
+                                                            element ==
+                                                            widget
+                                                                .chatroomid) !=
                                                     -1
                                                 ? Colors.red
                                                 : Colors.grey
@@ -632,8 +639,7 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                                 ),
                                 onTap: () async {
                                   value.addfollowlog(widget.chatroomid);
-                                  value
-                                      .find_who_likeme(widget.chatroomid);
+                                  value.find_who_likeme(widget.chatroomid);
                                   // await value.getmemberinfo(
                                   //     widget.chatroomid.toHexString());
                                 },
@@ -643,7 +649,10 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                         )),
                   ],
                 ),
-                OtherActionPage(memberid: widget.chatroomid,type: 1,)
+                OtherActionPage(
+                  memberid: widget.chatroomid,
+                  type: 1,
+                )
               ],
             ),
             Container(

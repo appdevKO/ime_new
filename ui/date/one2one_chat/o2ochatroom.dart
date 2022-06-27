@@ -1137,6 +1137,19 @@ class _O2OChatroomState extends State<O2OChatroom> {
                                               )
                                             : Container(),
                           ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      child: Text(
+                        //時間
+                        msg.time == null
+                            ? ''
+                            : " ${DateFormat('yyyy/MM/dd  KK:mm a').format(msg.time!)}",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 8,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
                 SizedBox(

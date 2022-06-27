@@ -73,18 +73,6 @@ class _MyProfilePageState extends State<MyProfilePage> {
                       top: 0,
                       child: Consumer<ChatProvider>(
                         builder: (context, value, child) {
-                          // return Container(
-                          //   height: MediaQuery.of(context).size.height * .5,
-                          //   width: MediaQuery.of(context).size.width,
-                          //   decoration: BoxDecoration(
-                          //     color: Colors.grey,
-                          //     image: DecorationImage(
-                          //       image: NetworkImage(
-                          //           '${value.remoteUserInfo[0].avatar_sub}'),
-                          //       fit: BoxFit.cover,
-                          //     ),
-                          //   ),child: Text('${value.remoteUserInfo[0].profilepic_list}'),
-                          // );
                           return Container(
                             height: MediaQuery.of(context).size.height * .5,
                             width: MediaQuery.of(context).size.width,
@@ -138,10 +126,10 @@ class _MyProfilePageState extends State<MyProfilePage> {
                             )),
                         child: Padding(
                           padding: const EdgeInsets.only(
-                            top: 50.0,
+                            top: 20.0,
                             left: 15,
                             right: 15,
-                            bottom: 50.0,
+                            bottom: 80.0,
                           ),
                           child: SingleChildScrollView(
                             child: Column(
