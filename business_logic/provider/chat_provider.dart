@@ -1253,7 +1253,10 @@ class ChatProvider with ChangeNotifier {
 
   int action_count = 0;
 
-  Future get_action_msg_count(id, type,) async {
+  Future get_action_msg_count(
+    id,
+    type,
+  ) async {
     print('獲得動態留言數量 $id');
     var result = await getcount(
       'action_msg',
@@ -1262,7 +1265,6 @@ class ChatProvider with ChangeNotifier {
     );
 
     if (result is int) {
-
       if (type == 2) {
         //detail page
         action_count = result;
@@ -1276,8 +1278,8 @@ class ChatProvider with ChangeNotifier {
         }
       } else if (type == 3) {
         // favorite list page 更新
-        var index =
-            favorite_actionlist?.indexWhere((element) => element.action.id == id);
+        var index = favorite_actionlist
+            ?.indexWhere((element) => element.action.id == id);
         if (index is int && index != -1) {
           favorite_actionlist![index].action.msg_num = result;
         }
@@ -1371,7 +1373,7 @@ class ChatProvider with ChangeNotifier {
     // notifyListeners();
   }
 
-  Future like_to_action(action_id, index, islike,TheAction) async {
+  Future like_to_action(action_id, index, islike, TheAction) async {
     print('action id $action_id,${remoteUserInfo[0].memberid}');
     if (islike) {
       print(" 要做的動作->取消喜歡 動態");
@@ -1659,6 +1661,13 @@ class ChatProvider with ChangeNotifier {
         }
       }
     });
+  }
+
+  Future getaccountinfo2() async {
+    print('獲得使用者資料 id $account_id');
+    var readresult = await readremotemongodb(DbUserinfoModel.fromJson, 'member',
+        field: mongo.where.eq('account', '6zmS6tPgeFOQwvfUMj3YXVYXIQN2'));
+    print('獲得使用者資料$readresult');
   }
 
   //用topic id 查到 某帳號 資料
@@ -2613,6 +2622,24 @@ class ChatProvider with ChangeNotifier {
     await getaccountinfo();
   }
 
+  Future change_datesetting(distance_range, age_range) async {
+    try {
+      await _mongoDB.updateData_single(
+        "member",
+        "account",
+        account_id,
+        {
+          'distance_range': distance_range,
+          'age_range': age_range,
+        },
+      );
+    } catch (e) {
+      print('上傳圖片失敗  $e');
+    }
+
+    await getaccountinfo();
+  }
+
   List profile_pic = [
     '',
     '',
@@ -2676,9 +2703,39 @@ class ChatProvider with ChangeNotifier {
       }
     }
   }
-
+  Future upload_pic_camera(index) async {
+    print('點擊上傳三張圖片中的$index');
+    var name = 'pic/' + Uuid().v1().toString() + '.png';
+    await pickimg2_camera();
+    if (pickimg_result == null) {
+      print('選檔案 空的');
+    } else {
+      // _imageName = pickimg_result.path!.split('/').last;
+      _imageName = name;
+      print('pickimg_result ${pickimg_result.runtimeType}');
+      // _imageBytes = await pickimg_result!.readAsBytes();
+      _imageBytes = resizeImage(await pickimg_result!.readAsBytes(), 1000);
+      //小圖
+      _subimageBytes = resizeImage(_imageBytes!, 300);
+      waitinglist[index] = true;
+      notifyListeners();
+      try {
+        final response = await api.save2(_imageName!, _imageBytes!);
+        final response2 = await api.save2(
+            _imageName!.split('.').first + '_2.png', _subimageBytes!);
+        print(
+            '圖片在gcp 圖片的位置 ${response.downloadLink}///${response2.downloadLink}');
+        profile_pic[index] = response.downloadLink.toString();
+        little_profile_pic[index] = response2.downloadLink.toString();
+        waitinglist[index] = false;
+        notifyListeners();
+      } catch (e) {
+        print('上傳圖片失敗  $e');
+      }
+    }
+  }
   set_profile_pic() {
-    if (remoteUserInfo[0].little_profilepic_list != null &&
+    if (remoteUserInfo[0].profilepic_list != null &&
         remoteUserInfo[0].little_profilepic_list != null) {
       for (int i = 0;
           i < remoteUserInfo[0].little_profilepic_list.length;
@@ -2794,6 +2851,8 @@ class ChatProvider with ChangeNotifier {
           'voice_introduction': voice_introduction,
           'profile_pic': profile_pic,
           'little_profile_pic': little_profile_pic,
+          'avatar': profile_pic[0],
+          'avatar_sub': little_profile_pic[0],
         },
       );
       print('change_profile ${nickname}');
@@ -3006,12 +3065,12 @@ class ChatProvider with ChangeNotifier {
 
   Future find_last_login_people() async {
     find_last_login_people_value = 1;
-    last_login_memberlist = await readremotemongodb(
-        DbUserinfoModel.fromJson, 'member',
-        field: mongo.where
-            // .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女')
-            .limit(pagesize)
-            .sortBy('lastlogin', descending: true));
+    last_login_memberlist =
+        await readremotemongodb(DbUserinfoModel.fromJson, 'member',
+            field: mongo.where
+                // .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女')
+                .limit(pagesize)
+                .sortBy('lastlogin', descending: true));
     print("find_last_login $last_login_memberlist");
     //把自己刪掉
     last_login_memberlist?.removeWhere(
@@ -3020,7 +3079,6 @@ class ChatProvider with ChangeNotifier {
   }
 
   Future addpage_find_last_login_people() async {
-
     var newpage = await readremotemongodb(DbUserinfoModel.fromJson, 'member',
         field: mongo.where
             .eq('sex', remoteUserInfo[0].sex == '女' ? '男' : '女')

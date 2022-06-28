@@ -108,6 +108,7 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
     client.subscribe("imedot/info", MqttQos.atLeastOnce);
     client.unsubscribe("imedotRoom/" + myRoomId);
     client.unsubscribe("imedotUser/" + myUid);
+
     myUid = getUid();
     client.subscribe("imedotUser/" + myUid, MqttQos.atLeastOnce);
 
@@ -348,13 +349,9 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                   ],
                                                 )),
                                             MqttListen1.pass_view_1
-                                                ? Positioned(
-                                                    right:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .width *
-                                                            0.03,
-                                                    bottom: 30.0,
+                                                ? Align(
+                                                    alignment:
+                                                        Alignment.bottomCenter,
                                                     child: ButtonBar(
                                                       alignment:
                                                           MainAxisAlignment
@@ -363,7 +360,7 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                         IconButton(
                                                           icon: Image.asset(
                                                               'assets/images/tdGame/ok.png'),
-                                                          iconSize: 60,
+                                                          iconSize: 55,
                                                           onPressed: () {
                                                             pushMqtt(
                                                                 "imedotRoom/" +
@@ -393,51 +390,48 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                 ? Align(
                                                     alignment:
                                                         Alignment.bottomCenter,
-                                                    child: Positioned(
-                                                      bottom: 20.0,
-                                                      child: ButtonBar(
-                                                        alignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: <Widget>[
-                                                          IconButton(
-                                                            icon: Image.asset(
-                                                              'assets/images/tdGame/truth.png',
-                                                            ),
-                                                            iconSize: 55,
-                                                            onPressed: () {
-                                                              setState(() {
-                                                                pushMqtt(
-                                                                    "imedotRoom/" +
-                                                                        (myRoomId) +
-                                                                        "/game",
-                                                                    'truth,');
-                                                                MqttListen1
-                                                                        .truth_dare_view_1 =
-                                                                    false;
-                                                              });
-                                                            },
+                                                    child: ButtonBar(
+                                                      alignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: <Widget>[
+                                                        IconButton(
+                                                          icon: Image.asset(
+                                                            'assets/images/tdGame/truth.png',
                                                           ),
-                                                          IconButton(
-                                                            icon: Image.asset(
-                                                              'assets/images/tdGame/dare.png',
-                                                            ),
-                                                            iconSize: 55,
-                                                            onPressed: () {
-                                                              setState(() {
-                                                                pushMqtt(
-                                                                    "imedotRoom/" +
-                                                                        (myRoomId) +
-                                                                        "/game",
-                                                                    'dare,');
-                                                                MqttListen1
-                                                                        .truth_dare_view_1 =
-                                                                    false;
-                                                              });
-                                                            },
+                                                          iconSize: 55,
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              pushMqtt(
+                                                                  "imedotRoom/" +
+                                                                      (myRoomId) +
+                                                                      "/game",
+                                                                  'truth,');
+                                                              MqttListen1
+                                                                      .truth_dare_view_1 =
+                                                                  false;
+                                                            });
+                                                          },
+                                                        ),
+                                                        IconButton(
+                                                          icon: Image.asset(
+                                                            'assets/images/tdGame/dare.png',
                                                           ),
-                                                        ],
-                                                      ),
+                                                          iconSize: 55,
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              pushMqtt(
+                                                                  "imedotRoom/" +
+                                                                      (myRoomId) +
+                                                                      "/game",
+                                                                  'dare,');
+                                                              MqttListen1
+                                                                      .truth_dare_view_1 =
+                                                                  false;
+                                                            });
+                                                          },
+                                                        ),
+                                                      ],
                                                     ),
                                                   )
                                                 : Container(
@@ -445,66 +439,63 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                             MqttListen1.choose_button_view_1
                                                 ? Stack(
                                                     children: [
-                                                      Positioned(
-                                                        bottom: 10.0,
-                                                        child: Align(
-                                                          alignment: Alignment
-                                                              .bottomCenter,
-                                                          child: ButtonBar(
-                                                            alignment:
-                                                                MainAxisAlignment
-                                                                    .center,
-                                                            children: <Widget>[
-                                                              IconButton(
-                                                                icon: Image.asset(
-                                                                    'assets/images/tdGame/2b.png'),
-                                                                iconSize: 40,
-                                                                onPressed: () {
-                                                                  pushMqtt(
-                                                                      "imedotRoom/" +
-                                                                          (myRoomId) +
-                                                                          "/game",
-                                                                      'choose_this,2');
-                                                                  setState(() {
-                                                                    T_D_player =
-                                                                        "2";
-                                                                  });
-                                                                },
-                                                              ),
-                                                              IconButton(
-                                                                icon: Image.asset(
-                                                                    'assets/images/tdGame/3b.png'),
-                                                                iconSize: 40,
-                                                                onPressed: () {
-                                                                  pushMqtt(
-                                                                      "imedotRoom/" +
-                                                                          (myRoomId) +
-                                                                          "/game",
-                                                                      'choose_this,3');
-                                                                  setState(() {
-                                                                    T_D_player =
-                                                                        "3";
-                                                                  });
-                                                                },
-                                                              ),
-                                                              IconButton(
-                                                                icon: Image.asset(
-                                                                    'assets/images/tdGame/4b.png'),
-                                                                iconSize: 40,
-                                                                onPressed: () {
-                                                                  pushMqtt(
-                                                                      "imedotRoom/" +
-                                                                          (myRoomId) +
-                                                                          "/game",
-                                                                      'choose_this,4');
-                                                                  setState(() {
-                                                                    T_D_player =
-                                                                        "4";
-                                                                  });
-                                                                },
-                                                              ),
-                                                            ],
-                                                          ),
+                                                      Align(
+                                                        alignment: Alignment
+                                                            .bottomCenter,
+                                                        child: ButtonBar(
+                                                          alignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: <Widget>[
+                                                            IconButton(
+                                                              icon: Image.asset(
+                                                                  'assets/images/tdGame/2b.png'),
+                                                              iconSize: 10,
+                                                              onPressed: () {
+                                                                pushMqtt(
+                                                                    "imedotRoom/" +
+                                                                        (myRoomId) +
+                                                                        "/game",
+                                                                    'choose_this,2');
+                                                                setState(() {
+                                                                  T_D_player =
+                                                                      "2";
+                                                                });
+                                                              },
+                                                            ),
+                                                            IconButton(
+                                                              icon: Image.asset(
+                                                                  'assets/images/tdGame/3b.png'),
+                                                              iconSize: 10,
+                                                              onPressed: () {
+                                                                pushMqtt(
+                                                                    "imedotRoom/" +
+                                                                        (myRoomId) +
+                                                                        "/game",
+                                                                    'choose_this,3');
+                                                                setState(() {
+                                                                  T_D_player =
+                                                                      "3";
+                                                                });
+                                                              },
+                                                            ),
+                                                            IconButton(
+                                                              icon: Image.asset(
+                                                                  'assets/images/tdGame/4b.png'),
+                                                              iconSize: 10,
+                                                              onPressed: () {
+                                                                pushMqtt(
+                                                                    "imedotRoom/" +
+                                                                        (myRoomId) +
+                                                                        "/game",
+                                                                    'choose_this,4');
+                                                                setState(() {
+                                                                  T_D_player =
+                                                                      "4";
+                                                                });
+                                                              },
+                                                            ),
+                                                          ],
                                                         ),
                                                       )
                                                     ],
@@ -610,13 +601,9 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                     height: 0,
                                                   ),
                                             MqttListen1.pass_view_2
-                                                ? Positioned(
-                                                    right:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .width *
-                                                            0.03,
-                                                    bottom: 30.0,
+                                                ? Align(
+                                                    alignment:
+                                                        Alignment.bottomCenter,
                                                     child: ButtonBar(
                                                       alignment:
                                                           MainAxisAlignment
@@ -625,7 +612,7 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                         IconButton(
                                                           icon: Image.asset(
                                                               'assets/images/tdGame/ok.png'),
-                                                          iconSize: 60,
+                                                          iconSize: 55,
                                                           onPressed: () {
                                                             setState(() {
                                                               pushMqtt(
@@ -659,51 +646,48 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                 ? Align(
                                                     alignment:
                                                         Alignment.bottomCenter,
-                                                    child: Positioned(
-                                                      bottom: 20.0,
-                                                      child: ButtonBar(
-                                                        alignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: <Widget>[
-                                                          IconButton(
-                                                            icon: Image.asset(
-                                                              'assets/images/tdGame/truth.png',
-                                                            ),
-                                                            iconSize: 55,
-                                                            onPressed: () {
-                                                              setState(() {
-                                                                pushMqtt(
-                                                                    "imedotRoom/" +
-                                                                        (myRoomId) +
-                                                                        "/game",
-                                                                    'truth,');
-                                                                MqttListen1
-                                                                        .truth_dare_view_2 =
-                                                                    false;
-                                                              });
-                                                            },
+                                                    child: ButtonBar(
+                                                      alignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: <Widget>[
+                                                        IconButton(
+                                                          icon: Image.asset(
+                                                            'assets/images/tdGame/truth.png',
                                                           ),
-                                                          IconButton(
-                                                            icon: Image.asset(
-                                                              'assets/images/tdGame/dare.png',
-                                                            ),
-                                                            iconSize: 55,
-                                                            onPressed: () {
-                                                              setState(() {
-                                                                pushMqtt(
-                                                                    "imedotRoom/" +
-                                                                        (myRoomId) +
-                                                                        "/game",
-                                                                    'dare,');
-                                                                MqttListen1
-                                                                        .truth_dare_view_2 =
-                                                                    false;
-                                                              });
-                                                            },
+                                                          iconSize: 55,
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              pushMqtt(
+                                                                  "imedotRoom/" +
+                                                                      (myRoomId) +
+                                                                      "/game",
+                                                                  'truth,');
+                                                              MqttListen1
+                                                                      .truth_dare_view_2 =
+                                                                  false;
+                                                            });
+                                                          },
+                                                        ),
+                                                        IconButton(
+                                                          icon: Image.asset(
+                                                            'assets/images/tdGame/dare.png',
                                                           ),
-                                                        ],
-                                                      ),
+                                                          iconSize: 55,
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              pushMqtt(
+                                                                  "imedotRoom/" +
+                                                                      (myRoomId) +
+                                                                      "/game",
+                                                                  'dare,');
+                                                              MqttListen1
+                                                                      .truth_dare_view_2 =
+                                                                  false;
+                                                            });
+                                                          },
+                                                        ),
+                                                      ],
                                                     ),
                                                   )
                                                 : Container(
@@ -711,66 +695,63 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                             MqttListen1.choose_button_view_2
                                                 ? Stack(
                                                     children: [
-                                                      Positioned(
-                                                        bottom: 10.0,
-                                                        child: Align(
-                                                          alignment: Alignment
-                                                              .bottomCenter,
-                                                          child: ButtonBar(
-                                                            alignment:
-                                                                MainAxisAlignment
-                                                                    .center,
-                                                            children: <Widget>[
-                                                              IconButton(
-                                                                icon: Image.asset(
-                                                                    'assets/images/tdGame/1b.png'),
-                                                                iconSize: 40,
-                                                                onPressed: () {
-                                                                  pushMqtt(
-                                                                      "imedotRoom/" +
-                                                                          (myRoomId) +
-                                                                          "/game",
-                                                                      'choose_this,1');
-                                                                  setState(() {
-                                                                    T_D_player =
-                                                                        "1";
-                                                                  });
-                                                                },
-                                                              ),
-                                                              IconButton(
-                                                                icon: Image.asset(
-                                                                    'assets/images/tdGame/3b.png'),
-                                                                iconSize: 40,
-                                                                onPressed: () {
-                                                                  pushMqtt(
-                                                                      "imedotRoom/" +
-                                                                          (myRoomId) +
-                                                                          "/game",
-                                                                      'choose_this,3');
-                                                                  setState(() {
-                                                                    T_D_player =
-                                                                        "3";
-                                                                  });
-                                                                },
-                                                              ),
-                                                              IconButton(
-                                                                icon: Image.asset(
-                                                                    'assets/images/tdGame/4b.png'),
-                                                                iconSize: 40,
-                                                                onPressed: () {
-                                                                  pushMqtt(
-                                                                      "imedotRoom/" +
-                                                                          (myRoomId) +
-                                                                          "/game",
-                                                                      'choose_this,4');
-                                                                  setState(() {
-                                                                    T_D_player =
-                                                                        "4";
-                                                                  });
-                                                                },
-                                                              ),
-                                                            ],
-                                                          ),
+                                                      Align(
+                                                        alignment: Alignment
+                                                            .bottomCenter,
+                                                        child: ButtonBar(
+                                                          alignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: <Widget>[
+                                                            IconButton(
+                                                              icon: Image.asset(
+                                                                  'assets/images/tdGame/1b.png'),
+                                                              iconSize: 10,
+                                                              onPressed: () {
+                                                                pushMqtt(
+                                                                    "imedotRoom/" +
+                                                                        (myRoomId) +
+                                                                        "/game",
+                                                                    'choose_this,1');
+                                                                setState(() {
+                                                                  T_D_player =
+                                                                      "1";
+                                                                });
+                                                              },
+                                                            ),
+                                                            IconButton(
+                                                              icon: Image.asset(
+                                                                  'assets/images/tdGame/3b.png'),
+                                                              iconSize: 10,
+                                                              onPressed: () {
+                                                                pushMqtt(
+                                                                    "imedotRoom/" +
+                                                                        (myRoomId) +
+                                                                        "/game",
+                                                                    'choose_this,3');
+                                                                setState(() {
+                                                                  T_D_player =
+                                                                      "3";
+                                                                });
+                                                              },
+                                                            ),
+                                                            IconButton(
+                                                              icon: Image.asset(
+                                                                  'assets/images/tdGame/4b.png'),
+                                                              iconSize: 10,
+                                                              onPressed: () {
+                                                                pushMqtt(
+                                                                    "imedotRoom/" +
+                                                                        (myRoomId) +
+                                                                        "/game",
+                                                                    'choose_this,4');
+                                                                setState(() {
+                                                                  T_D_player =
+                                                                      "4";
+                                                                });
+                                                              },
+                                                            ),
+                                                          ],
                                                         ),
                                                       ),
                                                     ],
@@ -915,12 +896,9 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                     height: 0,
                                                   ),
                                             MqttListen1.pass_view_3
-                                                ? Positioned(
-                                                    left: MediaQuery.of(context)
-                                                            .size
-                                                            .width *
-                                                        0.045,
-                                                    bottom: 30.0,
+                                                ? Align(
+                                                    alignment:
+                                                        Alignment.bottomCenter,
                                                     child: ButtonBar(
                                                       alignment:
                                                           MainAxisAlignment
@@ -929,7 +907,7 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                         IconButton(
                                                           icon: Image.asset(
                                                               'assets/images/tdGame/ok.png'),
-                                                          iconSize: 60,
+                                                          iconSize: 55,
                                                           onPressed: () {
                                                             setState(() {
                                                               pushMqtt(
@@ -963,51 +941,48 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                 ? Align(
                                                     alignment:
                                                         Alignment.bottomCenter,
-                                                    child: Positioned(
-                                                      bottom: 20.0,
-                                                      child: ButtonBar(
-                                                        alignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: <Widget>[
-                                                          IconButton(
-                                                            icon: Image.asset(
-                                                              'assets/images/tdGame/truth.png',
-                                                            ),
-                                                            iconSize: 55,
-                                                            onPressed: () {
-                                                              setState(() {
-                                                                pushMqtt(
-                                                                    "imedotRoom/" +
-                                                                        (myRoomId) +
-                                                                        "/game",
-                                                                    'truth,');
-                                                                MqttListen1
-                                                                        .truth_dare_view_3 =
-                                                                    false;
-                                                              });
-                                                            },
+                                                    child: ButtonBar(
+                                                      alignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: <Widget>[
+                                                        IconButton(
+                                                          icon: Image.asset(
+                                                            'assets/images/tdGame/truth.png',
                                                           ),
-                                                          IconButton(
-                                                            icon: Image.asset(
-                                                              'assets/images/tdGame/dare.png',
-                                                            ),
-                                                            iconSize: 55,
-                                                            onPressed: () {
-                                                              setState(() {
-                                                                pushMqtt(
-                                                                    "imedotRoom/" +
-                                                                        (myRoomId) +
-                                                                        "/game",
-                                                                    'dare,');
-                                                                MqttListen1
-                                                                        .truth_dare_view_3 =
-                                                                    false;
-                                                              });
-                                                            },
+                                                          iconSize: 55,
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              pushMqtt(
+                                                                  "imedotRoom/" +
+                                                                      (myRoomId) +
+                                                                      "/game",
+                                                                  'truth,');
+                                                              MqttListen1
+                                                                      .truth_dare_view_3 =
+                                                                  false;
+                                                            });
+                                                          },
+                                                        ),
+                                                        IconButton(
+                                                          icon: Image.asset(
+                                                            'assets/images/tdGame/dare.png',
                                                           ),
-                                                        ],
-                                                      ),
+                                                          iconSize: 55,
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              pushMqtt(
+                                                                  "imedotRoom/" +
+                                                                      (myRoomId) +
+                                                                      "/game",
+                                                                  'dare,');
+                                                              MqttListen1
+                                                                      .truth_dare_view_3 =
+                                                                  false;
+                                                            });
+                                                          },
+                                                        ),
+                                                      ],
                                                     ),
                                                   )
                                                 : Container(
@@ -1015,66 +990,63 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                             MqttListen1.choose_button_view_3
                                                 ? Stack(
                                                     children: [
-                                                      Positioned(
-                                                        bottom: 30.0,
-                                                        child: Align(
-                                                          alignment: Alignment
-                                                              .bottomCenter,
-                                                          child: ButtonBar(
-                                                            alignment:
-                                                                MainAxisAlignment
-                                                                    .center,
-                                                            children: <Widget>[
-                                                              IconButton(
-                                                                icon: Image.asset(
-                                                                    'assets/images/tdGame/1b.png'),
-                                                                iconSize: 40,
-                                                                onPressed: () {
-                                                                  pushMqtt(
-                                                                      "imedotRoom/" +
-                                                                          (myRoomId) +
-                                                                          "/game",
-                                                                      'choose_this,1');
-                                                                  setState(() {
-                                                                    T_D_player =
-                                                                        "1";
-                                                                  });
-                                                                },
-                                                              ),
-                                                              IconButton(
-                                                                icon: Image.asset(
-                                                                    'assets/images/tdGame/2b.png'),
-                                                                iconSize: 40,
-                                                                onPressed: () {
-                                                                  pushMqtt(
-                                                                      "imedotRoom/" +
-                                                                          (myRoomId) +
-                                                                          "/game",
-                                                                      'choose_this,2');
-                                                                  setState(() {
-                                                                    T_D_player =
-                                                                        "2";
-                                                                  });
-                                                                },
-                                                              ),
-                                                              IconButton(
-                                                                icon: Image.asset(
-                                                                    'assets/images/tdGame/4b.png'),
-                                                                iconSize: 40,
-                                                                onPressed: () {
-                                                                  pushMqtt(
-                                                                      "imedotRoom/" +
-                                                                          (myRoomId) +
-                                                                          "/game",
-                                                                      'choose_this,4');
-                                                                  setState(() {
-                                                                    T_D_player =
-                                                                        "4";
-                                                                  });
-                                                                },
-                                                              ),
-                                                            ],
-                                                          ),
+                                                      Align(
+                                                        alignment: Alignment
+                                                            .bottomCenter,
+                                                        child: ButtonBar(
+                                                          alignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: <Widget>[
+                                                            IconButton(
+                                                              icon: Image.asset(
+                                                                  'assets/images/tdGame/1b.png'),
+                                                              iconSize: 10,
+                                                              onPressed: () {
+                                                                pushMqtt(
+                                                                    "imedotRoom/" +
+                                                                        (myRoomId) +
+                                                                        "/game",
+                                                                    'choose_this,1');
+                                                                setState(() {
+                                                                  T_D_player =
+                                                                      "1";
+                                                                });
+                                                              },
+                                                            ),
+                                                            IconButton(
+                                                              icon: Image.asset(
+                                                                  'assets/images/tdGame/2b.png'),
+                                                              iconSize: 10,
+                                                              onPressed: () {
+                                                                pushMqtt(
+                                                                    "imedotRoom/" +
+                                                                        (myRoomId) +
+                                                                        "/game",
+                                                                    'choose_this,2');
+                                                                setState(() {
+                                                                  T_D_player =
+                                                                      "2";
+                                                                });
+                                                              },
+                                                            ),
+                                                            IconButton(
+                                                              icon: Image.asset(
+                                                                  'assets/images/tdGame/4b.png'),
+                                                              iconSize: 10,
+                                                              onPressed: () {
+                                                                pushMqtt(
+                                                                    "imedotRoom/" +
+                                                                        (myRoomId) +
+                                                                        "/game",
+                                                                    'choose_this,4');
+                                                                setState(() {
+                                                                  T_D_player =
+                                                                      "4";
+                                                                });
+                                                              },
+                                                            ),
+                                                          ],
                                                         ),
                                                       )
                                                     ],
@@ -1209,19 +1181,15 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                     height: 0,
                                                   ),
                                             MqttListen1.pass_view_4
-                                                ? Positioned(
-                                                    right:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .width *
-                                                            0.03,
-                                                    bottom: 30.0,
+                                                ? Align(
+                                                    alignment:
+                                                        Alignment.bottomCenter,
                                                     child: ButtonBar(
                                                       children: <Widget>[
                                                         IconButton(
                                                           icon: Image.asset(
                                                               'assets/images/tdGame/ok.png'),
-                                                          iconSize: 60,
+                                                          iconSize: 55,
                                                           onPressed: () {
                                                             setState(() {
                                                               pushMqtt(
@@ -1247,58 +1215,56 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                           },
                                                         ),
                                                       ],
-                                                    ))
+                                                    ),
+                                                  )
                                                 : Container(
                                                     width: 0, height: 0),
                                             MqttListen1.truth_dare_view_4
                                                 ? Align(
                                                     alignment:
                                                         Alignment.bottomCenter,
-                                                    child: Positioned(
-                                                      bottom: 20.0,
-                                                      child: ButtonBar(
-                                                        alignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: <Widget>[
-                                                          IconButton(
-                                                            icon: Image.asset(
-                                                              'assets/images/tdGame/truth.png',
-                                                            ),
-                                                            iconSize: 55,
-                                                            onPressed: () {
-                                                              setState(() {
-                                                                pushMqtt(
-                                                                    "imedotRoom/" +
-                                                                        (myRoomId) +
-                                                                        "/game",
-                                                                    'truth,');
-                                                                MqttListen1
-                                                                        .truth_dare_view_4 =
-                                                                    false;
-                                                              });
-                                                            },
+                                                    child: ButtonBar(
+                                                      alignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: <Widget>[
+                                                        IconButton(
+                                                          icon: Image.asset(
+                                                            'assets/images/tdGame/truth.png',
                                                           ),
-                                                          IconButton(
-                                                            icon: Image.asset(
-                                                              'assets/images/tdGame/dare.png',
-                                                            ),
-                                                            iconSize: 55,
-                                                            onPressed: () {
-                                                              setState(() {
-                                                                pushMqtt(
-                                                                    "imedotRoom/" +
-                                                                        (myRoomId) +
-                                                                        "/game",
-                                                                    'dare,');
-                                                                MqttListen1
-                                                                        .truth_dare_view_4 =
-                                                                    false;
-                                                              });
-                                                            },
+                                                          iconSize: 55,
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              pushMqtt(
+                                                                  "imedotRoom/" +
+                                                                      (myRoomId) +
+                                                                      "/game",
+                                                                  'truth,');
+                                                              MqttListen1
+                                                                      .truth_dare_view_4 =
+                                                                  false;
+                                                            });
+                                                          },
+                                                        ),
+                                                        IconButton(
+                                                          icon: Image.asset(
+                                                            'assets/images/tdGame/dare.png',
                                                           ),
-                                                        ],
-                                                      ),
+                                                          iconSize: 55,
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              pushMqtt(
+                                                                  "imedotRoom/" +
+                                                                      (myRoomId) +
+                                                                      "/game",
+                                                                  'dare,');
+                                                              MqttListen1
+                                                                      .truth_dare_view_4 =
+                                                                  false;
+                                                            });
+                                                          },
+                                                        ),
+                                                      ],
                                                     ),
                                                   )
                                                 : Container(
@@ -1306,66 +1272,63 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                             MqttListen1.choose_button_view_4
                                                 ? Stack(
                                                     children: [
-                                                      Positioned(
-                                                        bottom: 30.0,
-                                                        child: Align(
-                                                          alignment: Alignment
-                                                              .bottomCenter,
-                                                          child: ButtonBar(
-                                                            alignment:
-                                                                MainAxisAlignment
-                                                                    .center,
-                                                            children: <Widget>[
-                                                              IconButton(
-                                                                icon: Image.asset(
-                                                                    'assets/images/tdGame/1b.png'),
-                                                                iconSize: 40,
-                                                                onPressed: () {
-                                                                  pushMqtt(
-                                                                      "imedotRoom/" +
-                                                                          (myRoomId) +
-                                                                          "/game",
-                                                                      'choose_this,1');
-                                                                  setState(() {
-                                                                    T_D_player =
-                                                                        "1";
-                                                                  });
-                                                                },
-                                                              ),
-                                                              IconButton(
-                                                                icon: Image.asset(
-                                                                    'assets/images/tdGame/2b.png'),
-                                                                iconSize: 40,
-                                                                onPressed: () {
-                                                                  pushMqtt(
-                                                                      "imedotRoom/" +
-                                                                          (myRoomId) +
-                                                                          "/game",
-                                                                      'choose_this,2');
-                                                                  setState(() {
-                                                                    T_D_player =
-                                                                        "2";
-                                                                  });
-                                                                },
-                                                              ),
-                                                              IconButton(
-                                                                icon: Image.asset(
-                                                                    'assets/images/tdGame/3b.png'),
-                                                                iconSize: 40,
-                                                                onPressed: () {
-                                                                  pushMqtt(
-                                                                      "imedotRoom/" +
-                                                                          (myRoomId) +
-                                                                          "/game",
-                                                                      'choose_this,3');
-                                                                  setState(() {
-                                                                    T_D_player =
-                                                                        "3";
-                                                                  });
-                                                                },
-                                                              ),
-                                                            ],
-                                                          ),
+                                                      Align(
+                                                        alignment: Alignment
+                                                            .bottomCenter,
+                                                        child: ButtonBar(
+                                                          alignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: <Widget>[
+                                                            IconButton(
+                                                              icon: Image.asset(
+                                                                  'assets/images/tdGame/1b.png'),
+                                                              iconSize: 10,
+                                                              onPressed: () {
+                                                                pushMqtt(
+                                                                    "imedotRoom/" +
+                                                                        (myRoomId) +
+                                                                        "/game",
+                                                                    'choose_this,1');
+                                                                setState(() {
+                                                                  T_D_player =
+                                                                      "1";
+                                                                });
+                                                              },
+                                                            ),
+                                                            IconButton(
+                                                              icon: Image.asset(
+                                                                  'assets/images/tdGame/2b.png'),
+                                                              iconSize: 10,
+                                                              onPressed: () {
+                                                                pushMqtt(
+                                                                    "imedotRoom/" +
+                                                                        (myRoomId) +
+                                                                        "/game",
+                                                                    'choose_this,2');
+                                                                setState(() {
+                                                                  T_D_player =
+                                                                      "2";
+                                                                });
+                                                              },
+                                                            ),
+                                                            IconButton(
+                                                              icon: Image.asset(
+                                                                  'assets/images/tdGame/3b.png'),
+                                                              iconSize: 10,
+                                                              onPressed: () {
+                                                                pushMqtt(
+                                                                    "imedotRoom/" +
+                                                                        (myRoomId) +
+                                                                        "/game",
+                                                                    'choose_this,3');
+                                                                setState(() {
+                                                                  T_D_player =
+                                                                      "3";
+                                                                });
+                                                              },
+                                                            ),
+                                                          ],
                                                         ),
                                                       )
                                                     ],
@@ -1674,7 +1637,7 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                     '${MqttListen1.BeChosen}號玩家的懲罰是\n${MqttListen1.Punish}',
                                                     textAlign: TextAlign.center,
                                                     style: TextStyle(
-                                                      fontSize: 30,
+                                                      fontSize: 18,
                                                       foreground: Paint()
                                                         ..style =
                                                             PaintingStyle.stroke
@@ -1686,7 +1649,7 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
                                                     '${MqttListen1.BeChosen}號玩家的懲罰是\n${MqttListen1.Punish}',
                                                     textAlign: TextAlign.center,
                                                     style: TextStyle(
-                                                      fontSize: 30,
+                                                      fontSize: 18,
                                                       color: Colors.black,
                                                     ),
                                                   ),

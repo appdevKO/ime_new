@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:ime_new/business_logic/provider/chat_provider.dart';
 import 'package:ime_new/ui/widget/switch_button.dart';
@@ -13,27 +15,33 @@ class DateSetting extends StatefulWidget {
 }
 
 class _DateSettingState extends State<DateSetting> {
-  late TextEditingController _textEditingController;
   bool seen_myprofile = false;
   bool chatroom_notify = false;
   int index = 0;
+  double? _distance_value;
+
+  double? _age_value;
 
   @override
   void initState() {
+    _distance_value = Provider.of<ChatProvider>(context, listen: false)
+        .remoteUserInfo[0]
+        .distance_range;
+    _age_value =Provider.of<ChatProvider>(context, listen: false)
+        .remoteUserInfo[0]
+        .age_range.toDouble();
     initdata();
     super.initState();
   }
 
   @override
   void dispose() {
-    _textEditingController.dispose();
     super.dispose();
   }
 
   void initdata() async {
     await Provider.of<ChatProvider>(context, listen: false)
         .myblock_finduserinfolist();
-    _textEditingController = TextEditingController();
   }
 
   @override
@@ -71,11 +79,31 @@ class _DateSettingState extends State<DateSetting> {
                   )),
                   Container(
                     child: IconButton(
-                      icon: Icon(
-                        Icons.send,
-                        color: Colors.transparent,
+                      icon: Text(
+                        '儲存',
+                        style: TextStyle(color: Colors.white),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (_) {
+                              return AlertDialog(
+                                  title: Text('更改設定中 請稍候'),
+                                  content: SizedBox(
+                                      height: 50,
+                                      width: 50,
+                                      child: Center(
+                                          child: CircularProgressIndicator())));
+                            });
+                        Provider.of<ChatProvider>(context, listen: false)
+                            .change_datesetting(_distance_value, _age_value!.round())
+                            .whenComplete(() =>
+                                Future.delayed(Duration(seconds: 1), () async {
+                                  Navigator.pop(context);
+                                  Navigator.pop(context);
+                                }));
+                      },
                     ),
                   ),
                 ],
@@ -86,7 +114,12 @@ class _DateSettingState extends State<DateSetting> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.remove_red_eye_outlined),
+                  GestureDetector(
+                    child: Icon(Icons.remove_red_eye_outlined),
+                    onTap: () {
+                      // Provider.of<ChatProvider>(context,listen: false).getaccountinfo2();
+                    },
+                  ),
                   Padding(
                     padding: const EdgeInsets.only(left: 15.0),
                     child: Text('黑名單'),
@@ -118,19 +151,14 @@ class _DateSettingState extends State<DateSetting> {
                                       Text('黑名單')
                                     ],
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(right: 10.0),
-                                    child: GestureDetector(
-                                      child: Container(
-                                          width: 40,
-                                          child: Center(child: Text('編輯'))),
-                                      onTap: () {
-                                        print('編輯 黑名單');
-                                        setState(() {
-                                          index = 1;
-                                        });
-                                      },
-                                    ),
+                                  GestureDetector(
+                                    child: Container(child: Text('編輯')),
+                                    onTap: () {
+                                      print('編輯 黑名單');
+                                      setState(() {
+                                        index = 1;
+                                      });
+                                    },
                                   )
                                 ],
                               ),
@@ -211,6 +239,122 @@ class _DateSettingState extends State<DateSetting> {
                             ],
                           ),
                         ),
+                        Container(
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      IconButton(
+                                          onPressed: () {},
+                                          icon: Icon(
+                                            Icons.error,
+                                            color: Colors.grey,
+                                          )),
+                                      Text('目前定位')
+                                    ],
+                                  ),
+                                  Text('xx地區')
+                                ],
+                              ),
+                              Divider(
+                                height: 1,
+                                color: Colors.grey,
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      IconButton(
+                                          onPressed: () {},
+                                          icon: Icon(
+                                            Icons.error,
+                                            color: Colors.grey,
+                                          )),
+                                      Text('推薦距離設定')
+                                    ],
+                                  ),
+                                  Consumer<ChatProvider>(
+                                    builder: (context, value, child) {
+                                      return Text('$_distance_value 公里');
+                                    },
+                                  ),
+                                ],
+                              ),
+                              _distance_value != null
+                                  ? Slider(
+                                      min: 0.0,
+                                      max: 100.0,divisions:10,
+                                      value: _distance_value!,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _distance_value = value;
+                                        });
+                                      },
+                                    )
+                                  : Container(),
+                              Divider(
+                                height: 1,
+                                color: Colors.grey,
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      IconButton(
+                                          onPressed: () {},
+                                          icon: Icon(
+                                            Icons.error,
+                                            color: Colors.grey,
+                                          )),
+                                      Text('年齡偏好設定')
+                                    ],
+                                  ),
+                                  Consumer<ChatProvider>(
+                                    builder: (context, value, child) {
+                                      return Text('18歲~${(_age_value!).round()}歲');
+                                    },
+                                  ),
+                                ],
+                              ),
+                              _age_value != null
+                                  ? Slider(
+                                      min:18,
+                                      max: 99,divisions:81,
+                                      value: _age_value!,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _age_value = value;
+                                        });
+                                      },
+                                    )
+                                  : Container(),
+                              Divider(
+                                height: 1,
+                                color: Colors.grey,
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   )
@@ -224,10 +368,11 @@ class _DateSettingState extends State<DateSetting> {
                                 children: [
                                   Container(
                                       height: 400,
-                                      child:
-                                          value.myblocklog != null &&
-                                                  value.myblocklog[0].list_id !=
-                                                      null
+                                      child: value.myblocklog != null &&
+                                              value.myblocklog[0].list_id !=
+                                                  null
+                                          ? value.myblocklog[0].list_id
+                                                  .isNotEmpty
                                               ? ListView.builder(
                                                   itemBuilder:
                                                       (context, index) {
@@ -375,7 +520,8 @@ class _DateSettingState extends State<DateSetting> {
                                                   itemCount: value.myblocklog[0]
                                                       .list_id.length,
                                                 )
-                                              : Text('現在沒有黑名單')),
+                                              : Text('現在沒有黑名單')
+                                          : Text('加載中')),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [

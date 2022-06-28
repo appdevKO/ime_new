@@ -11,6 +11,8 @@ import 'package:ime_new/ui/me/profilepage.dart';
 import 'package:ime_new/ui/me/profilesetting.dart';
 import 'package:ime_new/ui/me/setting/date_setting.dart';
 import 'package:ime_new/ui/me/setting/edit_hello.dart';
+import 'package:ime_new/ui/me/setting/myfriends.dart';
+import 'package:ime_new/ui/me/setting/myincome.dart';
 import 'package:provider/provider.dart';
 import '../date/square/upgrade_vip.dart';
 import 'list/likeme_list.dart';
@@ -74,7 +76,8 @@ class _ProfileOptionState extends State<ProfileOption> {
     List<SettingOption> item = [
       SettingOption(
           title: '編輯打招呼',
-          icon: CircleAvatar(backgroundColor: Color(0xffFF9224),
+          icon: CircleAvatar(
+              backgroundColor: Color(0xffFF9224),
               radius: 26,
               child: Center(
                 child: Container(
@@ -92,7 +95,8 @@ class _ProfileOptionState extends State<ProfileOption> {
           }),
       SettingOption(
           title: 'ime收益',
-          icon: CircleAvatar(backgroundColor: Color(0xffFF5151),
+          icon: CircleAvatar(
+              backgroundColor: Color(0xffFF5151),
               radius: 26,
               child: Center(
                 child: Container(
@@ -104,10 +108,14 @@ class _ProfileOptionState extends State<ProfileOption> {
                   ),
                 ),
               )),
-          callback: () {}),
+          callback: () {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => Myincome()));
+          }),
       SettingOption(
           title: '我的LEVEL',
-          icon: CircleAvatar(backgroundColor: Color(0xffFF60AF),
+          icon: CircleAvatar(
+              backgroundColor: Color(0xffFF60AF),
               radius: 26,
               child: Center(
                 child: Container(
@@ -122,7 +130,8 @@ class _ProfileOptionState extends State<ProfileOption> {
           callback: () {}),
       SettingOption(
           title: '我的錢包',
-          icon: CircleAvatar(backgroundColor: Color(0xffFF95CA),
+          icon: CircleAvatar(
+              backgroundColor: Color(0xffFF95CA),
               radius: 26,
               child: Center(
                 child: Container(
@@ -137,7 +146,8 @@ class _ProfileOptionState extends State<ProfileOption> {
           callback: () {}),
       SettingOption(
           title: '特務任務',
-          icon: CircleAvatar(backgroundColor: Colors.amber,
+          icon: CircleAvatar(
+              backgroundColor: Colors.amber,
               radius: 26,
               child: Center(
                 child: Container(
@@ -152,7 +162,8 @@ class _ProfileOptionState extends State<ProfileOption> {
           callback: () {}),
       SettingOption(
           title: '最愛好友',
-          icon: CircleAvatar(backgroundColor: Color(0xffFF77FF),
+          icon: CircleAvatar(
+              backgroundColor: Color(0xffFF77FF),
               radius: 26,
               child: Center(
                 child: Container(
@@ -164,10 +175,14 @@ class _ProfileOptionState extends State<ProfileOption> {
                   ),
                 ),
               )),
-          callback: () {}),
+          callback: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => MyFollowPage()));
+          }),
       SettingOption(
           title: '活動花絮',
-          icon: CircleAvatar(backgroundColor: Color(0xffBE77FF),
+          icon: CircleAvatar(
+              backgroundColor: Color(0xffBE77FF),
               radius: 26,
               child: Center(
                 child: Container(
@@ -182,7 +197,8 @@ class _ProfileOptionState extends State<ProfileOption> {
           callback: () {}),
       SettingOption(
           title: '交友設定',
-          icon: CircleAvatar(backgroundColor: Color(0xff4A4AFF),
+          icon: CircleAvatar(
+              backgroundColor: Color(0xff4A4AFF),
               radius: 26,
               child: Center(
                 child: Container(
@@ -200,7 +216,8 @@ class _ProfileOptionState extends State<ProfileOption> {
           }),
       SettingOption(
           title: '直播設定',
-          icon: CircleAvatar(backgroundColor: Color(0xff0080FF),
+          icon: CircleAvatar(
+              backgroundColor: Color(0xff0080FF),
               radius: 26,
               child: Center(
                 child: Container(
@@ -252,25 +269,25 @@ class _ProfileOptionState extends State<ProfileOption> {
                                       backgroundColor: Colors.grey,
                                     );
                             }),
-                            Stack(
-                              children: [
-                                Text(
-                                  '修改大頭貼',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    foreground: Paint()
-                                      ..style = PaintingStyle.stroke
-                                      ..strokeWidth = 2
-                                      ..color = Colors.white,
-                                  ),
-                                ),
-                                Text(
-                                  '修改大頭貼',
-                                  style: TextStyle(
-                                      fontSize: 15, color: Colors.black),
-                                ),
-                              ],
-                            ),
+                            // Stack(
+                            //   children: [
+                            //     Text(
+                            //       '修改大頭貼',
+                            //       style: TextStyle(
+                            //         fontSize: 15,
+                            //         foreground: Paint()
+                            //           ..style = PaintingStyle.stroke
+                            //           ..strokeWidth = 2
+                            //           ..color = Colors.white,
+                            //       ),
+                            //     ),
+                            //     Text(
+                            //       '修改大頭貼',
+                            //       style: TextStyle(
+                            //           fontSize: 15, color: Colors.black),
+                            //     ),
+                            //   ],
+                            // ),
                             Positioned(
                                 top: -5,
                                 right: 0,
@@ -292,8 +309,8 @@ class _ProfileOptionState extends State<ProfileOption> {
                           ],
                         ),
                         onTap: () {
-                          Provider.of<ChatProvider>(context, listen: false)
-                              .change_avatar();
+                          // Provider.of<ChatProvider>(context, listen: false)
+                          //     .change_avatar();
                         },
                       ),
                       // 按鈕

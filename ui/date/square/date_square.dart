@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:ime_new/ui/date/square/square_near.dart';
-import 'package:ime_new/ui/date/square/square_new_login.dart';
-import 'package:ime_new/ui/date/square/square_new_register.dart';
-import 'package:ime_new/ui/date/square/square_recommend.dart';
-import 'package:ime_new/ui/otherpage/other_profile_page.dart';
-import 'package:ime_new/ui/widget/stack_text.dart';
-import 'package:provider/provider.dart';
 import 'package:ime_new/business_logic/provider/chat_provider.dart';
+import 'package:ime_new/ui/otherpage/other_profile_page.dart';
+import 'package:provider/provider.dart';
 import 'package:swiping_card_deck/swiping_card_deck.dart';
 
 //交友廣場 方塊

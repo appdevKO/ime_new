@@ -95,17 +95,19 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                                 width: MediaQuery.of(context).size.width,
                                 color: Colors.grey,
                                 child: ClipRRect(
-                                  child: value.o2omemberlist![0]
-                                                  .little_profilepic_list[
-                                              itemIndex] !=
-                                          ''
-                                      ? Image.network(
-                                          value.o2omemberlist![0]
-                                                  .little_profilepic_list[
-                                              itemIndex],
-                                          fit: BoxFit.cover,
-                                        )
-                                      : Center(child: Text('無照片')),
+                                  child: Container(
+                                    child: value.o2omemberlist![0]
+                                                    .little_profilepic_list[
+                                                itemIndex] !=
+                                            ''
+                                        ? Image.network(
+                                            value.o2omemberlist![0]
+                                                    .little_profilepic_list[
+                                                itemIndex],
+                                            fit: BoxFit.cover,
+                                          )
+                                        : Center(child: Text('無照片')),
+                                  ),
                                 ),
                               ),
                               itemCount: value.o2omemberlist![0]
@@ -115,6 +117,10 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                         },
                       ),
                     ),
+                    Positioned(
+                        top: 10,
+                        right: 10,
+                        child: Text('${_current+1}',style: TextStyle(fontWeight: FontWeight.w700),)),
                     // Positioned(
                     //   top: 0,
                     //   child: Consumer<ChatProvider>(

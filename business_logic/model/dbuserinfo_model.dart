@@ -45,7 +45,9 @@ class DbUserinfoModel {
       this.followme_num,
       this.default_chat_text,
       this.follow_log_list,
-      this.birthday});
+      this.birthday,
+      this.age_range,
+      this.distance_range});
 
   ObjectId? memberid;
   String? account;
@@ -79,6 +81,8 @@ class DbUserinfoModel {
   List? interest_list;
   List? follow_log_list;
   DateTime? birthday;
+  double? distance_range;
+  int? age_range;
 
   factory DbUserinfoModel.fromJson(Map<String, dynamic> json) =>
       DbUserinfoModel(
@@ -94,6 +98,9 @@ class DbUserinfoModel {
         height: json['height'] != null ? json['height'] : null,
         age: json['age'] != null ? json['age'] : null,
         sex: json['sex'] != null ? json['sex'] : null,
+        distance_range:
+            json['distance_range'] != null ? json['distance_range'] : null,
+        age_range: json['age_range'] != null ? json['age_range'] : null,
         money: json['money'] != null ? json['money'] : null,
         followme_num: json['follow_num'] != null ? json['follow_num'] : null,
         constellation:
@@ -131,6 +138,8 @@ class DbUserinfoModel {
         "default_chat": default_chat_text,
         "chatroomid": chatroomId,
         "follow_num": followme_num,
+        "age_range": age_range,
+        "distance_range": distance_range,
         "avatar": avatar,
         "avatar_sub": avatar_sub,
         "cover": cover,
