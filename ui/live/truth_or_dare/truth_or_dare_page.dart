@@ -1,10 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:ime_new/business_logic/provider/TD_game.dart';
 import 'package:ime_new/ui/live/truth_or_dare/roomListTable.dart';
-
-import 'package:provider/provider.dart';
 
 class TurthOrDare extends StatefulWidget {
   const TurthOrDare({Key? key}) : super(key: key);
@@ -18,7 +15,6 @@ class _TurthOrDareState extends State<TurthOrDare> {
 
   @override
   void initState() {
-
     super.initState();
   }
 
@@ -183,6 +179,4 @@ class _TurthOrDareState extends State<TurthOrDare> {
       ),
     );
   }
-
-
 }

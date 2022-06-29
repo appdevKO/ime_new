@@ -31,6 +31,7 @@ class DbUserinfoModel {
       this.interest_list,
       this.personality,
       this.profession,
+      this.role,
       this.area,
       this.position,
       this.date,
@@ -47,7 +48,8 @@ class DbUserinfoModel {
       this.follow_log_list,
       this.birthday,
       this.age_range,
-      this.distance_range});
+      this.distance_range,
+      this.vip});
 
   ObjectId? memberid;
   String? account;
@@ -83,6 +85,8 @@ class DbUserinfoModel {
   DateTime? birthday;
   double? distance_range;
   int? age_range;
+  int? role;
+  bool? vip;
 
   factory DbUserinfoModel.fromJson(Map<String, dynamic> json) =>
       DbUserinfoModel(
@@ -95,6 +99,8 @@ class DbUserinfoModel {
         avatar_sub: json["avatar_sub"],
         birthday: json["birthday"],
         cover: json['cover'],
+        role: json['role'],
+        vip: json['vip'],
         height: json['height'] != null ? json['height'] : null,
         age: json['age'] != null ? json['age'] : null,
         sex: json['sex'] != null ? json['sex'] : null,
@@ -139,6 +145,8 @@ class DbUserinfoModel {
         "chatroomid": chatroomId,
         "follow_num": followme_num,
         "age_range": age_range,
+        "role": role,
+        "vip": vip,
         "distance_range": distance_range,
         "avatar": avatar,
         "avatar_sub": avatar_sub,

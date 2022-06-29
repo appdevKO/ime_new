@@ -18,6 +18,7 @@ List<List<Color>> colorlist = [
     Color(0xff5ac9e8),
     Color(0xffa1e4ac),
   ],
+  [Color(0xffff9494), Color(0xfffdf0f0)]
 ];
 String default_roomimg =
     'https://media.istockphoto.com/photos/new-normal-concept-picture-id1294957728?s=612x612';

@@ -26,6 +26,7 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
   late TabController _tabController;
   int _current = 0;
   final CarouselController _controller = CarouselController();
+  bool hi = true;
 
   @override
   void initState() {
@@ -35,6 +36,7 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
       vsync: ScrollableState(),
       initialIndex: 0,
     );
+    hi=true;
     super.initState();
   }
 
@@ -120,7 +122,10 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                     Positioned(
                         top: 10,
                         right: 10,
-                        child: Text('${_current+1}',style: TextStyle(fontWeight: FontWeight.w700),)),
+                        child: Text(
+                          '${_current + 1}',
+                          style: TextStyle(fontWeight: FontWeight.w700),
+                        )),
                     // Positioned(
                     //   top: 0,
                     //   child: Consumer<ChatProvider>(
@@ -534,6 +539,14 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                                               .showSnackBar(SnackBar(
                                             content: Text("快到交友設定設置你的打招呼"),
                                           ));
+                                        } else {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(SnackBar(
+                                            content: Text("已向心儀的人打招呼"),
+                                          ));
+                                          setState(() {
+                                            hi=false;
+                                          });
                                         }
                                       });
                                     });

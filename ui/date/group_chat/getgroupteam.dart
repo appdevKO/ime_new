@@ -719,74 +719,76 @@ class _GetTeamState extends State<GetTeam> {
                         Container(
                           width: 15,
                         ),
-                        Consumer<ChatProvider>(builder: (context,value,child){
-                          return ElevatedButton(
-                            onPressed: () {
-
-                              // //送出 創建房間 條件
-                              if (checkvalue == true &&
-                                  dropvalue != null &&
-                                  selectedDateTime != null &&
-                                  _titleController.text != '' &&
-                                 ( _purposeController.text != '' ||
-                                  Provider.of<ChatProvider>(context,
-                                          listen: false)
-                                      .purposelist
-                                      .isNotEmpty)) {
-                                FocusScope.of(context).unfocus();
-                                Provider.of<ChatProvider>(context, listen: false)
-                                    .createchatroom(
-                                        _titleController.text,
-                                        dropvalue,
-                                        Provider.of<ChatProvider>(context,
-                                                    listen: false)
-                                                .remoteUserInfo[0]
-                                                .avatar_sub ??
-                                            '',
-                                        0,
-                                        _purposeController.text,
-                                        _noteController.text,
-                                        _ruleController.text,
-                                        DateTime.now().add(Duration(hours: 8)),
-                                        selectedDateTime!.add(Duration(hours: 8)))
-                                    .whenComplete(() {
-                                  _titleController.clear();
-                                  _purposeController.clear();
-                                  _areaController.clear();
-                                  _noteController.clear();
-                                  _ruleController.clear();
-                                  _quotaController.clear();
-                                });
-                                setState(() {
-                                  selectedDateTime = null;
-                                  index = 0;
-                                });
-
-                                Provider.of<ChatProvider>(context, listen: false)
-                                    .purposelist
-                                    .clear();
-                              } else {
-                                print('沒反應');
-                              }
-                            },
-                            child: Text('創建房間'),
-                            style: ElevatedButton.styleFrom(
-                                minimumSize: Size(115, 40),
-                                primary: checkvalue == true &&
+                        Consumer<ChatProvider>(
+                          builder: (context, value, child) {
+                            return ElevatedButton(
+                              onPressed: () {
+                                // //送出 創建房間 條件
+                                if (checkvalue == true &&
                                     dropvalue != null &&
                                     selectedDateTime != null &&
                                     _titleController.text != '' &&
                                     (_purposeController.text != '' ||
-                                        value
+                                        Provider.of<ChatProvider>(context,
+                                                listen: false)
                                             .purposelist
-                                            .isNotEmpty)
-                                    ? Colors.red
-                                    : Colors.grey,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8.0))),
-                          );
-                        },
+                                            .isNotEmpty)) {
+                                  FocusScope.of(context).unfocus();
+                                  Provider.of<ChatProvider>(context,
+                                          listen: false)
+                                      .createchatroom(
+                                          _titleController.text,
+                                          dropvalue,
+                                          Provider.of<ChatProvider>(context,
+                                                      listen: false)
+                                                  .remoteUserInfo[0]
+                                                  .avatar_sub ??
+                                              '',
+                                          0,
+                                          _purposeController.text,
+                                          _noteController.text,
+                                          _ruleController.text,
+                                          DateTime.now()
+                                              .add(Duration(hours: 8)),
+                                          selectedDateTime!
+                                              .add(Duration(hours: 8)))
+                                      .whenComplete(() {
+                                    _titleController.clear();
+                                    _purposeController.clear();
+                                    _areaController.clear();
+                                    _noteController.clear();
+                                    _ruleController.clear();
+                                    _quotaController.clear();
+                                  });
+                                  setState(() {
+                                    selectedDateTime = null;
+                                    index = 0;
+                                  });
 
+                                  Provider.of<ChatProvider>(context,
+                                          listen: false)
+                                      .purposelist
+                                      .clear();
+                                } else {
+                                  print('沒反應');
+                                }
+                              },
+                              child: Text('創建房間'),
+                              style: ElevatedButton.styleFrom(
+                                  minimumSize: Size(115, 40),
+                                  primary: checkvalue == true &&
+                                          dropvalue != null &&
+                                          selectedDateTime != null &&
+                                          _titleController.text != '' &&
+                                          (_purposeController.text != '' ||
+                                              value.purposelist.isNotEmpty)
+                                      ? Colors.red
+                                      : Colors.grey,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(8.0))),
+                            );
+                          },
                         ),
                       ],
                     ),
@@ -838,30 +840,6 @@ class _GroupteamState extends State<Groupteam> {
                                     enablePullUp: true,
                                     header: WaterDropMaterialHeader(
                                         backgroundColor: Color(0xffffbbbb)),
-                                    // footer: CustomFooter(
-                                    //   builder: (BuildContext context,
-                                    //       LoadStatus? mode) {
-                                    //     Widget body;
-                                    //     if (mode == LoadStatus.idle) {
-                                    //       body = Text("pull up load");
-                                    //     } else if (mode == LoadStatus.loading) {
-                                    //       // body = CupertinoActivityIndicator();
-                                    //       body = Text("等待 旋轉");
-                                    //     } else if (mode == LoadStatus.failed) {
-                                    //       body =
-                                    //           Text("Load Failed!Click retry!");
-                                    //     } else if (mode ==
-                                    //         LoadStatus.canLoading) {
-                                    //       body = Text("release to load more");
-                                    //     } else {
-                                    //       body = Text("No more Data");
-                                    //     }
-                                    //     return Container(
-                                    //       height: 55.0,
-                                    //       child: Center(child: body),
-                                    //     );
-                                    //   },
-                                    // ),
                                     controller: _refreshController,
                                     onRefresh: _onRefresh,
                                     onLoading: _onLoading,

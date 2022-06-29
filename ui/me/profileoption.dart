@@ -229,7 +229,11 @@ class _ProfileOptionState extends State<ProfileOption> {
                   ),
                 ),
               )),
-          callback: () {}),
+          callback: () {
+            print('456456');
+
+
+          }),
     ];
 
     return SafeArea(
@@ -463,7 +467,7 @@ class _ProfileOptionState extends State<ProfileOption> {
                                     color: Colors.blue,
                                   ),
                                   Text(
-                                    '最愛主播',
+                                    '最愛好友',
                                     style: TextStyle(
                                         color: Colors.grey, fontSize: 12),
                                   )

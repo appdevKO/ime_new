@@ -4,6 +4,7 @@ import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:ime_new/business_logic/provider/chat_provider.dart';
 import 'package:ime_new/ui/action/action_detail_page.dart';
+import 'package:ime_new/ui/action/create_action.dart';
 import 'package:ime_new/ui/action/new_actionlist.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -57,54 +58,125 @@ class _OtherActionPageState extends State<OtherActionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: new Size(MediaQuery.of(context).size.width, 50),
-        child: Container(
-          height: 56,
-          padding: EdgeInsets.only(top: 5),
-          decoration: new BoxDecoration(color: Color(0xffffbbbb)),
-          child: Center(child: Text(widget.type == 1 ? 'XXX的動態' : '我的動態')),
+        appBar: PreferredSize(
+          preferredSize: new Size(MediaQuery.of(context).size.width, 50),
+          child: Container(
+            height: 56,
+            padding: EdgeInsets.only(top: 5),
+            decoration: new BoxDecoration(color: Color(0xffffbbbb)),
+            child: Center(child: Text(widget.type == 1 ? 'XXX的動態' : '我的動態')),
+          ),
         ),
-      ),
-      body: Consumer<ChatProvider>(
-        builder: (context, value, child) {
-          return SmartRefresher(
-            enablePullDown: true,
-            enablePullUp: true,
-            controller: _refreshController,
-            header: WaterDropMaterialHeader(backgroundColor: Color(0xffffbbbb)),
-            onRefresh: _onRefresh,
-            onLoading: _onLoading,
-            child: value.someone_actionlist != null
-                ? value.someone_actionlist!.isNotEmpty
-                    ? ListView.separated(
-                        itemBuilder: (context, index) {
-                          return SingleAction3(
-                            index: index,
-                          );
-                        },
-                        separatorBuilder: (context, index) {
-                          return Divider(
-                            color: Colors.grey,
-                            thickness: 5,
-                          );
-                        },
-                        itemCount: value.someone_actionlist!.length,
-                      )
-                    : Container(
-                        child: Center(
-                          child: Text('這個人目前沒有動態'),
+        body: Consumer<ChatProvider>(builder: (context, value, child) {
+          return CustomScrollView(
+              physics: NeverScrollableScrollPhysics(),
+              slivers: <Widget>[
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 15, vertical: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            CircleAvatar(
+                                backgroundColor: Colors.grey,
+                                radius: 30,
+                                backgroundImage: NetworkImage(
+                                    '${value.remoteUserInfo[0].avatar_sub}')),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 10),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    value.remoteUserInfo[0].nickname != '' &&
+                                            value.remoteUserInfo[0].nickname !=
+                                                null
+                                        ? '${value.remoteUserInfo[0].nickname}'
+                                        : '不詳',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 16),
+                                  ),
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.location_on,
+                                        color: Colors.grey,
+                                        size: 15,
+                                      ),
+                                      Text(
+                                        value.remoteUserInfo[0].area != '' &&
+                                                value.remoteUserInfo[0].area !=
+                                                    null
+                                            ? '${value.remoteUserInfo[0].area}'
+                                            : '不詳',
+                                        style: TextStyle(
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                      )
-                : Container(
-                    child: Center(
-                      child: Text('動態載入中'),
+                        ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => NewAction()));
+                            },
+                            child: Text('建立動態')),
+                      ],
                     ),
                   ),
-          );
-        },
-      ),
-    );
+                ),
+                SliverFillRemaining(
+                  child: SmartRefresher(
+                    enablePullDown: true,
+                    enablePullUp: true,
+                    controller: _refreshController,
+                    header: WaterDropMaterialHeader(
+                        backgroundColor: Color(0xffffbbbb)),
+                    onRefresh: _onRefresh,
+                    onLoading: _onLoading,
+                    child: value.someone_actionlist != null
+                        ? value.someone_actionlist!.isNotEmpty
+                            ? ListView.separated(
+                                itemBuilder: (context, index) {
+                                  return SingleAction3(
+                                    index: index,
+                                  );
+                                },
+                                separatorBuilder: (context, index) {
+                                  return Divider(
+                                    color: Colors.grey,
+                                    thickness: 5,
+                                  );
+                                },
+                                itemCount: value.someone_actionlist!.length,
+                              )
+                            : Container(
+                                child: Center(
+                                  child: Text('這個人目前沒有動態'),
+                                ),
+                              )
+                        : Container(
+                            child: Center(
+                              child: Text('動態載入中'),
+                            ),
+                          ),
+                  ),
+                )
+              ]);
+        }));
   }
 }
 
@@ -408,14 +480,16 @@ class _SingleAction3State extends State<SingleAction3> {
                                 value.like_to_action(
                                     value.someone_actionlist![widget.index!].id,
                                     widget.index,
-                                    true, value.someone_actionlist![widget.index!]);
+                                    true,
+                                    value.someone_actionlist![widget.index!]);
                               } else {
                                 print('沒有在list ->點擊喜歡');
 
                                 value.like_to_action(
                                     value.someone_actionlist![widget.index!].id,
                                     widget.index,
-                                    false, value.someone_actionlist![widget.index!]);
+                                    false,
+                                    value.someone_actionlist![widget.index!]);
                               }
                             }),
                         Padding(
@@ -449,9 +523,7 @@ class _SingleAction3State extends State<SingleAction3> {
                               await Provider.of<ChatProvider>(context,
                                       listen: false)
                                   .get_action_msg(value
-                                      .someone_actionlist![widget.index!]
-
-                                      .id);
+                                      .someone_actionlist![widget.index!].id);
                               showModalBottomSheet<void>(
                                 isScrollControlled: true,
                                 context: context,

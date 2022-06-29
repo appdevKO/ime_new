@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
@@ -135,120 +136,168 @@ class _MyProfilePageState extends State<MyProfilePage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      '名字: ',
+                                //暱稱
+                                Consumer<ChatProvider>(
+                                    builder: (context, value, child) {
+                                  return Container(
+                                    width: 250,
+                                    child: Text(
+                                      value.remoteUserInfo[0].nickname != '' &&
+                                              value.remoteUserInfo[0]
+                                                      .nickname !=
+                                                  null
+                                          ? '${value.remoteUserInfo[0].nickname}'
+                                          : '不詳',
                                       style: TextStyle(
-                                          color: Colors.brown, fontSize: 16),
+                                          fontSize: 36,
+                                          fontWeight: FontWeight.w700),
                                     ),
-                                    Consumer<ChatProvider>(
-                                        builder: (context, value, child) {
-                                      return Container(
-                                        width: 250,
-                                        child: Text(value.remoteUserInfo[0]
-                                                        .nickname !=
-                                                    '' &&
-                                                value.remoteUserInfo[0]
-                                                        .nickname !=
-                                                    null
-                                            ? '${value.remoteUserInfo[0].nickname}'
-                                            : '不詳'),
-                                      );
-                                    })
-                                  ],
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 8.0),
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            '介紹: ',
-                                            style: TextStyle(
-                                                color: Colors.brown,
-                                                fontSize: 16),
-                                          ),
-                                          Consumer<ChatProvider>(
-                                              builder: (context, value, child) {
-                                            return Container(
-                                              width: 200,
-                                              child: Text(value
-                                                              .remoteUserInfo[0]
-                                                              .introduction !=
-                                                          null &&
-                                                      value.remoteUserInfo[0]
-                                                              .introduction !=
-                                                          ''
-                                                  ? '${value.remoteUserInfo[0].introduction}'
-                                                  : '不詳'),
-                                            );
-                                          }),
-                                        ],
-                                      ),
-                                    ),
-                                    Row(
-                                      children: [
-                                        Icon(
-                                          Icons.location_on_outlined,
-                                          size: 15,
-                                          color: Colors.grey,
-                                        ),
-                                        Consumer<ChatProvider>(
-                                            builder: (context, value, child) {
-                                          return Text(
-                                            value.remoteUserInfo[0].area != null
-                                                ? '${ChineseHelper.convertToTraditionalChinese(value.remoteUserInfo[0].area)}'
-                                                : '不詳',
-                                            style: TextStyle(
-                                              color: Colors.grey,
-                                            ),
-                                          );
-                                        }),
-                                      ],
-                                    )
-                                  ],
-                                ),
-                                Container(
-                                  height: 10,
-                                ),
+                                  );
+                                }),
                                 Padding(
                                   padding: const EdgeInsets.only(top: 8.0),
                                   child: Row(
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.center,
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Icon(
-                                        Icons.favorite,
-                                        color: Colors.pink,
-                                      ),
-                                      Text(
-                                        ' 誰喜歡我: ',
-                                        style: TextStyle(height: 1),
+                                        Icons.mail,
+                                        color: Colors.grey,
+                                        size: 15,
                                       ),
                                       Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 8.0),
-                                        child: Consumer<ChatProvider>(
-                                            builder: (context, value, child) {
-                                          return Text(
-                                            value.num_likeme != null
-                                                ? '${value.num_likeme}'
-                                                : '--',
-                                            style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 15,
-                                                height: 1),
-                                          );
-                                        }),
-                                      )
+                                          padding:
+                                              const EdgeInsets.only(left: 5.0),
+                                          child: Text('xxxxx')),
                                     ],
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.location_on_outlined,
+                                      size: 15,
+                                      color: Colors.grey,
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 5.0),
+                                      child: Consumer<ChatProvider>(
+                                          builder: (context, value, child) {
+                                        return Text(
+                                          value.remoteUserInfo[0].area != null
+                                              ? '${ChineseHelper.convertToTraditionalChinese(value.remoteUserInfo[0].area)}'
+                                              : '不詳',
+                                          style: TextStyle(),
+                                        );
+                                      }),
+                                    ),
+                                  ],
+                                ),
+                                Container(
+                                  height: 14,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 10.0),
+                                  child: Text(
+                                    '關於我',
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w700),
+                                  ),
+                                ),
+                                //介紹
+                                Consumer<ChatProvider>(
+                                    builder: (context, value, child) {
+                                  return Container(
+                                    width: 200,
+                                    child: Text(value.remoteUserInfo[0]
+                                                    .introduction !=
+                                                null &&
+                                            value.remoteUserInfo[0]
+                                                    .introduction !=
+                                                ''
+                                        ? '${value.remoteUserInfo[0].introduction}'
+                                        : '沒有留下介紹'),
+                                  );
+                                }),
+                                //誰喜歡我
+                                // Padding(
+                                //   padding: const EdgeInsets.only(top: 8.0),
+                                //   child: Row(
+                                //     crossAxisAlignment:
+                                //         CrossAxisAlignment.center,
+                                //     children: [
+                                //       Icon(
+                                //         Icons.favorite,
+                                //         color: Colors.pink,
+                                //       ),
+                                //       Text(
+                                //         ' 誰喜歡我: ',
+                                //         style: TextStyle(height: 1),
+                                //       ),
+                                //       Padding(
+                                //         padding:
+                                //             const EdgeInsets.only(left: 8.0),
+                                //         child: Consumer<ChatProvider>(
+                                //             builder: (context, value, child) {
+                                //           return Text(
+                                //             value.num_likeme != null
+                                //                 ? '${value.num_likeme}'
+                                //                 : '--',
+                                //             style: TextStyle(
+                                //                 color: Colors.black,
+                                //                 fontSize: 15,
+                                //                 height: 1),
+                                //           );
+                                //         }),
+                                //       )
+                                //     ],
+                                //   ),
+                                // ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 10.0),
+                                  child: Text(
+                                    '我的興趣',
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w700),
+                                  ),
+                                ),
+                                Container(
+                                  height: 80,
+                                  child: Consumer<ChatProvider>(
+                                    builder: (context, value, child) {
+                                      return Wrap(
+                                        children: List.generate(
+                                            10,
+                                            (index) => GestureDetector(
+                                                  child: Container(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 10,
+                                                            vertical: 4),
+                                                    child: Text(
+                                                      '123',
+                                                      style: TextStyle(
+                                                          color: Colors.black),
+                                                    ),
+                                                    decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(12),
+                                                        border: Border.all(
+                                                            width: 1,
+                                                            color:
+                                                                Colors.orange)),
+                                                  ),
+                                                  onTap: () {},
+                                                )),
+                                        spacing: 10,
+                                        runSpacing: 5,
+                                      );
+                                    },
                                   ),
                                 ),
                                 Padding(

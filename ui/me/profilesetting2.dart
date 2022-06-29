@@ -1161,8 +1161,8 @@ class _ProfileSetting2State extends State<ProfileSetting2> {
                                   : _voice_introductioncontroller.text,
                             );
                             //存到興趣表中
-                            Provider.of<ChatProvider>(context, listen: false)
-                                .saveinterest();
+                            // Provider.of<ChatProvider>(context, listen: false)
+                            //     .saveinterest();
                             await Provider.of<ChatProvider>(context,
                                     listen: false)
                                 .getaccountinfo();

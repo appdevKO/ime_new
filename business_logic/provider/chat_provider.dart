@@ -1209,27 +1209,26 @@ class ChatProvider with ChangeNotifier {
     action_favorite_value = 1;
     print("get_follow_action_list  my mongo id ${remoteUserInfo[0].memberid}");
     final pipeline = mongo.AggregationPipelineBuilder()
-          ..addStage(mongo.Project({'_id': 0}))
-          ..addStage(mongo.Match(mongo.where
-              .eq('member_id', remoteUserInfo[0].memberid)
-              .map['\$query']))
-          ..addStage(mongo.Lookup(
-            from: 'action',
-            as: 'actionlist',
-            // let: {},
-            foreignField: 'memberid',
-            localField: 'list_id',
-            // pipeline: [],
-          ))
-          ..addStage(mongo.Project({
-            'member_id': 0,
-            'create_time': 0,
-            'list_id': 0,
-          }))
-          // ..addStage(mongo.Unwind(mongo.Field('list_id')))
-          ..addStage(mongo.Unwind(mongo.Field('actionlist')))
-        // ..addStage(mongo.Limit(1))
-        ;
+      ..addStage(mongo.Project({'_id': 0}))
+      ..addStage(mongo.Match(mongo.where
+          .eq('member_id', remoteUserInfo[0].memberid)
+          .map['\$query']))
+      ..addStage(mongo.Lookup(
+        from: 'action',
+        as: 'actionlist',
+        // let: {},
+        foreignField: 'memberid',
+        localField: 'list_id',
+        // pipeline: [],
+      ))
+      ..addStage(mongo.Unwind(mongo.Field('actionlist')))
+      ..addStage(mongo.Project({
+        'member_id': 0,
+        'create_time': 0,
+        'list_id': 0,
+      }))
+      ..addStage(mongo.Sort({'actionlist.time': -1}))
+      ..addStage(mongo.Limit(pagesize));
     favorite_actionlist =
         await lookupmongodb(FollowActionModel.fromJson, 'follow_log', pipeline);
     print("get_follow_action_list ${favorite_actionlist!}");
@@ -1296,7 +1295,6 @@ class ChatProvider with ChangeNotifier {
   }
 
   Future addpage_action_msg(action_id) async {
-    print('留言分頁+1');
     var newpage = await readremotemongodb(ActionMsgModel.fromJson, 'action_msg',
         field: mongo.where
             .eq('action_id', action_id)
@@ -1362,15 +1360,38 @@ class ChatProvider with ChangeNotifier {
   }
 
   Future addpage_favorite_action() async {
-    ///
-    // var newpage = await readremotemongodb(DbUserinfoModel.fromJson, 'chatroom',
-    //     field: mongo.where
-    //         .eq('type', 0)
-    //         .sortBy('create_time', descending: true)
-    //         .skip(groupteamlist_value * pagesize)
-    //         .limit(pagesize));
-    // groupteamlist!.addAll(newpage);
-    // notifyListeners();
+    final pipeline = mongo.AggregationPipelineBuilder()
+      ..addStage(mongo.Project({'_id': 0}))
+      ..addStage(mongo.Match(mongo.where
+          .eq('member_id', remoteUserInfo[0].memberid)
+          .map['\$query']))
+      ..addStage(mongo.Lookup(
+        from: 'action',
+        as: 'actionlist',
+        // let: {},
+        foreignField: 'memberid',
+        localField: 'list_id',
+        // pipeline: [],
+      ))
+      ..addStage(mongo.Unwind(mongo.Field('actionlist')))
+      ..addStage(mongo.Project({
+        'member_id': 0,
+        'create_time': 0,
+        'list_id': 0,
+      }))
+      ..addStage(mongo.Sort({'actionlist.time': -1}))
+      ..addStage(mongo.Skip(action_favorite_value * pagesize))
+      ..addStage(mongo.Limit(pagesize));
+    var newpage =
+        await lookupmongodb(FollowActionModel.fromJson, 'follow_log', pipeline);
+    if (newpage is List) {
+      if (newpage.isEmpty) {
+      } else {
+        action_plus_page(2);
+        someone_actionlist!.addAll(newpage);
+      }
+    }
+    notifyListeners();
   }
 
   Future like_to_action(action_id, index, islike, TheAction) async {
@@ -1723,21 +1744,30 @@ class ChatProvider with ChangeNotifier {
     groupteamlist_value = 1;
     print('獲得揪團列表');
     groupteamlist = await readremotemongodb(ChatRoomModel.fromJson, 'chatroom',
-        field:
-            mongo.where.eq('type', 0).sortBy('create_time', descending: true));
+        field: mongo.where
+            .eq('type', 0)
+            .sortBy('create_time', descending: true)
+            .limit(pagesize));
     print('揪團$groupteamlist');
 
     notifyListeners();
   }
 
   Future addpage_getgroupteam() async {
-    var newpage = await readremotemongodb(DbUserinfoModel.fromJson, 'chatroom',
+    var newpage = await readremotemongodb(ChatRoomModel.fromJson, 'chatroom',
         field: mongo.where
             .eq('type', 0)
             .sortBy('create_time', descending: true)
             .skip(groupteamlist_value * pagesize)
             .limit(pagesize));
-    groupteamlist!.addAll(newpage);
+    if (newpage is List) {
+      if (newpage.isEmpty) {
+      } else {
+        grouppage_plus(1);
+        groupteamlist!.addAll(newpage);
+      }
+    }
+
     notifyListeners();
   }
 
@@ -1747,19 +1777,29 @@ class ChatProvider with ChangeNotifier {
     print('獲得揪咖列表');
     grouppersonlist = await readremotemongodb(
         ChatRoomModel.fromJson, 'chatroom',
-        field:
-            mongo.where.eq('type', 1).sortBy('create_time', descending: true));
+        field: mongo.where
+            .eq('type', 1)
+            .sortBy('create_time', descending: true)
+            .limit(pagesize));
     notifyListeners();
   }
 
   Future addpage_getgroupperson() async {
-    var newpage = await readremotemongodb(DbUserinfoModel.fromJson, 'chatroom',
+    var newpage = await readremotemongodb(ChatRoomModel.fromJson, 'chatroom',
         field: mongo.where
             .eq('type', 1)
             .sortBy('create_time', descending: true)
             .skip(grouppersonlist_value * pagesize)
             .limit(pagesize));
-    grouppersonlist!.addAll(newpage);
+
+    if (newpage is List) {
+      if (newpage.isEmpty) {
+      } else {
+        grouppage_plus(2);
+        grouppersonlist!.addAll(newpage);
+      }
+    }
+
     notifyListeners();
   }
 
@@ -1792,69 +1832,44 @@ class ChatProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  int o2ochatroomlist_value = 1;
+
   Future geto2ochatroomlist() async {
+    o2ochatroomlist_value = 1;
     print('獲得私聊列表 ${remoteUserInfo[0].memberid} //block id ${myblocklog[0]}');
     o2ochatroomlist = await readremotemongodb(O2ORoomModel.fromJson, 'o2olog',
-        field: mongo.where.eq('member_id', remoteUserInfo[0].memberid));
+        field: mongo.where
+            .eq('member_id', remoteUserInfo[0].memberid)
+            .limit(pagesize)
+            .sortBy('last_chat_time', descending: true));
     if (myblocklog[0].list_id != null) {
       //用黑名單列表 將私聊列表篩選出來
       print('黑名單篩選');
       o2ochatroomlist?.removeWhere(
           (element) => myblocklog[0].list_id.contains(element.chatto_id));
     }
-
-    // o2ochatroomlist?.forEach((element) {
-    //   // print('有房間在黑名單中 沒空${element.chatto_id}');
-    //   if (myblocklog[0].list_id.contains(element.chatto_id)) {
-    //     print('有房間在黑名單中 沒空');
-    //     list2!.add(element.chatto_id);
-    //   }
-    // });
-
-    ///要改list
-    // if (o2ochatroomlist!.isNotEmpty) {
-    //   // 去掉黑名單後 還有私聊聊天室列表 = 有記錄
-    // o2o_msglist = [];
-    //   for (var item in o2ochatroomlist!) {
-    //     o2o_msglist?.add(O2OChatMsg(
-    //       msg: [],
-    //       from: 144,
-    //       mqtt_tyype: "ime_o2o_chat",
-    //       topicid: remoteUserInfo[0].memberid.toHexString(),
-    //       memberid: item.chatto_id.toHexString(),
-    //       nickname: item.nickname,
-    //     ));
-    //     print("o2o list item ${item}");
-    //   }
-    // }
     notifyListeners();
   }
 
-  // Future geto2ochatroomlist2() async {
-  //   print('獲得私聊列表 ${remoteUserInfo[0].memberid} //block id ${myblocklog[0].list_id[0]}');
-  //   o2ochatroomlist = await readremotemongodb(O2ORoomModel.fromJson, 'o2olog',
-  //       field: mongo.where
-  //           .eq('member_id', remoteUserInfo[0].memberid)
-  //           .and(mongo.where.ne('member_id', myblocklog[0].list_id[0])));
-  //   if (o2ochatroomlist!.isNotEmpty) {
-  //     o2o_msglist = [];
-  //     for (var item in o2ochatroomlist!) {
-  //       o2o_msglist?.add(O2OChatMsg(
-  //         msg: [],
-  //         from: 144,
-  //         mqtt_tyype: "ime_o2o_chat",
-  //         topicid: remoteUserInfo[0].memberid.toHexString(),
-  //         memberid: item.chatto_id.toHexString(),
-  //         nickname: item.nickname,
-  //       ));
-  //       print("o2o list item ${item}");
-  //     }
-  //   }
-  //
-  //   ///不通知
-  // }
+  Future addpage_geto2ochatroom() async {
+    var newpage = await readremotemongodb(O2ORoomModel.fromJson, 'o2olog',
+        field: mongo.where
+            .eq('member_id', remoteUserInfo[0].memberid)
+            .sortBy('last_chat_time', descending: true)
+            .skip(o2ochatroomlist_value * pagesize)
+            .limit(pagesize));
 
-  // 篩選
+    if (newpage is List) {
+      if (newpage.isEmpty) {
+      } else {
+        o2ochatroomlist_value++;
+        o2ochatroomlist!.addAll(newpage);
+      }
+    }
+
+    notifyListeners();
+  }
+
   bool isgroupperson_filter = false;
   bool isgroupteam_filter = false;
   List? historymsg;
@@ -2320,6 +2335,7 @@ class ChatProvider with ChangeNotifier {
       /// role 1 玩家 2直播主
       // 存在即不更新
       //  = 第一次才會建立
+      // role = 1 =玩家
       await _mongoDB.updateData_single2("member", 'account', account.uid, {
         'create_time': DateTime.now().add(
           Duration(hours: 8),
@@ -2337,6 +2353,8 @@ class ChatProvider with ChangeNotifier {
         'profile_pic': [account.photoURL, '', ''],
         'role': 1,
         'default_chat': '',
+        'vip': false,
+        'get_donate_count': 0,
       });
 
       // 每次登入都刷新
@@ -2395,6 +2413,7 @@ class ChatProvider with ChangeNotifier {
         'chatto_id', chatto_id, {
       'nickname': chatto_nickname,
       'avatar': chatto_avatar,
+      'last_chat_time': DateTime.now().add(Duration(hours: 8)),
     });
     //我的對象要看的 我的資訊
     await _mongoDB.upsertData("o2olog", 'chatto_id', remoteUserInfo[0].memberid,
@@ -2402,6 +2421,7 @@ class ChatProvider with ChangeNotifier {
       'nickname': remoteUserInfo[0].nickname,
       'avatar': remoteUserInfo[0].avatar,
       'avatar_sub': remoteUserInfo[0].avatar_sub,
+      'last_chat_time': DateTime.now().add(Duration(hours: 8)),
     });
   }
 
@@ -2674,6 +2694,7 @@ class ChatProvider with ChangeNotifier {
     false,
   ];
 
+  //更改 list 圖片 個人資料設定
   Future upload_pic(index) async {
     print('點擊上傳三張圖片中的$index');
     await pickimg();
@@ -2703,6 +2724,7 @@ class ChatProvider with ChangeNotifier {
       }
     }
   }
+
   Future upload_pic_camera(index) async {
     print('點擊上傳三張圖片中的$index');
     var name = 'pic/' + Uuid().v1().toString() + '.png';
@@ -2734,6 +2756,7 @@ class ChatProvider with ChangeNotifier {
       }
     }
   }
+
   set_profile_pic() {
     if (remoteUserInfo[0].profilepic_list != null &&
         remoteUserInfo[0].little_profilepic_list != null) {
@@ -2931,20 +2954,20 @@ class ChatProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future saveinterest() async {
-    await _mongoDB.upsertData2(
-      "interest",
-      'memberid',
-      remoteUserInfo[0].memberid,
-      {
-        'interest_list': interestlist,
-        'age': remoteUserInfo[0].age,
-        'nickname': remoteUserInfo[0].nickname,
-        'area': remoteUserInfo[0].area,
-        'intro': remoteUserInfo[0].introduction
-      },
-    );
-  }
+  // Future saveinterest() async {
+  //   await _mongoDB.upsertData2(
+  //     "interest",
+  //     'memberid',
+  //     remoteUserInfo[0].memberid,
+  //     {
+  //       'interest_list': interestlist,
+  //       'age': remoteUserInfo[0].age,
+  //       'nickname': remoteUserInfo[0].nickname,
+  //       'area': remoteUserInfo[0].area,
+  //       'intro': remoteUserInfo[0].introduction
+  //     },
+  //   );
+  // }
 
   Future change_hello(sentence) async {
     try {
