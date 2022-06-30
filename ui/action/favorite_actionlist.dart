@@ -127,12 +127,6 @@ class _SingleAction2State extends State<SingleAction2> {
       builder: (context, value, child) {
         return Container(
           width: MediaQuery.of(context).size.width,
-          height: value.favorite_actionlist![widget.index!].action.image_sub !=
-                      '' &&
-                  value.favorite_actionlist![widget.index!].action.image_sub !=
-                      null
-              ? 340
-              : 190,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -325,9 +319,11 @@ class _SingleAction2State extends State<SingleAction2> {
                       strutStyle: StrutStyle(fontSize: 12.0),
                       text: TextSpan(
                           style: TextStyle(color: Colors.black),
-                          text: value.favorite_actionlist![widget.index!].action.text !=
+                          text: value.favorite_actionlist![widget.index!].action
+                                          .text !=
                                       '' &&
-                                  value.favorite_actionlist![widget.index!].action.text !=
+                                  value.favorite_actionlist![widget.index!]
+                                          .action.text !=
                                       null
                               ? '${value.favorite_actionlist![widget.index!].action.text}'
                               : '(無內文)'),
@@ -339,7 +335,8 @@ class _SingleAction2State extends State<SingleAction2> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => ActionDetailPage(
-                                TheAction: value.favorite_actionlist![widget.index!].action,
+                                TheAction: value
+                                    .favorite_actionlist![widget.index!].action,
                               )));
                 },
               ),
@@ -353,22 +350,20 @@ class _SingleAction2State extends State<SingleAction2> {
                                 .image_sub !=
                             null
                     ? GestureDetector(
-                        child: Container(
-                          height: 150,
-                          decoration: BoxDecoration(
-                              color: Colors.grey,
-                              image: DecorationImage(
-                                  image: NetworkImage(
-                                      '${value.favorite_actionlist![widget.index!].action.image_sub}'),
-                                  fit: BoxFit.cover)),
+                        child: Center(
+                          child: Image.network(
+                            '${value.favorite_actionlist![widget.index!].action.image_sub}',
+                            fit: BoxFit.fitHeight,
+                          ),
                         ),
                         onTap: () {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (context) => ActionDetailPage(
-                                        TheAction: value.favorite_actionlist![
-                                            widget.index!].action,
+                                        TheAction: value
+                                            .favorite_actionlist![widget.index!]
+                                            .action,
                                       )));
                         },
                       )
@@ -390,44 +385,45 @@ class _SingleAction2State extends State<SingleAction2> {
                             icon: Icon(
                               Icons.favorite,
                               size: 18,
-                              color: value.favorite_actionlist![widget.index!].action.like_list
+                              color: value.favorite_actionlist![widget.index!]
+                                      .action.like_list
                                       .contains(
                                           value.remoteUserInfo[0].memberid)
                                   ? Colors.red
                                   : Colors.grey,
                             ),
                             onPressed: () {
-                              if (value
-                                  .favorite_actionlist![widget.index!].action.like_list
+                              if (value.favorite_actionlist![widget.index!]
+                                  .action.like_list
                                   .contains(value.remoteUserInfo[0].memberid)) {
                                 print('有在list ->點擊就是取消喜歡');
                                 value.like_to_action(
-                                    value
-                                        .favorite_actionlist![widget.index!].action.id,
+                                    value.favorite_actionlist![widget.index!]
+                                        .action.id,
                                     widget.index,
-                                    true,value
-                                    .favorite_actionlist![widget.index!].action);
+                                    true,
+                                    value.favorite_actionlist![widget.index!]
+                                        .action);
                               } else {
                                 print('沒有在list ->點擊喜歡');
 
                                 value.like_to_action(
-                                    value
-                                        .favorite_actionlist![widget.index!].action.id,
+                                    value.favorite_actionlist![widget.index!]
+                                        .action.id,
                                     widget.index,
-                                    false,value
-                                    .favorite_actionlist![widget.index!].action);
+                                    false,
+                                    value.favorite_actionlist![widget.index!]
+                                        .action);
                               }
                             }),
                         Padding(
                           padding: const EdgeInsets.only(left: 3.0),
                           child: Text(
-                            value
-                                            .favorite_actionlist![widget.index!].action
+                            value.favorite_actionlist![widget.index!].action
                                             .like_num !=
                                         '' &&
-                                    value
-                                            .favorite_actionlist![widget.index!].action
-                                            .like_num !=
+                                    value.favorite_actionlist![widget.index!]
+                                            .action.like_num !=
                                         null
                                 ? '${value.favorite_actionlist![widget.index!].action.like_num}'
                                 : '-',
@@ -451,7 +447,10 @@ class _SingleAction2State extends State<SingleAction2> {
                             onPressed: () async {
                               await Provider.of<ChatProvider>(context,
                                       listen: false)
-                                  .get_action_msg(value.favorite_actionlist![widget.index!].action.id);
+                                  .get_action_msg(value
+                                      .favorite_actionlist![widget.index!]
+                                      .action
+                                      .id);
                               showModalBottomSheet<void>(
                                 isScrollControlled: true,
                                 context: context,
@@ -541,7 +540,8 @@ class _SingleAction2State extends State<SingleAction2> {
                                                                           : false,
                                                                       actionid: value
                                                                           .favorite_actionlist![
-                                                                              widget.index!].action
+                                                                              widget.index!]
+                                                                          .action
                                                                           .id,
                                                                     );
                                                                   },
@@ -648,7 +648,8 @@ class _SingleAction2State extends State<SingleAction2> {
                                                                             false)
                                                                     .get_action_msg_count(
                                                                         value
-                                                                            .favorite_actionlist![widget.index!].action
+                                                                            .favorite_actionlist![widget.index!]
+                                                                            .action
                                                                             .id,
                                                                         3);
                                                               } else {
@@ -701,8 +702,9 @@ class _SingleAction2State extends State<SingleAction2> {
                                                                   value
                                                                       .favorite_actionlist![
                                                                           widget
-                                                                              .index!].
-                                                                      action.id,
+                                                                              .index!]
+                                                                      .action
+                                                                      .id,
                                                                   _textController
                                                                       .text);
                                                           _textController
@@ -735,7 +737,8 @@ class _SingleAction2State extends State<SingleAction2> {
                                                               .get_action_msg(value
                                                                   .favorite_actionlist![
                                                                       widget
-                                                                          .index!].action
+                                                                          .index!]
+                                                                  .action
                                                                   .id);
 
                                                           await Provider.of<
@@ -746,7 +749,8 @@ class _SingleAction2State extends State<SingleAction2> {
                                                                   value
                                                                       .favorite_actionlist![
                                                                           widget
-                                                                              .index!].action
+                                                                              .index!]
+                                                                      .action
                                                                       .id,
                                                                   3);
                                                         } else {
@@ -769,13 +773,11 @@ class _SingleAction2State extends State<SingleAction2> {
                           Padding(
                             padding: const EdgeInsets.only(left: 3.0),
                             child: Text(
-                              value
-                                              .favorite_actionlist![widget.index!].action
+                              value.favorite_actionlist![widget.index!].action
                                               .msg_num !=
                                           '' &&
-                                      value
-                                              .favorite_actionlist![widget.index!].action
-                                              .msg_num !=
+                                      value.favorite_actionlist![widget.index!]
+                                              .action.msg_num !=
                                           null
                                   ? '${value.favorite_actionlist![widget.index!].action.msg_num}'
                                   : '-',

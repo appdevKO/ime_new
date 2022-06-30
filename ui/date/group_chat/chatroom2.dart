@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_sound/flutter_sound.dart';
@@ -31,13 +32,12 @@ class GroupChatRoom2 extends StatefulWidget {
   GroupChatRoom2(
       {Key? key,
       required this.chatroomid,
-      required this.title,
       required this.chattype,
       required this.own})
       : super(key: key);
 
   final mongo.ObjectId chatroomid;
-  final String title;
+
   final int chattype;
   final bool own;
 
@@ -78,18 +78,19 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
   RefreshController _refreshController =
       RefreshController(initialRefresh: false);
 
+  late CustomPopupMenuController _controller;
+
   @override
   void initState() {
     _textController = TextEditingController();
     dialogcontroller = TextEditingController();
-
+    _controller = CustomPopupMenuController();
     initdata();
     _focus.addListener(_onFocusChange);
     initmic();
     initplayer();
     Provider.of<ChatProvider>(context, listen: false)
         .findindex(widget.chatroomid.toHexString());
-
     super.initState();
   }
 
@@ -153,40 +154,116 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
                   Center(
                     child: Container(
                       width: 250,
-                      child: RichText(
-                        overflow: TextOverflow.ellipsis,
-                        strutStyle: StrutStyle(fontSize: 12.0),
-                        text: TextSpan(
-                          style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                              fontSize: 16,
-                              height: 1,
-                              color: Colors.white),
-                          text: '${widget.title}',
-                        ),
-                      ),
+                      child: Consumer<ChatProvider>(
+                          builder: (context, value, child) {
+                        return RichText(
+                          overflow: TextOverflow.ellipsis,
+                          strutStyle: StrutStyle(fontSize: 12.0),
+                          text: TextSpan(
+                            style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 16,
+                                height: 1,
+                                color: Colors.white),
+                            text: value.chatroomsetting[0].title != null
+                                ? '${value.chatroomsetting[0].title}'
+                                : "加載中",
+                          ),
+                        );
+                      }),
                     ),
                   ),
 
-                  IconButton(
-                    icon: Icon(
-                      Icons.settings,
-                      color: Colors.white,
-                    ),
-                    onPressed: () {
-                      _focus.unfocus();
-                      // FocusScope.of(context).unfocus();
-                      // print("退出退出退出 ${widget.chatroomid}");
-                      // Provider.of<ChatProvider>(context, listen: false)
-                      //     .notify_chatroom_member_exit(widget.chatroomid);
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => ChatroomSetting(
-                                    chatroomId: widget.chatroomid,
-                                    own: widget.own,
-                                  )));
-                    },
+                  // IconButton(
+                  //   icon: Icon(
+                  //     Icons.settings,
+                  //     color: Colors.white,
+                  //   ),
+                  //   onPressed: () {
+                  //     _focus.unfocus();
+                  //     // FocusScope.of(context).unfocus();
+                  //     // print("退出退出退出 ${widget.chatroomid}");
+                  //     // Provider.of<ChatProvider>(context, listen: false)
+                  //     //     .notify_chatroom_member_exit(widget.chatroomid);
+                  //     Navigator.push(
+                  //         context,
+                  //         MaterialPageRoute(
+                  //             builder: (context) => ChatroomSetting(
+                  //                   chatroomId: widget.chatroomid,
+                  //                   own: widget.own,
+                  //                 )));
+                  //   },
+                  // ),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 10),
+                    child: Consumer<ChatProvider>(
+                        builder: (context, value, child) {
+                      return CustomPopupMenu(
+                        child: Icon(Icons.more_vert, color: Colors.white),
+                        menuBuilder: () => ClipRRect(
+                          borderRadius: BorderRadius.circular(5),
+                          child: widget.own
+                              ? Container(
+                                  color: Colors.white,
+                                  child: IntrinsicWidth(
+                                      child: GestureDetector(
+                                    behavior: HitTestBehavior.translucent,
+                                    onTap: () {
+                                      _focus.unfocus();
+                                      _controller.hideMenu();
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  ChatroomSetting(
+                                                    chatroomId:
+                                                        widget.chatroomid,
+                                                  )));
+                                    },
+                                    child: Container(
+                                      width: 150,
+                                      margin: EdgeInsets.all(20),
+                                      child: Text(
+                                        "房間設定",
+                                        style: TextStyle(fontSize: 15),
+                                      ),
+                                    ),
+                                  )),
+                                )
+                              : Container(
+                                  color: Colors.white,
+                                  child: IntrinsicWidth(
+                                      child: GestureDetector(
+                                    behavior: HitTestBehavior.translucent,
+                                    onTap: () {
+                                      _focus.unfocus();
+                                      _controller.hideMenu();
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  ChatroomInfo(
+                                                    chatroomId:
+                                                        widget.chatroomid,
+                                                    own: widget.own,
+                                                  )));
+                                    },
+                                    child: Container(
+                                      width: 150,
+                                      margin: EdgeInsets.all(20),
+                                      child: Text(
+                                        '房間資訊',
+                                        style: TextStyle(fontSize: 15),
+                                      ),
+                                    ),
+                                  )),
+                                ),
+                        ),
+                        pressType: PressType.singleClick,
+                        verticalMargin: -10,
+                        controller: _controller,
+                      );
+                    }),
                   ),
                 ],
               ),
@@ -667,8 +744,7 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
             .msglist![topicindex!]
             .msg = [];
         // 清空memberlist
-        Provider.of<ChatProvider>(context, listen: false)
-            .memberlist = [];
+        Provider.of<ChatProvider>(context, listen: false).memberlist = [];
         Provider.of<ChatProvider>(context, listen: false).getgroupteam();
         Provider.of<ChatProvider>(context, listen: false).getgroupperson();
         Provider.of<ChatProvider>(context, listen: false).change_redpoint(2);
@@ -1534,6 +1610,8 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
     //要等 不然資料流會亂跑
     await Provider.of<ChatProvider>(context, listen: false)
         .getchatroommember(widget.chatroomid);
+    Provider.of<ChatProvider>(context, listen: false)
+        .getchatroomsetting(widget.chatroomid);
   }
 
   Future initmic() async {

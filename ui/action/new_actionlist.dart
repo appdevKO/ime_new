@@ -138,10 +138,7 @@ class _SingleActionState extends State<SingleAction> {
         return Container(
           width: MediaQuery.of(context).size.width,
           child: Container(
-            height: value.newest_actionlist![widget.index!].image_sub != '' &&
-                    value.newest_actionlist![widget.index!].image_sub != null
-                ? 340
-                : 190,
+
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -357,14 +354,8 @@ class _SingleActionState extends State<SingleAction> {
                           value.newest_actionlist![widget.index!].image_sub !=
                               null
                       ? GestureDetector(
-                          child: Container(
-                            height: 150,
-                            decoration: BoxDecoration(
-                                color: Colors.grey,
-                                image: DecorationImage(
-                                    image: NetworkImage(
-                                        '${value.newest_actionlist![widget.index!].image_sub}'),
-                                    fit: BoxFit.cover)),
+                          child: Center(
+                            child: Image.network('${value.newest_actionlist![widget.index!].image_sub}',fit: BoxFit.fitHeight,),
                           ),
                           onTap: () {
                             Navigator.push(

@@ -13,43 +13,45 @@ String dbUserinfoModelToJson(DbUserinfoModel data) =>
     json.encode(data.toJson());
 
 class DbUserinfoModel {
-  DbUserinfoModel(
-      {this.memberid,
-      this.nickname,
-      this.account,
-      this.chatroomId,
-      this.avatar,
-      this.avatar_sub,
-      this.cover,
-      this.height,
-      this.age,
-      this.sex,
-      this.money,
-      this.constellation,
-      this.introduction,
-      this.size,
-      this.interest_list,
-      this.personality,
-      this.profession,
-      this.role,
-      this.area,
-      this.position,
-      this.date,
-      this.lookfor,
-      this.education,
-      this.language,
-      this.smoke,
-      this.drink,
-      this.voice_introduction,
-      this.profilepic_list,
-      this.little_profilepic_list,
-      this.followme_num,
-      this.default_chat_text,
-      this.follow_log_list,
-      this.birthday,
-      this.age_range,
-      this.distance_range,
-      this.vip});
+  DbUserinfoModel({
+    this.memberid,
+    this.nickname,
+    this.account,
+    this.chatroomId,
+    this.avatar,
+    this.avatar_sub,
+    this.cover,
+    this.height,
+    this.age,
+    this.sex,
+    this.money,
+    this.constellation,
+    this.introduction,
+    this.size,
+    this.interest_list,
+    this.personality,
+    this.profession,
+    this.role,
+    this.area,
+    this.position,
+    this.date,
+    this.lookfor,
+    this.education,
+    this.language,
+    this.smoke,
+    this.drink,
+    this.voice_introduction,
+    this.profilepic_list,
+    this.little_profilepic_list,
+    this.followme_num,
+    this.default_chat_text,
+    this.follow_log_list,
+    this.birthday,
+    this.age_range,
+    this.distance_range,
+    this.vip,
+    this.tag,
+  });
 
   ObjectId? memberid;
   String? account;
@@ -87,9 +89,26 @@ class DbUserinfoModel {
   int? age_range;
   int? role;
   bool? vip;
+  List? tag = [];
 
-  factory DbUserinfoModel.fromJson(Map<String, dynamic> json) =>
-      DbUserinfoModel(
+  factory DbUserinfoModel.fromJson(Map<String, dynamic> json) {
+    var list = [];
+    if (json["personality"] != null && json["personality"] != '')
+      list.add(json["personality"]);
+    if (json["size"] != null && json["size"] != '') list.add(json["size"]);
+    if (json["profession"] != null && json["profession"] != '')
+      list.add(json["profession"]);
+    if (json["area"] != null && json["area"] != '') list.add(json["area"]);
+    if (json["money"] != null && json["money"] != '') list.add(json["money"]);
+    if (json["education"] != null && json["education"] != '')
+      list.add(json["education"]);
+
+    if (json["language"] != null && json["language"] != '')
+      list.add(json["language"]);
+
+    if (json["smoke"] != null && json["smoke"] != '') list.add(json["smoke"]);
+    if (json["drink"] != null && json["drink"] != '') list.add(json["drink"]);
+    return DbUserinfoModel(
         memberid: json["_id"],
         nickname: json["nickname"] == null ? null : json["nickname"],
         default_chat_text: json["default_chat"],
@@ -135,7 +154,8 @@ class DbUserinfoModel {
         voice_introduction: json["voice_introduction"] != null
             ? json['voice_introduction']
             : null,
-      );
+        tag: list);
+  }
 
   Map<String, dynamic> toJson() => {
         "_id": memberid,

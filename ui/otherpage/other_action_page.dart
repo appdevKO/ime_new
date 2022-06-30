@@ -72,71 +72,78 @@ class _OtherActionPageState extends State<OtherActionPage> {
               physics: NeverScrollableScrollPhysics(),
               slivers: <Widget>[
                 SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 15, vertical: 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            CircleAvatar(
-                                backgroundColor: Colors.grey,
-                                radius: 30,
-                                backgroundImage: NetworkImage(
-                                    '${value.remoteUserInfo[0].avatar_sub}')),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 10),
-                              child: Column(
+                  child: widget.type == 2
+                      ? Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 10),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    value.remoteUserInfo[0].nickname != '' &&
-                                            value.remoteUserInfo[0].nickname !=
-                                                null
-                                        ? '${value.remoteUserInfo[0].nickname}'
-                                        : '不詳',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 16),
-                                  ),
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        Icons.location_on,
-                                        color: Colors.grey,
-                                        size: 15,
-                                      ),
-                                      Text(
-                                        value.remoteUserInfo[0].area != '' &&
-                                                value.remoteUserInfo[0].area !=
-                                                    null
-                                            ? '${value.remoteUserInfo[0].area}'
-                                            : '不詳',
-                                        style: TextStyle(
-                                          color: Colors.grey,
+                                  CircleAvatar(
+                                      backgroundColor: Colors.grey,
+                                      radius: 30,
+                                      backgroundImage: NetworkImage(
+                                          '${value.remoteUserInfo[0].avatar_sub}')),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 10),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          value.remoteUserInfo[0].nickname !=
+                                                      '' &&
+                                                  value.remoteUserInfo[0]
+                                                          .nickname !=
+                                                      null
+                                              ? '${value.remoteUserInfo[0].nickname}'
+                                              : '不詳',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w700,
+                                              fontSize: 16),
                                         ),
-                                      ),
-                                    ],
+                                        Row(
+                                          children: [
+                                            Icon(
+                                              Icons.location_on,
+                                              color: Colors.grey,
+                                              size: 15,
+                                            ),
+                                            Text(
+                                              value.remoteUserInfo[0].area !=
+                                                          '' &&
+                                                      value.remoteUserInfo[0]
+                                                              .area !=
+                                                          null
+                                                  ? '${value.remoteUserInfo[0].area}'
+                                                  : '不詳',
+                                              style: TextStyle(
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ],
                               ),
-                            ),
-                          ],
-                        ),
-                        ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => NewAction()));
-                            },
-                            child: Text('建立動態')),
-                      ],
-                    ),
-                  ),
+                              ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => NewAction()));
+                                  },
+                                  child: Text('建立動態')),
+                            ],
+                          ),
+                        )
+                      : Container(),
                 ),
                 SliverFillRemaining(
                   child: SmartRefresher(
@@ -214,10 +221,6 @@ class _SingleAction3State extends State<SingleAction3> {
       builder: (context, value, child) {
         return Container(
           width: MediaQuery.of(context).size.width,
-          height: value.someone_actionlist![widget.index!].image_sub != '' &&
-                  value.someone_actionlist![widget.index!].image_sub != null
-              ? 340
-              : 190,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -428,14 +431,11 @@ class _SingleAction3State extends State<SingleAction3> {
                         value.someone_actionlist![widget.index!].image_sub !=
                             null
                     ? GestureDetector(
-                        child: Container(
-                          height: 150,
-                          decoration: BoxDecoration(
-                              color: Colors.grey,
-                              image: DecorationImage(
-                                  image: NetworkImage(
-                                      '${value.someone_actionlist![widget.index!].image_sub}'),
-                                  fit: BoxFit.cover)),
+                        child: Center(
+                          child: Image.network(
+                            '${value.someone_actionlist![widget.index!].image_sub}',
+                            fit: BoxFit.fitHeight,
+                          ),
                         ),
                         onTap: () {
                           Navigator.push(

@@ -8,13 +8,15 @@ ChatroomSettingModel chatroomFromJson(String str) =>
 String chatroomToJson(ChatroomSettingModel data) => json.encode(data.toJson());
 
 class ChatroomSettingModel {
-  ChatroomSettingModel({this.id, this.imgurl, this.rule, this.note,this.purpose});
+  ChatroomSettingModel(
+      {this.id, this.imgurl, this.rule, this.note, this.purpose, this.title});
 
   ObjectId? id;
   String? imgurl;
   String? rule;
   String? note;
   String? purpose;
+  String? title;
 
   factory ChatroomSettingModel.fromJson(Map<String, dynamic> json) =>
       ChatroomSettingModel(
@@ -23,6 +25,7 @@ class ChatroomSettingModel {
         note: json["note"],
         rule: json["rule"],
         purpose: json["purpose"],
+        title: json['title'],
       );
 
   Map<String, dynamic> toJson() => {
@@ -31,5 +34,6 @@ class ChatroomSettingModel {
         "rule": rule,
         "note": note,
         "purpose": purpose,
+        'title': title,
       };
 }

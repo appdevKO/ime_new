@@ -1020,10 +1020,7 @@ class _GroupPersonState extends State<GroupPerson> {
                                                                     .filter_grouppersonlist![
                                                                         index]
                                                                     .id,
-                                                                title: value
-                                                                    .filter_grouppersonlist![
-                                                                        index]
-                                                                    .title,
+
                                                                 chattype: 2,
                                                                 own: value.filter_grouppersonlist![index]
                                                                             .ownerId !=
@@ -1358,10 +1355,7 @@ class _GroupPersonState extends State<GroupPerson> {
                                                                     .grouppersonlist![
                                                                         index]
                                                                     .id,
-                                                                title: value
-                                                                    .grouppersonlist![
-                                                                        index]
-                                                                    .title,
+
                                                                 chattype: 2,
                                                                 own: value.grouppersonlist![index]
                                                                             .ownerId !=

@@ -69,7 +69,7 @@ class _O2OChatroomState extends State<O2OChatroom> {
   recordState myrecord = recordState.notrecord;
   int? topicindex = -1;
   bool iconopen = false;
-  late List menuItems;
+
   late CustomPopupMenuController _controller;
   RefreshController _refreshController =
       RefreshController(initialRefresh: false);
@@ -82,9 +82,7 @@ class _O2OChatroomState extends State<O2OChatroom> {
     _focus.addListener(_onFocusChange);
     initmic();
     initplayer();
-    menuItems = [
-      '加入黑名單',
-    ];
+
     super.initState();
   }
 

@@ -62,6 +62,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
               physics: NeverScrollableScrollPhysics(),
               controller: _tabController,
               children: [
+                //關於我
                 Stack(
                   children: [
                     //最底下 決定範圍
@@ -154,44 +155,36 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                     ),
                                   );
                                 }),
+
                                 Padding(
                                   padding: const EdgeInsets.only(top: 8.0),
                                   child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
                                     children: [
                                       Icon(
-                                        Icons.mail,
-                                        color: Colors.grey,
+                                        Icons.location_on_outlined,
                                         size: 15,
+                                        color: Colors.grey,
                                       ),
                                       Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 5.0),
-                                          child: Text('xxxxx')),
+                                        padding:
+                                            const EdgeInsets.only(left: 5.0),
+                                        child: Consumer<ChatProvider>(
+                                            builder: (context, value, child) {
+                                          return Text(
+                                            value.remoteUserInfo[0].area !=
+                                                        null &&
+                                                    value.remoteUserInfo[0]
+                                                            .area !=
+                                                        ''
+                                                ? '${ChineseHelper.convertToTraditionalChinese(value.remoteUserInfo[0].area)}'
+                                                : '不詳',
+                                            style:
+                                                TextStyle(color: Colors.grey),
+                                          );
+                                        }),
+                                      ),
                                     ],
                                   ),
-                                ),
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.location_on_outlined,
-                                      size: 15,
-                                      color: Colors.grey,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 5.0),
-                                      child: Consumer<ChatProvider>(
-                                          builder: (context, value, child) {
-                                        return Text(
-                                          value.remoteUserInfo[0].area != null
-                                              ? '${ChineseHelper.convertToTraditionalChinese(value.remoteUserInfo[0].area)}'
-                                              : '不詳',
-                                          style: TextStyle(),
-                                        );
-                                      }),
-                                    ),
-                                  ],
                                 ),
                                 Container(
                                   height: 14,
@@ -256,6 +249,51 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                 //   ),
                                 // ),
                                 Padding(
+                                  padding: const EdgeInsets.only(top: 8.0),
+                                  child: Consumer<ChatProvider>(
+                                    builder: (context, value, child) {
+                                      return Wrap(
+                                        children: List.generate(
+                                            value.remoteUserInfo[0].tag.length,
+                                            (index) => Container(
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal: 10,
+                                                      vertical: 4),
+                                                  width: value
+                                                              .remoteUserInfo[0]
+                                                              .tag[index]
+                                                              .length *
+                                                          16.0 +
+                                                      45,
+                                                  child: Row(
+                                                    children: [
+                                                      Icon(
+                                                        Icons.mail,
+                                                        color: Colors.grey,
+                                                      ),
+                                                      Text(
+                                                        '${value.remoteUserInfo[0].tag[index]}',
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.black),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              18),
+                                                      border: Border.all(
+                                                          width: 1,
+                                                          color: Colors.grey)),
+                                                )),
+                                        spacing: 10,
+                                        runSpacing: 5,
+                                      );
+                                    },
+                                  ),
+                                ),
+                                Padding(
                                   padding: const EdgeInsets.symmetric(
                                       vertical: 10.0),
                                   child: Text(
@@ -265,107 +303,120 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                         fontWeight: FontWeight.w700),
                                   ),
                                 ),
-                                Container(
-                                  height: 80,
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 8.0),
                                   child: Consumer<ChatProvider>(
                                     builder: (context, value, child) {
-                                      return Wrap(
-                                        children: List.generate(
-                                            10,
-                                            (index) => GestureDetector(
-                                                  child: Container(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 10,
-                                                            vertical: 4),
-                                                    child: Text(
-                                                      '123',
-                                                      style: TextStyle(
-                                                          color: Colors.black),
-                                                    ),
-                                                    decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(12),
-                                                        border: Border.all(
-                                                            width: 1,
-                                                            color:
-                                                                Colors.orange)),
-                                                  ),
-                                                  onTap: () {},
-                                                )),
-                                        spacing: 10,
-                                        runSpacing: 5,
-                                      );
+                                      return value.remoteUserInfo[0]
+                                              .interest_list.isNotEmpty
+                                          ? Wrap(
+                                              children: List.generate(
+                                                  value.remoteUserInfo[0]
+                                                      .interest_list.length,
+                                                  (index) => Container(
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                                horizontal: 10,
+                                                                vertical: 4),
+                                                        width: 80,
+                                                        child: Row(
+                                                          children: [
+                                                            Icon(
+                                                              Icons.mail,
+                                                              color:
+                                                                  Colors.grey,
+                                                            ),
+                                                            Text(
+                                                              '${value.remoteUserInfo[0].interest_list[index]}',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .black),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        decoration: BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        18),
+                                                            border: Border.all(
+                                                                width: 1,
+                                                                color: Colors
+                                                                    .grey)),
+                                                      )),
+                                              spacing: 10,
+                                              runSpacing: 5,
+                                            )
+                                          : Text('還未設定興趣');
                                     },
                                   ),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 8.0),
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        '體型: ',
-                                        style: TextStyle(color: Colors.brown),
-                                      ),
-                                      Consumer<ChatProvider>(
-                                          builder: (context, value, child) {
-                                        return Container(
-                                          width: 250,
-                                          child: Text(value
-                                                      .remoteUserInfo[0].size !=
-                                                  null
-                                              ? '${value.remoteUserInfo[0].size}'
-                                              : '不詳'),
-                                        );
-                                      })
-                                    ],
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 8.0),
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        '個性: ',
-                                        style: TextStyle(color: Colors.brown),
-                                      ),
-                                      Consumer<ChatProvider>(
-                                          builder: (context, value, child) {
-                                        return Container(
-                                          width: 250,
-                                          child: Text(value.remoteUserInfo[0]
-                                                      .personality !=
-                                                  null
-                                              ? '${value.remoteUserInfo[0].personality}'
-                                              : '不詳'),
-                                        );
-                                      })
-                                    ],
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 8.0),
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        '職業: ',
-                                        style: TextStyle(color: Colors.brown),
-                                      ),
-                                      Consumer<ChatProvider>(
-                                          builder: (context, value, child) {
-                                        return Container(
-                                          width: 250,
-                                          child: Text(value.remoteUserInfo[0]
-                                                      .profession !=
-                                                  null
-                                              ? '${value.remoteUserInfo[0].profession}'
-                                              : '不詳'),
-                                        );
-                                      })
-                                    ],
-                                  ),
-                                ),
+                                // Padding(
+                                //   padding: const EdgeInsets.only(top: 8.0),
+                                //   child: Row(
+                                //     children: [
+                                //       Text(
+                                //         '體型: ',
+                                //         style: TextStyle(color: Colors.brown),
+                                //       ),
+                                //       Consumer<ChatProvider>(
+                                //           builder: (context, value, child) {
+                                //         return Container(
+                                //           width: 250,
+                                //           child: Text(value
+                                //                       .remoteUserInfo[0].size !=
+                                //                   null
+                                //               ? '${value.remoteUserInfo[0].size}'
+                                //               : '不詳'),
+                                //         );
+                                //       })
+                                //     ],
+                                //   ),
+                                // ),
+                                // Padding(
+                                //   padding: const EdgeInsets.only(top: 8.0),
+                                //   child: Row(
+                                //     children: [
+                                //       Text(
+                                //         '個性: ',
+                                //         style: TextStyle(color: Colors.brown),
+                                //       ),
+                                //       Consumer<ChatProvider>(
+                                //           builder: (context, value, child) {
+                                //         return Container(
+                                //           width: 250,
+                                //           child: Text(value.remoteUserInfo[0]
+                                //                       .personality !=
+                                //                   null
+                                //               ? '${value.remoteUserInfo[0].personality}'
+                                //               : '不詳'),
+                                //         );
+                                //       })
+                                //     ],
+                                //   ),
+                                // ),
+                                // Padding(
+                                //   padding: const EdgeInsets.only(top: 8.0),
+                                //   child: Row(
+                                //     children: [
+                                //       Text(
+                                //         '職業: ',
+                                //         style: TextStyle(color: Colors.brown),
+                                //       ),
+                                //       Consumer<ChatProvider>(
+                                //           builder: (context, value, child) {
+                                //         return Container(
+                                //           width: 250,
+                                //           child: Text(value.remoteUserInfo[0]
+                                //                       .profession !=
+                                //                   null
+                                //               ? '${value.remoteUserInfo[0].profession}'
+                                //               : '不詳'),
+                                //         );
+                                //       })
+                                //     ],
+                                //   ),
+                                // ),
                                 // Padding(
                                 //   padding: const EdgeInsets.only(top: 8.0),
                                 //   child: Row(
@@ -389,161 +440,157 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                 //   ),
                                 // ),
                                 Padding(
-                                  padding: const EdgeInsets.only(top: 8.0),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        '我的約會安排: ',
-                                        style: TextStyle(color: Colors.brown),
-                                      ),
-                                      Consumer<ChatProvider>(
-                                          builder: (context, value, child) {
-                                        return Container(
-                                          width: 200,
-                                          child: Text(value
-                                                      .remoteUserInfo[0].date !=
-                                                  null
-                                              ? '${value.remoteUserInfo[0].date}'
-                                              : '不詳'),
-                                        );
-                                      })
-                                    ],
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 10.0),
+                                  child: Text(
+                                    '我的約會安排',
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w700),
                                   ),
                                 ),
+                                Consumer<ChatProvider>(
+                                    builder: (context, value, child) {
+                                  return Container(
+                                    width: 200,
+                                    child: Text(
+                                        value.remoteUserInfo[0].date != null
+                                            ? '${value.remoteUserInfo[0].date}'
+                                            : '不詳'),
+                                  );
+                                }),
+                                // Padding(
+                                //   padding: const EdgeInsets.only(top: 8.0),
+                                //   child: Row(
+                                //     children: [
+                                //       Text(
+                                //         '零用錢預算:',
+                                //         style: TextStyle(color: Colors.brown),
+                                //       ),
+                                //       Consumer<ChatProvider>(
+                                //           builder: (context, value, child) {
+                                //         return Container(
+                                //           width: 250,
+                                //           child: Text(value.remoteUserInfo[0]
+                                //                       .money !=
+                                //                   null
+                                //               ? '${value.remoteUserInfo[0].money}'
+                                //               : '不詳'),
+                                //         );
+                                //       })
+                                //     ],
+                                //   ),
+                                // ),
                                 Padding(
-                                  padding: const EdgeInsets.only(top: 8.0),
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        '零用錢預算:',
-                                        style: TextStyle(color: Colors.brown),
-                                      ),
-                                      Consumer<ChatProvider>(
-                                          builder: (context, value, child) {
-                                        return Container(
-                                          width: 250,
-                                          child: Text(value.remoteUserInfo[0]
-                                                      .money !=
-                                                  null
-                                              ? '${value.remoteUserInfo[0].money}'
-                                              : '不詳'),
-                                        );
-                                      })
-                                    ],
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 10.0),
+                                  child: Text(
+                                    '我在尋找',
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w700),
                                   ),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 8.0),
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        '我在尋找: ',
-                                        style: TextStyle(color: Colors.brown),
-                                      ),
-                                      Consumer<ChatProvider>(
-                                          builder: (context, value, child) {
-                                        return Container(
-                                          width: 250,
-                                          child: Text(value.remoteUserInfo[0]
-                                                      .lookfor !=
-                                                  null
-                                              ? '${value.remoteUserInfo[0].lookfor}'
-                                              : '不詳'),
-                                        );
-                                      })
-                                    ],
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 8.0),
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        '學歷:',
-                                        style: TextStyle(color: Colors.brown),
-                                      ),
-                                      Consumer<ChatProvider>(
-                                          builder: (context, value, child) {
-                                        return Container(
-                                          width: 250,
-                                          child: Text(value.remoteUserInfo[0]
-                                                      .education !=
-                                                  null
-                                              ? '${value.remoteUserInfo[0].education}'
-                                              : '不詳'),
-                                        );
-                                      })
-                                    ],
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 8.0),
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        '慣用語言:',
-                                        style: TextStyle(color: Colors.brown),
-                                      ),
-                                      Consumer<ChatProvider>(
-                                          builder: (context, value, child) {
-                                        return Container(
-                                          width: 250,
-                                          child: Text(value.remoteUserInfo[0]
-                                                      .language !=
-                                                  null
-                                              ? '${value.remoteUserInfo[0].language}'
-                                              : '不詳'),
-                                        );
-                                      })
-                                    ],
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 8.0),
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        '吸菸習慣:',
-                                        style: TextStyle(color: Colors.brown),
-                                      ),
-                                      Consumer<ChatProvider>(
-                                          builder: (context, value, child) {
-                                        return Container(
-                                          width: 250,
-                                          child: Text(value.remoteUserInfo[0]
-                                                      .smoke !=
-                                                  null
-                                              ? '${value.remoteUserInfo[0].smoke}'
-                                              : '不詳'),
-                                        );
-                                      })
-                                    ],
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 8.0),
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        '飲酒習慣:',
-                                        style: TextStyle(color: Colors.brown),
-                                      ),
-                                      Consumer<ChatProvider>(
-                                          builder: (context, value, child) {
-                                        return Container(
-                                          width: 250,
-                                          child: Text(value.remoteUserInfo[0]
-                                                      .drink !=
-                                                  null
-                                              ? '${value.remoteUserInfo[0].drink}'
-                                              : '不詳'),
-                                        );
-                                      })
-                                    ],
-                                  ),
-                                ),
+                                Consumer<ChatProvider>(
+                                    builder: (context, value, child) {
+                                  return Container(
+                                    width: 250,
+                                    child: Text(value
+                                                .remoteUserInfo[0].lookfor !=
+                                            null
+                                        ? '${value.remoteUserInfo[0].lookfor}'
+                                        : '不詳'),
+                                  );
+                                }),
+
+                                // Padding(
+                                //   padding: const EdgeInsets.only(top: 8.0),
+                                //   child: Row(
+                                //     children: [
+                                //       Text(
+                                //         '學歷:',
+                                //         style: TextStyle(color: Colors.brown),
+                                //       ),
+                                //       Consumer<ChatProvider>(
+                                //           builder: (context, value, child) {
+                                //         return Container(
+                                //           width: 250,
+                                //           child: Text(value.remoteUserInfo[0]
+                                //                       .education !=
+                                //                   null
+                                //               ? '${value.remoteUserInfo[0].education}'
+                                //               : '不詳'),
+                                //         );
+                                //       })
+                                //     ],
+                                //   ),
+                                // ),
+                                // Padding(
+                                //   padding: const EdgeInsets.only(top: 8.0),
+                                //   child: Row(
+                                //     children: [
+                                //       Text(
+                                //         '慣用語言:',
+                                //         style: TextStyle(color: Colors.brown),
+                                //       ),
+                                //       Consumer<ChatProvider>(
+                                //           builder: (context, value, child) {
+                                //         return Container(
+                                //           width: 250,
+                                //           child: Text(value.remoteUserInfo[0]
+                                //                       .language !=
+                                //                   null
+                                //               ? '${value.remoteUserInfo[0].language}'
+                                //               : '不詳'),
+                                //         );
+                                //       })
+                                //     ],
+                                //   ),
+                                // ),
+                                // Padding(
+                                //   padding: const EdgeInsets.only(top: 8.0),
+                                //   child: Row(
+                                //     children: [
+                                //       Text(
+                                //         '吸菸習慣:',
+                                //         style: TextStyle(color: Colors.brown),
+                                //       ),
+                                //       Consumer<ChatProvider>(
+                                //           builder: (context, value, child) {
+                                //         return Container(
+                                //           width: 250,
+                                //           child: Text(value.remoteUserInfo[0]
+                                //                       .smoke !=
+                                //                   null
+                                //               ? '${value.remoteUserInfo[0].smoke}'
+                                //               : '不詳'),
+                                //         );
+                                //       })
+                                //     ],
+                                //   ),
+                                // ),
+                                // Padding(
+                                //   padding: const EdgeInsets.only(top: 8.0),
+                                //   child: Row(
+                                //     children: [
+                                //       Text(
+                                //         '飲酒習慣:',
+                                //         style: TextStyle(color: Colors.brown),
+                                //       ),
+                                //       Consumer<ChatProvider>(
+                                //           builder: (context, value, child) {
+                                //         return Container(
+                                //           width: 250,
+                                //           child: Text(value.remoteUserInfo[0]
+                                //                       .drink !=
+                                //                   null
+                                //               ? '${value.remoteUserInfo[0].drink}'
+                                //               : '不詳'),
+                                //         );
+                                //       })
+                                //     ],
+                                //   ),
+                                // ),
                               ],
                             ),
                           ),
@@ -552,6 +599,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                     ),
                   ],
                 ),
+                //動態
                 OtherActionPage(
                     memberid: Provider.of<ChatProvider>(context, listen: false)
                         .remoteUserInfo[0]

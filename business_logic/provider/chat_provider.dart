@@ -2182,9 +2182,10 @@ class ChatProvider with ChangeNotifier {
     // print('idididid  $id');
     chatroomsetting = await readremotemongodb(
         ChatroomSettingModel.fromJson, 'chatroom',
-        field: mongo.where
-            .eq('_id', id)
-            .fields(['imgurl', 'note', 'rule', 'purpose']));
+        field: mongo.where.eq('_id', id)
+        // .fields(['imgurl', 'note', 'rule', 'purpose'])
+
+        );
     print('setting image $chatroomsetting');
     notifyListeners();
   }
@@ -2796,6 +2797,27 @@ class ChatProvider with ChangeNotifier {
     }
 
     await getaccountinfo();
+  }
+
+  Future change_chatroom_info(
+    id,
+    title,
+    purpose,
+    note,
+    rule,
+  ) async {
+    print('改變chatroom_info $id $title $purpose $note $rule}');
+    await _mongoDB.updateData_single(
+      "chatroom",
+      "_id",
+      id,
+      {
+        "title": title,
+        "purpose": purpose,
+        "note": note,
+        "rule": rule,
+      },
+    );
   }
 
   changenowroomimg(img) {

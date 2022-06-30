@@ -93,17 +93,20 @@ class _LoginPageState extends State<LoginPage> {
                             print('facebook user :${result.user?.uid}');
                             //跳轉
                             await Provider.of<ChatProvider>(context,
-                                    listen: false)
+                                listen: false)
                                 .register(result.user)
                                 .whenComplete(() =>
-                                    Future.delayed(Duration(seconds: 2), () {
-                                      Navigator.pushAndRemoveUntil(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  IndexPage2()),
-                                          (route) => route == null);
-                                    }));
+
+                            // Navigator.pushAndRemoveUntil(
+                            //     context,
+                            //     MaterialPageRoute(builder: (context) => IndexPage2()),
+                            //     (route) => route == null)
+                            Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        WaitingPage()),
+                                    (route) => route == null));
                           } else
                             print('不是');
                         },

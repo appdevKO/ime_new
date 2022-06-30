@@ -36,7 +36,7 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
       vsync: ScrollableState(),
       initialIndex: 0,
     );
-    hi=true;
+    hi = true;
     super.initState();
   }
 
@@ -523,32 +523,36 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                                           color: Colors.black,
                                         ),
                                       ),
-                                      backgroundColor: Color(0xffffbbbb),
+                                      backgroundColor:
+                                          hi ? Color(0xffffbbbb) : Colors.grey,
                                     ),
                                     onTap: () {
-                                      Provider.of<ChatProvider>(context,
-                                              listen: false)
-                                          .easyhi(
-                                              widget.chatroomid,
-                                              value.o2omemberlist![0].nickname,
-                                              value
-                                                  .o2omemberlist![0].avatar_sub)
-                                          .then((value) {
-                                        if (!value) {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(SnackBar(
-                                            content: Text("快到交友設定設置你的打招呼"),
-                                          ));
-                                        } else {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(SnackBar(
-                                            content: Text("已向心儀的人打招呼"),
-                                          ));
-                                          setState(() {
-                                            hi=false;
-                                          });
-                                        }
-                                      });
+                                      if(hi){
+                                        Provider.of<ChatProvider>(context,
+                                            listen: false)
+                                            .easyhi(
+                                            widget.chatroomid,
+                                            value.o2omemberlist![0].nickname,
+                                            value
+                                                .o2omemberlist![0].avatar_sub)
+                                            .then((value) {
+                                          if (!value) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(SnackBar(
+                                              content: Text("快到交友設定設置你的打招呼"),
+                                            ));
+                                          } else {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(SnackBar(
+                                              content: Text("已向心儀的人打招呼"),
+                                            ));
+                                            setState(() {
+                                              hi = false;
+                                            });
+                                          }
+                                        });
+                                      }
+
                                     });
                               }),
                             ),

@@ -220,6 +220,8 @@ class _NewActionState extends State<NewAction> {
                                     .whenComplete(() => Future.delayed(
                                             Duration(seconds: 2), () async {
                                           await value.get_new_action_list();
+                                          await value.get_someone_action_list(
+                                              value.remoteUserInfo[0].memberid);
                                           value.cancelaction_img();
                                           _textEditingController.clear();
                                           Navigator.pop(context);

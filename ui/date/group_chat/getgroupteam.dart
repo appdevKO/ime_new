@@ -1151,10 +1151,7 @@ class _GroupteamState extends State<Groupteam> {
                                                                     .filter_groupteamlist![
                                                                         index]
                                                                     .id,
-                                                                title: value
-                                                                    .filter_groupteamlist![
-                                                                        index]
-                                                                    .title,
+
                                                                 chattype: 1,
                                                                 own: value.filter_groupteamlist![index]
                                                                             .ownerId !=
@@ -1517,10 +1514,7 @@ class _GroupteamState extends State<Groupteam> {
                                                                     .groupteamlist![
                                                                         index]
                                                                     .id,
-                                                                title: value
-                                                                    .groupteamlist![
-                                                                        index]
-                                                                    .title,
+
                                                                 chattype: 1,
                                                                 own: value.groupteamlist![index]
                                                                             .ownerId !=
