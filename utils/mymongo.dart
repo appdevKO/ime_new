@@ -93,7 +93,13 @@ class MongoDB {
 
     return datalist;
   }
-
+  Future sweetGetUserList(collection_name, account) async {
+    var coll = db.collection(collection_name);
+    Map<String, dynamic> u =
+    await coll.findOne({"account": 'vO5gVqgW12MEr96Q1j5ShEy9lHq1'});
+    print('uuu ${u}');
+    return u;
+  }
   // Future readdb2(
   //   collection_name,
   // ) async {

@@ -5,6 +5,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:ime_new/business_logic/provider/chat_provider.dart';
 import 'package:ime_new/ui/otherpage/other_action_page.dart';
+import 'package:intl/intl.dart';
 
 import 'package:lpinyin/lpinyin.dart';
 import 'package:provider/provider.dart';
@@ -71,6 +72,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                       width: MediaQuery.of(context).size.width,
                       color: Colors.grey,
                     ),
+                    //背景照片
                     Positioned(
                       top: 0,
                       child: Consumer<ChatProvider>(
@@ -116,6 +118,13 @@ class _MyProfilePageState extends State<MyProfilePage> {
                       ),
                     ),
                     Positioned(
+                        top: 10,
+                        right: 10,
+                        child: Text(
+                          '${_current + 1}',
+                          style: TextStyle(fontWeight: FontWeight.w700),
+                        )),
+                    Positioned(
                       top: MediaQuery.of(context).size.height * .42,
                       child: Container(
                         height: MediaQuery.of(context).size.height * .58,
@@ -155,7 +164,36 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                     ),
                                   );
                                 }),
-
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 8.0),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.cake,
+                                        size: 15,
+                                        color: Colors.grey,
+                                      ),
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 5.0),
+                                        child: Consumer<ChatProvider>(
+                                            builder: (context, value, child) {
+                                          return Text(
+                                            value.remoteUserInfo[0].birthday !=
+                                                        null &&
+                                                    value.remoteUserInfo[0]
+                                                            .birthday !=
+                                                        ''
+                                                ? '${DateFormat('yyyy-MM-dd').format(value.remoteUserInfo[0].birthday)}'
+                                                : '生日不詳',
+                                            style:
+                                                TextStyle(color: Colors.grey),
+                                          );
+                                        }),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                                 Padding(
                                   padding: const EdgeInsets.only(top: 8.0),
                                   child: Row(
@@ -318,7 +356,14 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                                             .symmetric(
                                                                 horizontal: 10,
                                                                 vertical: 4),
-                                                        width: 80,
+                                                        width: value
+                                                                    .remoteUserInfo[
+                                                                        0]
+                                                                    .interest_list[
+                                                                        index]
+                                                                    .length *
+                                                                16.0 +
+                                                            45,
                                                         child: Row(
                                                           children: [
                                                             Icon(
@@ -601,10 +646,12 @@ class _MyProfilePageState extends State<MyProfilePage> {
                 ),
                 //動態
                 OtherActionPage(
-                    memberid: Provider.of<ChatProvider>(context, listen: false)
-                        .remoteUserInfo[0]
-                        .memberid,
-                    type: 2)
+                  memberid: Provider.of<ChatProvider>(context, listen: false)
+                      .remoteUserInfo[0]
+                      .memberid,
+                  type: 2,
+                  nickname: '',
+                )
               ],
             ),
             Container(

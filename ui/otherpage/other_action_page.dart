@@ -13,9 +13,14 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'other_profile_page.dart';
 
 class OtherActionPage extends StatefulWidget {
-  OtherActionPage({Key? key, required this.memberid, required this.type})
+  OtherActionPage(
+      {Key? key,
+      required this.memberid,
+      required this.nickname,
+      required this.type})
       : super(key: key);
   final memberid;
+  final nickname;
   final int type;
 
   @override
@@ -64,7 +69,7 @@ class _OtherActionPageState extends State<OtherActionPage> {
             height: 56,
             padding: EdgeInsets.only(top: 5),
             decoration: new BoxDecoration(color: Color(0xffffbbbb)),
-            child: Center(child: Text(widget.type == 1 ? 'XXX的動態' : '我的動態')),
+            child: Center(child: Text(widget.type == 1 ? '${widget.nickname}的動態' : '我的動態')),
           ),
         ),
         body: Consumer<ChatProvider>(builder: (context, value, child) {

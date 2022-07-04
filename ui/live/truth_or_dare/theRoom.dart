@@ -49,12 +49,6 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
   List<int> remoteUid = [];
   final _gridViewKey = GlobalKey();
   Size? _gridViewSize;
-  void getSize() {
-    setState(() {
-      _gridViewSize = _gridViewKey.currentContext!.size;
-    });
-  }
-
   @override
   void initState() {
     super.initState();
@@ -70,7 +64,7 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
     });
 
     Future(() async {
-      Timer.periodic(Duration(seconds: 3), (timer) {
+      Timer.periodic(Duration(seconds: 5), (timer) {
         if (myRoomSeatIndex == 0) {
           timer.cancel();
         } else {
@@ -90,7 +84,6 @@ class _theRoomState extends State<theRoom> with TickerProviderStateMixin {
 
   @override
   void deactivate() {
-    myRoomSeatIndex = 0;
     engine!.muteAllRemoteVideoStreams(true);
     engine!.muteAllRemoteAudioStreams(true);
     engine!.disableVideo();

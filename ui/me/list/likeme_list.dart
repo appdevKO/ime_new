@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ime_new/business_logic/provider/chat_provider.dart';
+import 'package:intl/intl.dart';
 
 import 'package:lpinyin/lpinyin.dart';
 import 'package:provider/provider.dart';
@@ -65,97 +66,122 @@ class _LikeMeListState extends State<LikeMeList> {
                       Icons.send,
                       color: Colors.transparent,
                     ),
-                    onPressed: () {},
+                    onPressed: () async {
+                      await Provider.of<ChatProvider>(context, listen: false)
+                          .get_followed_userinfo_list();
+                    },
                   ),
                 ),
               ],
             ),
           ),
-          Consumer<ChatProvider>(builder: (context, value, child) {
-            return value.follow_me_user_list != null
-                ? Container(
-                    height: 400,
-                    child: Padding(
-                      padding: const EdgeInsets.all(15.0),
-                      child: ListView.builder(
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                CircleAvatar(
-                                  backgroundColor: Colors.grey,
-                                  radius: 30,
-                                  backgroundImage: NetworkImage(value
-                                      .follow_me_user_list[index].avatar_sub),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 8.0),
-                                  child: Column(
+          Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 10.0, vertical: 20),
+              child: Consumer<ChatProvider>(builder: (context, value, child) {
+                return value.follow_me_list != null
+                    ? Container(
+                        height: 400,
+                        child: Padding(
+                          padding: const EdgeInsets.all(5.0),
+                          child: ListView.builder(
+                            itemBuilder: (context, index) {
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 10.0),
+                                child: GestureDetector(
+                                  child: Row(
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.center,
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
-                                      Text(value.follow_me_user_list[index]
-                                                  .nickname !=
-                                              null
-                                          ? '${value.follow_me_user_list[index].nickname}'
-                                          : '名字不詳'),
-                                      // Text(value.follow_me_user_list[index]
-                                      //             .memberid !=
-                                      //         null
-                                      //     ? '${value.follow_me_user_list[index].memberid}'
-                                      //     : '識別id不詳'),
-                                      Row(
-                                        children: [
-                                          Text(value.follow_me_user_list[index]
-                                                      .constellation !=
-                                                  null
-                                              ? '${value.follow_me_user_list[index].constellation}座'
-                                              : '星座不詳'),
-                                          Text(value.follow_me_user_list[index]
-                                                      .age !=
-                                                  null
-                                              ? '/${value.follow_me_user_list[index].age}歲'
-                                              : '/年齡不詳'),
-                                          Text(value.follow_me_user_list[index]
-                                                      .height !=
-                                                  null
-                                              ? '/${value.follow_me_user_list[index].height}cm'
-                                              : '/身高不詳'),
-                                          Text(value.follow_me_user_list[index]
-                                                          .area !=
-                                                      null &&
-                                                  value
-                                                          .follow_me_user_list[
-                                                              index]
-                                                          .area !=
-                                                      ''
-                                              ? '/${ChineseHelper.convertToTraditionalChinese(value.follow_me_user_list[index].area)}'
-                                              : '/所在地不詳'),
-                                        ],
+                                      CircleAvatar(
+                                        backgroundColor: Colors.grey,
+                                        radius: 30,
+                                        backgroundImage: NetworkImage(value
+                                            .follow_me_list[index]
+                                            .followed_userinfo
+                                            .avatar_sub),
+                                      ),
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 10.0),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              value
+                                                          .follow_me_list[index]
+                                                          .followed_userinfo
+                                                          .nickname !=
+                                                      null
+                                                  ? '${value.follow_me_list[index].followed_userinfo.nickname}'
+                                                  : '名字不詳',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.w700,
+                                                  fontSize: 18),
+                                            ),
+                                            Row(
+                                              children: [
+                                                Text(
+                                                    '${value.follow_me_list[index].followed_userinfo.sex}'),
+                                                Text(value
+                                                            .follow_me_list[
+                                                                index]
+                                                            .followed_userinfo
+                                                            .birthday !=
+                                                        null
+                                                    ? '  / ${DateFormat('yyyy-MM-dd').format(value.follow_me_list[index].followed_userinfo.birthday)}'
+                                                    : '  / 生日'),
+                                                Text(value
+                                                            .follow_me_list[
+                                                                index]
+                                                            .followed_userinfo
+                                                            .height !=
+                                                        null
+                                                    ? '  / ${value.follow_me_list[index].followed_userinfo.height}cm'
+                                                    : '  / 身高不詳'),
+                                                Text(value
+                                                                .follow_me_list[
+                                                                    index]
+                                                                .followed_userinfo
+                                                                .area !=
+                                                            null &&
+                                                        value
+                                                                .follow_me_list[
+                                                                    index]
+                                                                .followed_userinfo
+                                                                .area !=
+                                                            ''
+                                                    ? '  / ${ChineseHelper.convertToTraditionalChinese(value.follow_me_list[index].followed_userinfo.area)}'
+                                                    : '  / 所在地不詳'),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ],
                                   ),
                                 ),
-                              ],
-                            ),
-                          );
-                        },
-                        itemCount: value.follow_me_user_list.length,
-                      ),
-                    ),
-                  )
-                : Container();
-          })
+                              );
+                            },
+                            itemCount: value.follow_me_list.length,
+                          ),
+                        ),
+                      )
+                    : Container();
+              }))
         ],
       ),
     ));
   }
 
   Future initdata() async {
-    await Provider.of<ChatProvider>(context, listen: false).followme_finduserinfolist();
+    // await Provider.of<ChatProvider>(context, listen: false).followme_finduserinfolist();
+    await Provider.of<ChatProvider>(context, listen: false)
+        .get_followed_userinfo_list();
   }
 }

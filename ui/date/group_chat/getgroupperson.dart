@@ -36,6 +36,8 @@ class _GetPersonState extends State<GetPerson> {
   String? dropvalue2;
   String? dropvalue;
   DateTime? selectedDateTime;
+  DateTime? beforeDate;
+  DateTime? afterDate;
 
   @override
   void initState() {
@@ -164,7 +166,11 @@ class _GetPersonState extends State<GetPerson> {
                                         //儲存篩選狀態
                                         value.change_filter(2);
                                         value.setfilter_chatroom(2,
-                                            area: dropvalue2);
+                                            area: dropvalue2,
+                                            after_time: afterDate,
+                                            before_time: beforeDate);
+                                        beforeDate = null;
+                                        afterDate = null;
                                         //重新載入篩選後的結果
                                         Navigator.pop(context);
                                       },
@@ -269,6 +275,64 @@ class _GetPersonState extends State<GetPerson> {
                                         runSpacing: 5,
                                       ),
                                     )),
+                                Text('時間篩選'),
+                                Row(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    ElevatedButton(
+                                      child: Text('選擇時間'),
+                                      onPressed: () {
+                                        DatePicker.showDatePicker(context,
+                                            showTitleActions: true,
+                                            minTime: DateTime.now(),
+                                            maxTime: DateTime.now()
+                                                .add(Duration(days: 365)),
+                                            onChanged: (date) {
+                                              print('change $date');
+                                            }, onConfirm: (date) {
+                                              sheetstate(() {
+                                                beforeDate = date;
+                                              });
+                                            },
+                                            currentTime: DateTime.now(),
+                                            locale: LocaleType.tw);
+                                      },
+                                    ),
+                                    Text(beforeDate != null
+                                        ? '在${DateFormat('yyyy-MM-dd').format(beforeDate!)}之前'
+                                        : '先選擇日期'),
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    ElevatedButton(
+                                      child: Text('選擇時間'),
+                                      onPressed: () {
+                                        DatePicker.showDatePicker(context,
+                                            showTitleActions: true,
+                                            minTime: DateTime.now(),
+                                            maxTime: DateTime.now()
+                                                .add(Duration(days: 365)),
+                                            onChanged: (date) {
+                                              print('change $date');
+                                            }, onConfirm: (date) {
+                                              sheetstate(() {
+                                                afterDate = date;
+                                              });
+                                            },
+                                            currentTime: DateTime.now(),
+                                            locale: LocaleType.tw);
+                                      },
+                                    ),
+                                    Text(afterDate != null
+                                        ? '在${DateFormat('yyyy-MM-dd').format(afterDate!)}之後'
+                                        : '先選擇日期'),
+
+                                  ],
+                                )
                               ],
                             ),
                           ),
@@ -1020,7 +1084,6 @@ class _GroupPersonState extends State<GroupPerson> {
                                                                     .filter_grouppersonlist![
                                                                         index]
                                                                     .id,
-
                                                                 chattype: 2,
                                                                 own: value.filter_grouppersonlist![index]
                                                                             .ownerId !=
@@ -1355,7 +1418,6 @@ class _GroupPersonState extends State<GroupPerson> {
                                                                     .grouppersonlist![
                                                                         index]
                                                                     .id,
-
                                                                 chattype: 2,
                                                                 own: value.grouppersonlist![index]
                                                                             .ownerId !=

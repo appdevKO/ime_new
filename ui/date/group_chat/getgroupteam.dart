@@ -38,6 +38,8 @@ class _GetTeamState extends State<GetTeam> {
   String? dropvalue2;
   String? dropvalue;
   DateTime? selectedDateTime;
+  DateTime? beforeDate;
+  DateTime? afterDate;
 
   @override
   void initState() {
@@ -298,13 +300,12 @@ class _GetTeamState extends State<GetTeam> {
                                         onTap: () {
                                           //儲存篩選狀態
                                           value.change_filter(1);
-                                          if (value.purposelist.isNotEmpty) {
-                                            value.setfilter_chatroom(1,
-                                                area: dropvalue2);
-                                          } else {
-                                            value.setfilter_chatroom(1,
-                                                area: dropvalue2);
-                                          }
+                                          value.setfilter_chatroom(1,
+                                              area: dropvalue2,
+                                              after_time: afterDate,
+                                              before_time: beforeDate);
+                                          beforeDate = null;
+                                          afterDate = null;
 
                                           //重新載入篩選後的結果
 
@@ -412,6 +413,64 @@ class _GetTeamState extends State<GetTeam> {
                                           runSpacing: 5,
                                         ),
                                       )),
+                                  Text('時間篩選'),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      ElevatedButton(
+                                        child: Text('選擇時間'),
+                                        onPressed: () {
+                                          DatePicker.showDatePicker(context,
+                                              showTitleActions: true,
+                                              minTime: DateTime.now(),
+                                              maxTime: DateTime.now()
+                                                  .add(Duration(days: 365)),
+                                              onChanged: (date) {
+                                            print('change $date');
+                                          }, onConfirm: (date) {
+                                            sheetstate(() {
+                                              beforeDate = date;
+                                            });
+                                          },
+                                              currentTime: DateTime.now(),
+                                              locale: LocaleType.tw);
+                                        },
+                                      ),
+                                      Text(beforeDate != null
+                                          ? '在${DateFormat('yyyy-MM-dd').format(beforeDate!)}之前'
+                                          : '先選擇日期'),
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      ElevatedButton(
+                                        child: Text('選擇時間'),
+                                        onPressed: () {
+                                          DatePicker.showDatePicker(context,
+                                              showTitleActions: true,
+                                              minTime: DateTime.now(),
+                                              maxTime: DateTime.now()
+                                                  .add(Duration(days: 365)),
+                                              onChanged: (date) {
+                                            print('change $date');
+                                          }, onConfirm: (date) {
+                                            sheetstate(() {
+                                              afterDate = date;
+                                            });
+                                          },
+                                              currentTime: DateTime.now(),
+                                              locale: LocaleType.tw);
+                                        },
+                                      ),
+                                      Text(afterDate != null
+                                          ? '在${DateFormat('yyyy-MM-dd').format(afterDate!)}之後'
+                                          : '先選擇日期'),
+
+                                    ],
+                                  )
                                 ],
                               ),
                             ),
@@ -1151,7 +1210,6 @@ class _GroupteamState extends State<Groupteam> {
                                                                     .filter_groupteamlist![
                                                                         index]
                                                                     .id,
-
                                                                 chattype: 1,
                                                                 own: value.filter_groupteamlist![index]
                                                                             .ownerId !=
@@ -1514,7 +1572,6 @@ class _GroupteamState extends State<Groupteam> {
                                                                     .groupteamlist![
                                                                         index]
                                                                     .id,
-
                                                                 chattype: 1,
                                                                 own: value.groupteamlist![index]
                                                                             .ownerId !=

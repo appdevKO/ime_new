@@ -118,19 +118,20 @@ class TD_game with ChangeNotifier {
     client.onSubscribed = onSubscribed;
     client.onSubscribeFail = onSubscribeFail;
     client.pongCallback = pong;
+    client.autoReconnect = true;
 
     final connMessage = MqttConnectMessage()
         .authenticateAs('username', 'password')
         .keepAliveFor(60)
         .withWillTopic('willtopic')
         .withWillMessage('Will message')
-        .startClean()
+        //.startClean()
         .withWillQos(MqttQos.atLeastOnce);
     client.connectionMessage = connMessage;
     try {
       await client.connect('sayhong_test', 'HoolyHi168888');
     } catch (e) {
-      //print('Exception: $e');
+      print('Exception: $e');
       client.disconnect();
     }
 
@@ -163,7 +164,7 @@ class TD_game with ChangeNotifier {
           var encode = utf8.decode(('$pt'.split(',')[3]).runes.toList());
           List<int> res = base64.decode(base64.normalize(encode));
           roomName = (utf8.decode(res));
-          pushMqtt("imedotUser/" + myUid, "getToken," + myRoomId);
+          //pushMqtt("imedotUser/" + myUid, "getToken," + myRoomId);
           client.subscribe("imedotRoom/" + myRoomId, MqttQos.atLeastOnce);
           client.subscribe(
               "imedotRoom/" + myRoomId + "/game", MqttQos.atLeastOnce);
@@ -203,10 +204,11 @@ class TD_game with ChangeNotifier {
           text_view_notify_king = false;
           firstOut = true;
           notifyListeners();
-        } else if ('$pt'.startsWith('postToken,')) {
-          channelToken = '$pt'.split(',')[1];
-          //print('getToken $channelToken');
         }
+        //else if ('$pt'.startsWith('postToken,')) {
+        //   channelToken = '$pt'.split(',')[1];
+        //   //print('getToken $channelToken');
+        // }
       } else if ('${c[0].topic}' == ('imedotRoom/' + myRoomId)) {
         // 從MQTT收新人入房消息，改變瀏覽器網址
         if ('$pt'.startsWith('getid,')) {
@@ -360,24 +362,24 @@ class TD_game with ChangeNotifier {
             pos = 12.75;
           }
           Timer(const Duration(milliseconds: 500), () async {
-            await pushMqtt("imedotRoom/" + (myRoomId) + "/game", 'start_text,');
+            pushMqtt("imedotRoom/" + (myRoomId) + "/game", 'start_text,');
           });
-          Timer(const Duration(milliseconds: 2000 + 2000), () async {
-            await pushMqtt(
-                "imedotRoom/" + (myRoomId) + "/game", 'start_text_end,');
-          });
-          Timer(const Duration(milliseconds: 2200 + 2000), () async {
-            await pushMqtt("imedotRoom/" + (myRoomId) + "/game", 'start,');
-          });
-          Timer(const Duration(milliseconds: 5200 + 2000), () async {
-            await pushMqtt(
-                "imedotRoom/" + (myRoomId) + "/game", 'pointer_end,');
-          });
-          Timer(const Duration(milliseconds: 5200 + 2000), () async {
-            pushMqtt("imedotRoom/" + (myRoomId) + "/game", 'notify_king,');
+          // Timer(const Duration(milliseconds: 2000 + 2000), () async {
+          //   await pushMqtt(
+          //       "imedotRoom/" + (myRoomId) + "/game", 'start_text_end,');
+          // });
+          // Timer(const Duration(milliseconds: 2200 + 2000), () async {
+          //   await pushMqtt("imedotRoom/" + (myRoomId) + "/game", 'start,');
+          // });
+          // Timer(const Duration(milliseconds: 5200 + 2000), () async {
+          //   await pushMqtt(
+          //       "imedotRoom/" + (myRoomId) + "/game", 'pointer_end,');
+          // });
+          // Timer(const Duration(milliseconds: 5200 + 2000), () async {
+          //   pushMqtt("imedotRoom/" + (myRoomId) + "/game", 'notify_king,');
 
-            pushMqtt("imedotRoom/" + (myRoomId) + "/game", 'choose_one,');
-          });
+          //   pushMqtt("imedotRoom/" + (myRoomId) + "/game", 'choose_one,');
+          // });
         } else if ('$pt'.startsWith('next_game,')) {
           BeChosen = '';
           Punish = '';
@@ -448,16 +450,25 @@ class TD_game with ChangeNotifier {
           if (stopGame == false) {
             text_view_start = true;
             notifyListeners();
+            Timer(const Duration(milliseconds: 3500), () async {
+              pushMqtt("imedotRoom/" + (myRoomId) + "/game", 'start_text_end,');
+            });
           }
         } else if ('$pt'.startsWith('start_text_end,')) {
           if (stopGame == false) {
             text_view_start = false;
             notifyListeners();
+            Timer(const Duration(milliseconds: 200), () async {
+              pushMqtt("imedotRoom/" + (myRoomId) + "/game", 'start,');
+            });
           }
         } else if ('$pt'.startsWith('start,')) {
           if (stopGame == false) {
             roulette_wheel_view = true;
             notifyListeners();
+            Timer(const Duration(milliseconds: 3000), () async {
+              pushMqtt("imedotRoom/" + (myRoomId) + "/game", 'pointer_end,');
+            });
           }
         } else if ('$pt'.startsWith('notify_king,')) {
           if (stopGame == false) {
@@ -478,6 +489,9 @@ class TD_game with ChangeNotifier {
           }
           roulette_wheel_view = false;
           notifyListeners();
+          pushMqtt("imedotRoom/" + (myRoomId) + "/game", 'notify_king,');
+          pushMqtt("imedotRoom/" + (myRoomId) + "/game", 'choose_one,');
+          ;
         } else if ('$pt'.startsWith('choose_one,')) {
           if (myRoomSeatIndex == (int.parse(king!) + 1)) {
             if (king == '0') {
@@ -596,12 +610,12 @@ class TD_game with ChangeNotifier {
 
 // 连接成功
 void onConnected() {
-  print('tdgame Connected');
+  //print('tdgame Connected');
 }
 
 // 连接断开
 void onDisconnected() {
-  print('Disconnected');
+  //print('Disconnected');
 }
 
 // 订阅主题成功
@@ -611,17 +625,17 @@ void onSubscribed(String topic) {
 
 // 订阅主题失败
 void onSubscribeFail(String topic) {
-  print('Failed to subscribe $topic');
+  //print('Failed to subscribe $topic');
 }
 
 // 成功取消订阅
 void onUnsubscribed(String topic) {
-  print('Unsubscribed topic: $topic');
+  //print('Unsubscribed topic: $topic');
 }
 
 // 收到 PING 响应
 void pong() {
-  print('Ping response client callback invoked');
+  //print('Ping response client callback invoked');
 }
 
 GetKing() {

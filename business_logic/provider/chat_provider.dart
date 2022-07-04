@@ -1235,6 +1235,61 @@ class ChatProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future get_follow_info_list() async {
+    print("get_follow_info_list  my mongo id ${remoteUserInfo[0].memberid}");
+    final pipeline = mongo.AggregationPipelineBuilder()
+      ..addStage(mongo.Project({'_id': 0}))
+      ..addStage(mongo.Match(mongo.where
+          .eq('member_id', remoteUserInfo[0].memberid)
+          .map['\$query']))
+      ..addStage(mongo.Lookup(
+        from: 'member',
+        as: 'following_userinfo',
+        // let: {},
+        foreignField: '_id',
+        localField: 'list_id',
+        // pipeline: [],
+      ))
+      ..addStage(mongo.Unwind(mongo.Field('following_userinfo')))
+      ..addStage(mongo.Project({
+        // 'create_time': 0,
+        'list_id': 0,
+      }));
+    var result =
+        await lookupmongodb(FollowLogModel.fromJson, 'follow_log', pipeline);
+    print("get_follow_action_list $result");
+    myfollowlog = result as List;
+    // print("get_follow_action_list ${result[0].userinfo}");
+    notifyListeners();
+  }
+
+  Future get_followed_userinfo_list() async {
+    print("get_followed_info_list  my mongo id ${remoteUserInfo[0].memberid}");
+    final pipeline = mongo.AggregationPipelineBuilder()
+      ..addStage(mongo.Project({'_id': 0}))
+      ..addStage(mongo.Match(
+          mongo.where.eq('list_id', remoteUserInfo[0].memberid).map['\$query']))
+      ..addStage(mongo.Lookup(
+        from: 'member',
+        as: 'followed_userinfo',
+        // let: {},
+        foreignField: '_id',
+        localField: 'list_id',
+        // pipeline: [],
+      ))
+      ..addStage(mongo.Unwind(mongo.Field('followed_userinfo')))
+      ..addStage(mongo.Project({
+        // 'create_time': 0,
+        'list_id': 0,
+      }));
+    var result =
+        await lookupmongodb(FollowLogModel.fromJson, 'follow_log', pipeline);
+    print("get_followed_info_list  $result");
+    follow_me_list = result as List;
+    // print("get_follow_action_list ${result[0].userinfo}");
+    notifyListeners();
+  }
+
   int action_msg_value = 1;
 
   Future get_action_msg(action_id) async {
@@ -1636,7 +1691,9 @@ class ChatProvider with ChangeNotifier {
 
         await createfollowlog();
         await createblocklog();
-        await getmyfollowlog();
+
+        await get_follow_info_list();
+        await get_followed_userinfo_list();
         await getmyblocklog();
 
         return true;
@@ -1702,16 +1759,16 @@ class ChatProvider with ChangeNotifier {
   List follow_me_user_list = [];
   List my_block_user_list = [];
 
-  Future followme_finduserinfolist() async {
-    follow_me_user_list = [];
-    for (var item in follow_me_list!) {
-      var result = await getuserInfo(item.memberid);
-      print('22222222');
-      follow_me_user_list.add(result[0]);
-    }
-    print('find user info list ${follow_me_user_list}');
-    notifyListeners();
-  }
+  // Future followme_finduserinfolist() async {
+  //   follow_me_user_list = [];
+  //   for (var item in follow_me_list!) {
+  //     var result = await getuserInfo(item.memberid);
+  //     print('22222222');
+  //     follow_me_user_list.add(result[0]);
+  //   }
+  //   print('find user info list ${follow_me_user_list}');
+  //   notifyListeners();
+  // }
 
   Future myblock_finduserinfolist() async {
     my_block_user_list = [];
@@ -1889,78 +1946,350 @@ class ChatProvider with ChangeNotifier {
   var filter_grouppersonlist;
   var filter_groupteamlist;
 
-  Future setfilter_chatroom(
-    num, {
-    area,
-  }) async {
+  Future setfilter_chatroom(num, {area, before_time, after_time}) async {
     print("filter filter");
     if (num == 2) {
       if (area != null) {
         if (purposelist.isNotEmpty) {
-          print('有目的 有地區');
-          filter_grouppersonlist = await readremotemongodb(
-              ChatRoomModel.fromJson, 'chatroom',
-              field: mongo.where
-                  .eq('area', area)
-                  .and(mongo.where.eq('purpose', purposelist[0]))
-                  .and(mongo.where.eq('type', 1))
-                  .sortBy('create_time', descending: true));
+          if (before_time != null) {
+            if (after_time != null) {
+              print('有目的 有地區');
+              filter_grouppersonlist = await readremotemongodb(
+                  ChatRoomModel.fromJson, 'chatroom',
+                  field: mongo.where
+                      .eq('area', area)
+                      .and(mongo.where.eq('purpose', purposelist[0]))
+                      .and(mongo.where.eq('type', 1))
+                      .and(mongo.where.gt('datetime', after_time))
+                      .and(mongo.where.lt('datetime', before_time))
+                      .sortBy('create_time', descending: true));
+            } else {
+              print('有目的 有地區');
+              filter_grouppersonlist = await readremotemongodb(
+                  ChatRoomModel.fromJson, 'chatroom',
+                  field: mongo.where
+                      .eq('area', area)
+                      .and(mongo.where.eq('purpose', purposelist[0]))
+                      .and(mongo.where.eq('type', 1))
+                      .and(mongo.where.lt('datetime', before_time))
+                      .sortBy('create_time', descending: true));
+            }
+          } else {
+            if (after_time != null) {
+              print('有目的 有地區');
+              filter_grouppersonlist = await readremotemongodb(
+                  ChatRoomModel.fromJson, 'chatroom',
+                  field: mongo.where
+                      .eq('area', area)
+                      .and(mongo.where.eq('purpose', purposelist[0]))
+                      .and(mongo.where.eq('type', 1))
+                      .and(mongo.where.gt('datetime', after_time))
+                      .sortBy('create_time', descending: true));
+            } else {
+              print('有目的 有地區');
+              filter_grouppersonlist = await readremotemongodb(
+                  ChatRoomModel.fromJson, 'chatroom',
+                  field: mongo.where
+                      .eq('area', area)
+                      .and(mongo.where.eq('purpose', purposelist[0]))
+                      .and(mongo.where.eq('type', 1))
+                      .sortBy('create_time', descending: true));
+            }
+          }
         } else {
-          print('沒目的 有地區');
-          filter_grouppersonlist = await readremotemongodb(
-              ChatRoomModel.fromJson, 'chatroom',
-              field: mongo.where
-                  .eq('area', area)
-                  .and(mongo.where.eq('type', 1))
-                  .sortBy('create_time', descending: true));
+          if (before_time != null) {
+            if (after_time != null) {
+              print('沒目的 有地區');
+              filter_grouppersonlist = await readremotemongodb(
+                  ChatRoomModel.fromJson, 'chatroom',
+                  field: mongo.where
+                      .eq('area', area)
+                      .and(mongo.where.eq('type', 1))
+                      .and(mongo.where.gt('datetime', after_time))
+                      .and(mongo.where.lt('datetime', before_time))
+                      .sortBy('create_time', descending: true));
+            } else {
+              print('沒目的 有地區');
+              filter_grouppersonlist = await readremotemongodb(
+                  ChatRoomModel.fromJson, 'chatroom',
+                  field: mongo.where
+                      .eq('area', area)
+                      .and(mongo.where.eq('type', 1))
+                      .and(mongo.where.lt('datetime', before_time))
+                      .sortBy('create_time', descending: true));
+            }
+          } else {
+            if (after_time != null) {
+              print('沒目的 有地區');
+              filter_grouppersonlist = await readremotemongodb(
+                  ChatRoomModel.fromJson, 'chatroom',
+                  field: mongo.where
+                      .eq('area', area)
+                      .and(mongo.where.eq('type', 1))
+                      .and(mongo.where.gt('datetime', after_time))
+                      .sortBy('create_time', descending: true));
+            } else {
+              print('沒目的 有地區');
+              filter_grouppersonlist = await readremotemongodb(
+                  ChatRoomModel.fromJson, 'chatroom',
+                  field: mongo.where
+                      .eq('area', area)
+                      .and(mongo.where.eq('type', 1))
+                      .sortBy('create_time', descending: true));
+            }
+          }
         }
       } else {
-        print('有目的 沒地區');
         if (purposelist.isNotEmpty) {
-          filter_grouppersonlist = await readremotemongodb(
-              ChatRoomModel.fromJson, 'chatroom',
-              field: mongo.where
-                  .eq('purpose', purposelist[0])
-                  .and(mongo.where.eq('type', 1))
-                  .sortBy('create_time', descending: true));
+          if (before_time != null) {
+            if (after_time != null) {
+              print('有目的 沒地區');
+              filter_grouppersonlist = await readremotemongodb(
+                  ChatRoomModel.fromJson, 'chatroom',
+                  field: mongo.where
+                      .eq('purpose', purposelist[0])
+                      .and(mongo.where.eq('type', 1))
+                      .and(mongo.where.gt('datetime', after_time))
+                      .and(mongo.where.lt('datetime', before_time))
+                      .sortBy('create_time', descending: true));
+            } else {
+              print('有目的 沒地區');
+              filter_grouppersonlist = await readremotemongodb(
+                  ChatRoomModel.fromJson, 'chatroom',
+                  field: mongo.where
+                      .eq('purpose', purposelist[0])
+                      .and(mongo.where.eq('type', 1))
+                      .and(mongo.where.lt('datetime', before_time))
+                      .sortBy('create_time', descending: true));
+            }
+          } else {
+            if (after_time != null) {
+              print('有目的 沒地區');
+              filter_grouppersonlist = await readremotemongodb(
+                  ChatRoomModel.fromJson, 'chatroom',
+                  field: mongo.where
+                      .eq('purpose', purposelist[0])
+                      .and(mongo.where.eq('type', 1))
+                      .and(mongo.where.gt('datetime', after_time))
+                      .sortBy('create_time', descending: true));
+            } else {
+              print('有目的 沒地區');
+              filter_grouppersonlist = await readremotemongodb(
+                  ChatRoomModel.fromJson, 'chatroom',
+                  field: mongo.where
+                      .eq('purpose', purposelist[0])
+                      .and(mongo.where.eq('type', 1))
+                      .sortBy('create_time', descending: true));
+            }
+          }
         } else {
-          filter_grouppersonlist = [];
+          if (before_time != null) {
+            if (after_time != null) {
+              print('沒目的 沒地區1');
+              filter_grouppersonlist = await readremotemongodb(
+                  ChatRoomModel.fromJson, 'chatroom',
+                  field: mongo.where
+                      .eq('type', 1)
+                      .and(mongo.where.gt('datetime', after_time))
+                      .and(mongo.where.lt('datetime', before_time))
+                      .sortBy('create_time', descending: true));
+            } else {
+              print('沒目的 沒地區2');
+              filter_grouppersonlist = await readremotemongodb(
+                  ChatRoomModel.fromJson, 'chatroom',
+                  field: mongo.where
+                      .eq('type', 1)
+                      .and(mongo.where.lt('datetime', before_time))
+                      .sortBy('create_time', descending: true));
+            }
+          } else {
+            if (after_time != null) {
+              print('沒目的 沒地區3');
+              filter_grouppersonlist = await readremotemongodb(
+                  ChatRoomModel.fromJson, 'chatroom',
+                  field: mongo.where
+                      .eq('type', 1)
+                      .and(mongo.where.gt('datetime', after_time))
+                      .sortBy('create_time', descending: true));
+            } else {
+              print('沒目的 沒地區4');
+              filter_grouppersonlist = [];
+            }
+          }
         }
       }
     } else {
       if (area != null) {
         if (purposelist.isNotEmpty) {
-          print('有目的 有地區');
-          filter_groupteamlist = await readremotemongodb(
-              ChatRoomModel.fromJson, 'chatroom',
-              field: mongo.where
-                  .eq('area', area)
-                  .and(mongo.where.eq('purpose', purposelist[0]))
-                  .and(mongo.where.eq('type', 0))
-                  .sortBy('create_time', descending: true));
+          if (before_time != null) {
+            if (after_time != null) {
+              print('有目的 有地區');
+              filter_groupteamlist = await readremotemongodb(
+                  ChatRoomModel.fromJson, 'chatroom',
+                  field: mongo.where
+                      .eq('area', area)
+                      .and(mongo.where.eq('purpose', purposelist[0]))
+                      .and(mongo.where.eq('type', 0))
+                      .and(mongo.where.gt('datetime', after_time))
+                      .and(mongo.where.lt('datetime', before_time))
+                      .sortBy('create_time', descending: true));
+            } else {
+              print('有目的 有地區');
+              filter_groupteamlist = await readremotemongodb(
+                  ChatRoomModel.fromJson, 'chatroom',
+                  field: mongo.where
+                      .eq('area', area)
+                      .and(mongo.where.eq('purpose', purposelist[0]))
+                      .and(mongo.where.eq('type', 0))
+                      .and(mongo.where.lt('datetime', before_time))
+                      .sortBy('create_time', descending: true));
+            }
+          } else {
+            if (after_time != null) {
+              print('有目的 有地區');
+              filter_groupteamlist = await readremotemongodb(
+                  ChatRoomModel.fromJson, 'chatroom',
+                  field: mongo.where
+                      .eq('area', area)
+                      .and(mongo.where.eq('purpose', purposelist[0]))
+                      .and(mongo.where.eq('type', 0))
+                      .and(mongo.where.gt('datetime', after_time))
+                      .sortBy('create_time', descending: true));
+            } else {
+              print('有目的 有地區');
+              filter_groupteamlist = await readremotemongodb(
+                  ChatRoomModel.fromJson, 'chatroom',
+                  field: mongo.where
+                      .eq('area', area)
+                      .and(mongo.where.eq('purpose', purposelist[0]))
+                      .and(mongo.where.eq('type', 0))
+                      .sortBy('create_time', descending: true));
+            }
+          }
         } else {
-          print('沒目的 有地區');
-          filter_groupteamlist = await readremotemongodb(
-              ChatRoomModel.fromJson, 'chatroom',
-              field: mongo.where
-                  .eq('area', area)
-                  .and(mongo.where.eq('type', 0))
-                  .sortBy('create_time', descending: true));
+          if (before_time != null) {
+            if (after_time != null) {
+              print('沒目的 有地區');
+              filter_groupteamlist = await readremotemongodb(
+                  ChatRoomModel.fromJson, 'chatroom',
+                  field: mongo.where
+                      .eq('area', area)
+                      .and(mongo.where.eq('type', 0))
+                      .and(mongo.where.gt('datetime', after_time))
+                      .and(mongo.where.lt('datetime', before_time))
+                      .sortBy('create_time', descending: true));
+            } else {
+              print('沒目的 有地區');
+              filter_groupteamlist = await readremotemongodb(
+                  ChatRoomModel.fromJson, 'chatroom',
+                  field: mongo.where
+                      .eq('area', area)
+                      .and(mongo.where.eq('type', 0))
+                      .and(mongo.where.lt('datetime', before_time))
+                      .sortBy('create_time', descending: true));
+            }
+          } else {
+            if (after_time != null) {
+              print('沒目的 有地區');
+              filter_groupteamlist = await readremotemongodb(
+                  ChatRoomModel.fromJson, 'chatroom',
+                  field: mongo.where
+                      .eq('area', area)
+                      .and(mongo.where.eq('type', 0))
+                      .and(mongo.where.gt('datetime', after_time))
+                      .sortBy('create_time', descending: true));
+            } else {
+              print('沒目的 有地區');
+              filter_groupteamlist = await readremotemongodb(
+                  ChatRoomModel.fromJson, 'chatroom',
+                  field: mongo.where
+                      .eq('area', area)
+                      .and(mongo.where.eq('type', 0))
+                      .sortBy('create_time', descending: true));
+            }
+          }
         }
       } else {
         if (purposelist.isNotEmpty) {
-          print('有目的 沒地區 ${purposelist[0]}');
-          filter_groupteamlist = await readremotemongodb(
-              ChatRoomModel.fromJson, 'chatroom',
-              field: mongo.where
-                  .eq('purpose', purposelist[0])
-                  .and(mongo.where.eq('type', 0))
-                  .sortBy('create_time', descending: true));
+          if (before_time != null) {
+            if (after_time != null) {
+              print('有目的 沒地區 ${purposelist[0]}');
+              filter_groupteamlist = await readremotemongodb(
+                  ChatRoomModel.fromJson, 'chatroom',
+                  field: mongo.where
+                      .eq('purpose', purposelist[0])
+                      .and(mongo.where.eq('type', 0))
+                      .and(mongo.where.gt('datetime', after_time))
+                      .and(mongo.where.lt('datetime', before_time))
+                      .sortBy('create_time', descending: true));
+            } else {
+              print('有目的 沒地區 ${purposelist[0]}');
+              filter_groupteamlist = await readremotemongodb(
+                  ChatRoomModel.fromJson, 'chatroom',
+                  field: mongo.where
+                      .eq('purpose', purposelist[0])
+                      .and(mongo.where.eq('type', 0))
+                      .and(mongo.where.lt('datetime', before_time))
+                      .sortBy('create_time', descending: true));
+            }
+          } else {
+            if (after_time != null) {
+              print('有目的 沒地區 ${purposelist[0]}');
+              filter_groupteamlist = await readremotemongodb(
+                  ChatRoomModel.fromJson, 'chatroom',
+                  field: mongo.where
+                      .eq('purpose', purposelist[0])
+                      .and(mongo.where.eq('type', 0))
+                      .and(mongo.where.gt('datetime', after_time))
+                      .sortBy('create_time', descending: true));
+            } else {
+              print('有目的 沒地區 ${purposelist[0]}');
+              filter_groupteamlist = await readremotemongodb(
+                  ChatRoomModel.fromJson, 'chatroom',
+                  field: mongo.where
+                      .eq('purpose', purposelist[0])
+                      .and(mongo.where.eq('type', 0))
+                      .sortBy('create_time', descending: true));
+            }
+          }
         } else {
-          filter_groupteamlist = [];
+          if (before_time != null) {
+            if (after_time != null) {
+              print('沒目的 沒地區5');
+              filter_groupteamlist = await readremotemongodb(
+                  ChatRoomModel.fromJson, 'chatroom',
+                  field: mongo.where
+                      .eq('type', 0)
+                      .and(mongo.where.gt('datetime', after_time))
+                      .and(mongo.where.lt('datetime', before_time))
+                      .sortBy('create_time', descending: true));
+            } else {
+              print('沒目的 沒地區6 $before_time');
+              filter_groupteamlist = await readremotemongodb(
+                  ChatRoomModel.fromJson, 'chatroom',
+                  field: mongo.where
+                      .eq('type', 0)
+                      .and(mongo.where.lt('datetime', before_time))
+                      .sortBy('create_time', descending: true));
+            }
+          } else {
+            if (after_time != null) {
+              print('沒目的 沒地區7');
+              filter_groupteamlist = await readremotemongodb(
+                  ChatRoomModel.fromJson, 'chatroom',
+                  field: mongo.where
+                      .eq('type', 0)
+                      .and(mongo.where.gt('datetime', after_time))
+                      .sortBy('create_time', descending: true));
+            } else {
+              print('沒目的 沒地區4');
+              filter_groupteamlist = [];
+            }
+          }
         }
       }
     }
+
     notifyListeners();
   }
 
@@ -2160,16 +2489,16 @@ class ChatProvider with ChangeNotifier {
 
   Future deleteAllRoom() async {
     print('all delete');
-    await _mongoDB.deletealltable('chatmsg');
-    await _mongoDB.deletealltable('action');
-    await _mongoDB.deletealltable('action_msg');
-    await _mongoDB.deletealltable('groupchatmsg');
-    await _mongoDB.deletealltable('o2ochatmsg');
-    await _mongoDB.deletealltable('o2olog');
-    await _mongoDB.deletealltable('block_log');
+    // await _mongoDB.deletealltable('chatmsg');
+    // await _mongoDB.deletealltable('action');
+    // await _mongoDB.deletealltable('action_msg');
+    // await _mongoDB.deletealltable('groupchatmsg');
+    // await _mongoDB.deletealltable('o2ochatmsg');
+    // await _mongoDB.deletealltable('o2olog');
+    // await _mongoDB.deletealltable('block_log');
     await _mongoDB.deletealltable('follow_log');
-    await _mongoDB.deletealltable('chatroom');
-    await _mongoDB.deletealltable('member');
+    // await _mongoDB.deletealltable('chatroom');
+    // await _mongoDB.deletealltable('member');
   }
 
   void dbclose() {
@@ -2449,23 +2778,23 @@ class ChatProvider with ChangeNotifier {
   var myfollowlog;
   var follow_me_list;
 
-  Future getmyfollowlog() async {
-    print('查詢我的追蹤跟追蹤我的');
-    //我的追蹤
-    myfollowlog = await readremotemongodb(FollowLogModel.fromJson, 'follow_log',
-        field: mongo.where.eq('member_id', remoteUserInfo[0].memberid)) as List;
-
-    //追蹤我的
-    follow_me_list = await readremotemongodb(
-        FollowLogModel.fromJson, 'follow_log',
-        field: mongo.where.eq('list_id', remoteUserInfo[0].memberid)) as List;
-    print('getmyfollowlog $myfollowlog');
-    //自己的不會空 會為1
-
-    print('get follow me list  $follow_me_list');
-
-    notifyListeners();
-  }
+  // Future getmyfollow_and_followed_log() async {
+  //   print('查詢我的追蹤跟追蹤我的');
+  //   //我的追蹤
+  //   // myfollowlog = await readremotemongodb(FollowLogModel.fromJson, 'follow_log',
+  //   //     field: mongo.where.eq('member_id', remoteUserInfo[0].memberid)) as List;
+  //   //
+  //   // //追蹤我的
+  //   // follow_me_list = await readremotemongodb(
+  //   //     FollowLogModel.fromJson, 'follow_log',
+  //   //     field: mongo.where.eq('list_id', remoteUserInfo[0].memberid)) as List;
+  //   // print('getmyfollowlog $myfollowlog');
+  //   // //自己的不會空 會為1
+  //   //
+  //   // print('get follow me list  $follow_me_list');
+  //
+  //   notifyListeners();
+  // }
 
   // Future getyfollowme_num() async {
   //   var result = await readremotemongodb(FollowLogModel.fromJson, 'follow_log',
@@ -2482,16 +2811,50 @@ class ChatProvider with ChangeNotifier {
     print("add followlog");
 
     var index;
-    if (myfollowlog[0].list_id == null) {
-      index = -1;
-      myfollowlog[0].list_id = [];
-    } else {
-      index =
-          myfollowlog[0].list_id.indexWhere((element) => element == follow_id);
-    }
-    print('follow log index $index');
+    if (myfollowlog.isNotEmpty) {
+      if (myfollowlog[0].list_id == null) {
+        index = -1;
+        myfollowlog[0].list_id = [];
+      } else {
+        index = myfollowlog[0]
+            .list_id
+            .indexWhere((element) => element == follow_id);
+      }
 
-    if (index == -1) {
+      print('follow log index $index');
+
+      if (index == -1) {
+        print('加入關住');
+        //沒關注 ->要關注
+        // 加入log
+        await _mongoDB.updateData_addSet(
+          "follow_log",
+          "member_id",
+          remoteUserInfo[0].memberid,
+          'list_id',
+          follow_id,
+        );
+        // follow數+1
+        await _mongoDB.plus_num('member', "_id", follow_id, 'follow_num', 1);
+        myfollowlog[0].list_id.add(follow_id);
+      } else {
+        //在關注 ->取消關注
+        print('取消關住 $follow_id');
+        myfollowlog[0].list_id.remove(follow_id);
+
+        //資料庫將聊天室去掉
+        _mongoDB.deleteData(
+          "follow_log",
+          "member_id",
+          remoteUserInfo[0].memberid,
+          'list_id',
+          follow_id,
+        );
+
+        // follow數-1
+        await _mongoDB.plus_num('member', "_id", follow_id, 'follow_num', -1);
+      }
+    }else{
       print('加入關住');
       //沒關注 ->要關注
       // 加入log
@@ -2504,23 +2867,8 @@ class ChatProvider with ChangeNotifier {
       );
       // follow數+1
       await _mongoDB.plus_num('member', "_id", follow_id, 'follow_num', 1);
-      myfollowlog[0].list_id.add(follow_id);
-    } else {
-      //在關注 ->取消關注
-      print('取消關住 $follow_id');
-      myfollowlog[0].list_id.remove(follow_id);
-
-      //資料庫將聊天室去掉
-      _mongoDB.deleteData(
-        "follow_log",
-        "member_id",
-        remoteUserInfo[0].memberid,
-        'list_id',
-        follow_id,
-      );
-
-      // follow數-1
-      await _mongoDB.plus_num('member', "_id", follow_id, 'follow_num', -1);
+      myfollowlog.add(FollowLogModel(list_id:[follow_id] ));
+      // myfollowlog[0].list_id.add(follow_id);
     }
     notifyListeners();
   }
@@ -2644,6 +2992,7 @@ class ChatProvider with ChangeNotifier {
   }
 
   Future change_datesetting(distance_range, age_range) async {
+    print('儲存交友設定');
     try {
       await _mongoDB.updateData_single(
         "member",
@@ -2655,7 +3004,7 @@ class ChatProvider with ChangeNotifier {
         },
       );
     } catch (e) {
-      print('上傳圖片失敗  $e');
+      print('儲存交友設定失敗  $e');
     }
 
     await getaccountinfo();

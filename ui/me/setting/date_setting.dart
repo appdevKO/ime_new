@@ -25,11 +25,18 @@ class _DateSettingState extends State<DateSetting> {
   @override
   void initState() {
     _distance_value = Provider.of<ChatProvider>(context, listen: false)
-        .remoteUserInfo[0]
-        .distance_range;
-    _age_value =Provider.of<ChatProvider>(context, listen: false)
-        .remoteUserInfo[0]
-        .age_range.toDouble();
+            .remoteUserInfo[0]
+            .distance_range ??
+        0;
+    _age_value = Provider.of<ChatProvider>(context, listen: false)
+                .remoteUserInfo[0]
+                .age_range !=
+            null
+        ? Provider.of<ChatProvider>(context, listen: false)
+            .remoteUserInfo[0]
+            .age_range
+            .toDouble()
+        : 18;
     initdata();
     super.initState();
   }
@@ -97,7 +104,8 @@ class _DateSettingState extends State<DateSetting> {
                                           child: CircularProgressIndicator())));
                             });
                         Provider.of<ChatProvider>(context, listen: false)
-                            .change_datesetting(_distance_value, _age_value!.round())
+                            .change_datesetting(
+                                _distance_value, _age_value!.round())
                             .whenComplete(() =>
                                 Future.delayed(Duration(seconds: 1), () async {
                                   Navigator.pop(context);
@@ -295,7 +303,8 @@ class _DateSettingState extends State<DateSetting> {
                               _distance_value != null
                                   ? Slider(
                                       min: 0.0,
-                                      max: 100.0,divisions:10,
+                                      max: 100.0,
+                                      divisions: 10,
                                       value: _distance_value!,
                                       onChanged: (value) {
                                         setState(() {
@@ -331,15 +340,17 @@ class _DateSettingState extends State<DateSetting> {
                                   ),
                                   Consumer<ChatProvider>(
                                     builder: (context, value, child) {
-                                      return Text('18歲~${(_age_value!).round()}歲');
+                                      return Text(
+                                          '18歲~${(_age_value!).round()}歲');
                                     },
                                   ),
                                 ],
                               ),
                               _age_value != null
                                   ? Slider(
-                                      min:18,
-                                      max: 99,divisions:81,
+                                      min: 18,
+                                      max: 99,
+                                      divisions: 81,
                                       value: _age_value!,
                                       onChanged: (value) {
                                         setState(() {

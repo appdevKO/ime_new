@@ -165,7 +165,7 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
                                 fontSize: 16,
                                 height: 1,
                                 color: Colors.white),
-                            text: value.chatroomsetting[0].title != null
+                            text: value.chatroomsetting.isNotEmpty&&value.chatroomsetting[0].title != null
                                 ? '${value.chatroomsetting[0].title}'
                                 : "加載中",
                           ),

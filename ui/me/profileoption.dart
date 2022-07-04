@@ -11,7 +11,7 @@ import 'package:ime_new/ui/me/profilepage.dart';
 import 'package:ime_new/ui/me/profilesetting.dart';
 import 'package:ime_new/ui/me/setting/date_setting.dart';
 import 'package:ime_new/ui/me/setting/edit_hello.dart';
-import 'package:ime_new/ui/me/setting/myfriends.dart';
+import 'package:ime_new/ui/me/list/myfriends.dart';
 import 'package:ime_new/ui/me/setting/myincome.dart';
 import 'package:provider/provider.dart';
 import '../date/square/upgrade_vip.dart';
@@ -60,13 +60,19 @@ class _ProfileOptionState extends State<ProfileOption> {
             .isNotEmpty) {
       await Provider.of<ChatProvider>(context, listen: false).createfollowlog();
       await Provider.of<ChatProvider>(context, listen: false).createblocklog();
-      await Provider.of<ChatProvider>(context, listen: false).getmyfollowlog();
+      await Provider.of<ChatProvider>(context, listen: false)
+          .get_follow_info_list();
+      await Provider.of<ChatProvider>(context, listen: false)
+          .get_followed_userinfo_list();
       await Provider.of<ChatProvider>(context, listen: false).getmyblocklog();
     } else {
       await Provider.of<ChatProvider>(context, listen: false).getaccountinfo();
       await Provider.of<ChatProvider>(context, listen: false).createfollowlog();
       await Provider.of<ChatProvider>(context, listen: false).createblocklog();
-      await Provider.of<ChatProvider>(context, listen: false).getmyfollowlog();
+      await Provider.of<ChatProvider>(context, listen: false)
+          .get_follow_info_list();
+      await Provider.of<ChatProvider>(context, listen: false)
+          .get_followed_userinfo_list();
       await Provider.of<ChatProvider>(context, listen: false).getmyblocklog();
     }
   }
@@ -109,8 +115,8 @@ class _ProfileOptionState extends State<ProfileOption> {
                 ),
               )),
           callback: () {
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => Myincome()));
+            // Navigator.push(
+            //     context, MaterialPageRoute(builder: (context) => Myincome()));
           }),
       SettingOption(
           title: '我的LEVEL',
@@ -231,8 +237,6 @@ class _ProfileOptionState extends State<ProfileOption> {
               )),
           callback: () {
             print('456456');
-
-
           }),
     ];
 
@@ -441,39 +445,34 @@ class _ProfileOptionState extends State<ProfileOption> {
                             width: 1,
                             color: Colors.grey,
                           ),
-                          Column(
-                            children: [
-                              Consumer<ChatProvider>(
-                                  builder: (context, value, child) {
-                                return Text(value.myfollowlog is List
-                                    ? value.myfollowlog.isNotEmpty
-                                        ? value.myfollowlog.length > 0
-                                            ? value.myfollowlog[0].list_id !=
-                                                    null
-                                                ? value.myfollowlog[0].list_id
-                                                        is List
-                                                    ? '${value.myfollowlog[0].list_id.length}'
-                                                    : '0'
-                                                : '0'
-                                            : '0'
-                                        : '0'
-                                    : '加載中');
-                              }),
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.star,
-                                    size: 12,
-                                    color: Colors.blue,
-                                  ),
-                                  Text(
-                                    '最愛好友',
-                                    style: TextStyle(
-                                        color: Colors.grey, fontSize: 12),
-                                  )
-                                ],
-                              )
-                            ],
+                          GestureDetector(
+                            child: Column(
+                              children: [
+                                Consumer<ChatProvider>(
+                                    builder: (context, value, child) {
+                                      return Text(value.myfollowlog is List
+                                          ? '${value.myfollowlog.length}'
+                                          : '加載中');
+                                    }),
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.star,
+                                      size: 12,
+                                      color: Colors.blue,
+                                    ),
+                                    Text(
+                                      '最愛好友',
+                                      style: TextStyle(
+                                          color: Colors.grey, fontSize: 12),
+                                    )
+                                  ],
+                                )
+                              ],
+                            ),  onTap: () {
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (context) => MyFollowPage()));
+                          },
                           ),
                           Container(
                             width: 20,

@@ -104,10 +104,10 @@ List<String> professionlist = [
   '其他',
 ];
 List<String> moneylist = [
-  '1萬以下',
-  '1-5萬',
-  '5-10萬',
-  '10萬以上',
+  '１萬以下',
+  '１-５萬',
+  '５-１０萬',
+  '１０萬以上',
   '不限',
 ];
 List<String> educationlist = [

@@ -98,7 +98,7 @@ class DbUserinfoModel {
     if (json["size"] != null && json["size"] != '') list.add(json["size"]);
     if (json["profession"] != null && json["profession"] != '')
       list.add(json["profession"]);
-    if (json["area"] != null && json["area"] != '') list.add(json["area"]);
+    // if (json["area"] != null && json["area"] != '') list.add(json["area"]);
     if (json["money"] != null && json["money"] != '') list.add(json["money"]);
     if (json["education"] != null && json["education"] != '')
       list.add(json["education"]);
@@ -134,7 +134,7 @@ class DbUserinfoModel {
             json["introduction"] != null ? json['introduction'] : null,
         size: json["size"] != null ? json['size'] : null,
         interest_list:
-            json["interest_list"] != null ? json['interest_list'] : null,
+            json["interest_list"] != null ? json['interest_list'] : [],
         follow_log_list: json["follow_log"] != null ? json['follow_log'] : null,
         personality: json["personality"] != null ? json['personality'] : null,
         profession: json["profession"] != null ? json['profession'] : null,

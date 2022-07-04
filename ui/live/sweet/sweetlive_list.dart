@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -8,6 +9,7 @@ import 'package:ime_new/ui/live/sweet/sweetView.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:provider/provider.dart';
 import 'package:ime_new/business_logic/model/sweetRoom.dart';
+import 'package:mongo_dart/mongo_dart.dart' as mongo;
 
 bool? identity;
 
@@ -22,7 +24,7 @@ class _SweetLiveListState extends State<SweetLiveList> {
   var count;
   String avatar = "https://i.ibb.co/cFFSzdK/sex-man.png";
   String nickName = "";
-  String memberId = "";
+  String account = "";
   @override
   Widget build(BuildContext context) {
     return Consumer<sweetProvider>(builder: (context, _sweetProvider, child) {
@@ -31,20 +33,14 @@ class _SweetLiveListState extends State<SweetLiveList> {
       } catch (error) {
         count = 0;
       }
-      return Consumer<ChatProvider>(builder: (context, ChatProvider1, child) {
+      return Consumer<ChatProvider>(builder: (context, _ChatProvider, child) {
         try {
-          if (ChatProvider1.remoteUserInfo[0].avatar == null) {
-            if ((ChatProvider1.remoteUserInfo[0].sex) == '男') {
-              avatar = "https://i.ibb.co/cFFSzdK/sex-man.png";
-            } else if ((ChatProvider1.remoteUserInfo[0].sex) == '女') {
-              avatar = "https://i.ibb.co/kJxyvc4/sex-woman.png";
-            }
-          } else {
-            avatar = ChatProvider1.remoteUserInfo[0].avatar;
+          if (_ChatProvider.remoteUserInfo[0] != null) {
+            nickName = _ChatProvider.remoteUserInfo[0].nickname;
+            account = _ChatProvider.remoteUserInfo[0].account;
           }
-          nickName = ChatProvider1.remoteUserInfo[0].nickname;
-          memberId = ChatProvider1.remoteUserInfo[0].id;
         } catch (err) {}
+
         return count != 0
             ? Stack(
                 children: [
@@ -58,7 +54,6 @@ class _SweetLiveListState extends State<SweetLiveList> {
                         childAspectRatio: 0.8, //子元素在横轴长度和主轴长度的比例
                       ),
                       itemBuilder: (context, index) {
-                        print(' name ${_sweetProvider.rooms[index].name}');
                         String name =
                             encodeToString(_sweetProvider.rooms[index].name);
                         String explain =
@@ -74,12 +69,10 @@ class _SweetLiveListState extends State<SweetLiveList> {
                                     var audienceJson = {};
                                     audienceJson['"rid"'] =
                                         ('"${_sweetProvider.rooms[index].id}"');
-                                    audienceJson['"avatarUrl"'] =
-                                        ('"${avatar}"');
                                     audienceJson['"nickname"'] =
-                                        ('"${nickName}"');
-                                    audienceJson['"memberId"'] =
-                                        ('"${memberId}"');
+                                        ('"${strToEncode(nickName)}"');
+                                    audienceJson['"account"'] =
+                                        ('"${account}"');
                                     //print(' audienceJson$audienceJson');
                                     sweetRoomId =
                                         _sweetProvider.rooms[index].id;
@@ -283,6 +276,7 @@ Future<Future<String?>> openRoom(
                 String enName = stringToBase64.encode(roomName);
                 String enExplain = stringToBase64.encode(roomExplain);
                 String enAnchorName = stringToBase64.encode(nickName);
+                print('enAnchorName $enAnchorName');
                 var audienceJson = {};
                 audienceJson['"avatarUrl"'] = ('"${avatalUrl}"');
                 audienceJson['"enName"'] = ('"${enName}"');
