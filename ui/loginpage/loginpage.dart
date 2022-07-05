@@ -1,15 +1,19 @@
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:ime_new/business_logic/model/push_notify_model.dart';
 import 'package:ime_new/business_logic/provider/chat_provider.dart';
 import 'package:ime_new/business_logic/provider/sweetProvider.dart';
 import 'package:ime_new/ui/loginpage/waitingpage.dart';
 import 'package:provider/provider.dart';
 import '../indexpage2.dart';
+import '../push.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -25,6 +29,7 @@ class _LoginPageState extends State<LoginPage> {
     // Provider.of<sweetProvider>(context, listen: false).connect();
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -93,34 +98,39 @@ class _LoginPageState extends State<LoginPage> {
                             print('facebook user :${result.user?.uid}');
                             //跳轉
                             await Provider.of<ChatProvider>(context,
-                                listen: false)
+                                    listen: false)
                                 .register(result.user)
                                 .whenComplete(() =>
 
-                            // Navigator.pushAndRemoveUntil(
-                            //     context,
-                            //     MaterialPageRoute(builder: (context) => IndexPage2()),
-                            //     (route) => route == null)
-                            Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        WaitingPage()),
-                                    (route) => route == null));
+                                    // Navigator.pushAndRemoveUntil(
+                                    //     context,
+                                    //     MaterialPageRoute(builder: (context) => IndexPage2()),
+                                    //     (route) => route == null)
+                                    Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                WaitingPage()),
+                                        (route) => route == null));
                           } else
                             print('不是');
                         },
                       ),
                     ),
-                    GestureDetector(child: Container(child: Text('fake'),),onTap: (){
-                      Provider.of<ChatProvider>(context,listen: false). set_accountid('nzYox6rbIkSUW5Fnj5w0hmYYSXE3');
-                      Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  WaitingPage()),
-                              (route) => route == null);
-                    },),
+                    GestureDetector(
+                      child: Container(
+                        child: Text('fake'),
+                      ),
+                      onTap: () {
+                        Provider.of<ChatProvider>(context, listen: false)
+                            .set_accountid('nzYox6rbIkSUW5Fnj5w0hmYYSXE3');
+                        Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => WaitingPage()),
+                            (route) => route == null);
+                      },
+                    ),
                     // Row(
                     //   children: [
                     //     Text('facebook 登入'),
@@ -215,10 +225,16 @@ class LeadPage extends StatefulWidget {
 class _LeadPageState extends State<LeadPage> {
   late PageController _pageController;
   late StreamSubscription<User?> user;
+  String? _token;
+
+
 
   @override
   void initState() {
     _pageController = PageController(initialPage: 0);
+
+
+
     user = FirebaseAuth.instance.authStateChanges().listen((user) {
       if (user == null) {
         print('User is currently signed out!');

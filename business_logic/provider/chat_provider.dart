@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geocoding/geocoding.dart';
@@ -2722,13 +2723,14 @@ class ChatProvider with ChangeNotifier {
       //     },
       //   );
       // }
-
+      var token = await  FirebaseMessaging.instance.getToken();
       await _mongoDB.upsertData2(
         "member",
         'account',
         account.uid,
         {
           'lastlogin': DateTime.now().add(Duration(hours: 8)),
+          'fcm_token':token.toString()
           // 'area': placemarks[0].administrativeArea,
         },
       );
@@ -3881,5 +3883,29 @@ class ChatProvider with ChangeNotifier {
         "member", "account", account_id, {'default_chat': text});
 
     notifyListeners();
+  }
+
+/**
+ * 推播
+ *
+ */
+
+// Crude counter to make messages unique
+  int _messageCount = 0;
+
+  /// The API endpoint here accepts a raw FCM payload for demonstration purposes.
+  String constructFCMPayload(String? token) {
+    _messageCount++;
+    return jsonEncode({
+      'token': token,
+      'data': {
+        'via': 'FlutterFire Cloud Messaging!!!',
+        'count': _messageCount.toString(),
+      },
+      'notification': {
+        'title': 'Hello FlutterFire!',
+        'body': 'This notification (#$_messageCount) was created via FCM!',
+      },
+    });
   }
 }

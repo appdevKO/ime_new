@@ -1,14 +1,18 @@
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:ime_new/business_logic/provider/chat_provider.dart';
 import 'package:ime_new/ui/live/livepage2.dart';
 import 'package:ime_new/ui/me/profileoption.dart';
 import 'package:ime_new/ui/meet/meet_page.dart';
+import 'package:ime_new/ui/push.dart';
 import 'package:ime_new/utils/viewconfig.dart';
 import 'package:provider/provider.dart';
 
 import 'date/datepage.dart';
 import 'package:move_to_background/move_to_background.dart';
+
 class IndexPage2 extends StatefulWidget {
   const IndexPage2({Key? key}) : super(key: key);
 
@@ -20,12 +24,39 @@ class _IndexPage2State extends State<IndexPage2> {
   late TabController _tabController;
   int currentindex = 1;
 
-  // late List menuItems;
-  CustomPopupMenuController _controller = CustomPopupMenuController();
   String area = '';
   String age = '';
   String height = '';
+  Future<void> setupInteractedMessage() async {
+    //從中止狀態中 點擊 點開app
+    FirebaseMessaging.instance
+        .getInitialMessage()
+        .then((RemoteMessage? message) {
+      if (message != null) {
+        print('從終止獲得推播');
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => FakeMessage()));
+      }
+    });
 
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      RemoteNotification? notification = message.notification;
+      AndroidNotification? android = message.notification?.android;
+      if (notification != null && android != null && !kIsWeb) {
+        print('收到');
+      }
+    });
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      print('A new onMessageOpenedApp event was published! $message');
+      Future.delayed(const Duration(milliseconds: 730), () {
+        Navigator.pushNamed(
+          context,
+          '/message',
+        );
+      });
+    });
+  }
   @override
   void initState() {
     _tabController = TabController(
@@ -33,17 +64,12 @@ class _IndexPage2State extends State<IndexPage2> {
       vsync: ScrollableState(),
       initialIndex: 1,
     );
-    // inimongo_login();
+    setupInteractedMessage();
     /// ios--後改
     /// mongodb
-    WidgetsBinding.instance?.addPostFrameCallback((_) async {
-      initdata();
-    });
-    // // mqtt
-    // Provider.of<ChatProvider>(context, listen: false).mqtt_connect();
-    // Provider.of<ChatProvider>(context, listen: false).initialGCP();
-
-    // menuItems = ['123', '456', '777'];
+    // WidgetsBinding.instance?.addPostFrameCallback((_) async {
+    //   initdata();
+    // });
     super.initState();
   }
 
@@ -69,115 +95,120 @@ class _IndexPage2State extends State<IndexPage2> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      child: SafeArea(
-        child: Scaffold(resizeToAvoidBottomInset: false,
-          appBar: PreferredSize(
-            preferredSize: new Size(MediaQuery.of(context).size.width, 50),
-            child: Container(
-              decoration: new BoxDecoration(
-                gradient: new LinearGradient(colors: colorlist[currentindex]),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    IconButton(
-                        icon: Icon(
-                          Icons.person,
-                          color: Colors.white,
+        child: SafeArea(
+          child: Scaffold(
+            resizeToAvoidBottomInset: false,
+            appBar: PreferredSize(
+              preferredSize: new Size(MediaQuery.of(context).size.width, 50),
+              child: Container(
+                decoration: new BoxDecoration(
+                  gradient: new LinearGradient(colors: colorlist[currentindex]),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                          icon: Icon(
+                            Icons.person,
+                            color: Colors.white,
+                          ),
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ProfileOption()));
+                          }),
+                      Expanded(
+                          child: Container(
+                        alignment: Alignment.center,
+                        child: TabBar(
+                          isScrollable: true,
+                          onTap: setcolorindex,
+                          controller: _tabController,
+                          unselectedLabelColor: Colors.white.withOpacity(.7),
+                          labelStyle: TextStyle(fontSize: 18),
+                          unselectedLabelStyle: TextStyle(fontSize: 14),
+                          indicator: BoxDecoration(
+                            borderRadius: new BorderRadius.circular(30.0),
+                          ),
+                          tabs: [
+                            Tab(
+                              child: Text(
+                                '直播',
+                                maxLines: 1,
+                              ),
+                            ),
+                            Tab(
+                              child: Text(
+                                '交友',
+                                maxLines: 1,
+                              ),
+                            ),
+                            Tab(
+                              child: Text(
+                                '聯誼',
+                                maxLines: 1,
+                              ),
+                            ),
+                          ],
                         ),
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ProfileOption()));
-                        }),
-                    Expanded(
-                        child: Container(
-                      alignment: Alignment.center,
-                      child: TabBar(
-                        isScrollable: true,
-                        onTap: setcolorindex,
-                        controller: _tabController,
-                        unselectedLabelColor: Colors.white.withOpacity(.7),
-                        labelStyle: TextStyle(fontSize: 18),
-                        unselectedLabelStyle: TextStyle(fontSize: 14),
-                        indicator: BoxDecoration(
-                          borderRadius: new BorderRadius.circular(30.0),
-                        ),
-                        tabs: [
-                          Tab(
-                            child: Text(
-                              '直播',
-                              maxLines: 1,
-                            ),
+                      )),
+                      // _tabController.index == 0
+                      //     ? Consumer<ChatProvider>(
+                      //         builder: (context, value, child) {
+                      //         return GestureDetector(
+                      //           onTap: () {},
+                      //           child: Container(
+                      //             decoration: BoxDecoration(
+                      //                 color: value.search
+                      //                     ? Color(0xff77cc77)
+                      //                     : Colors.transparent,
+                      //                 shape: BoxShape.circle),
+                      //             padding: EdgeInsets.all(4),
+                      //             child: Icon(
+                      //               Icons.search,
+                      //               color: Colors.white,
+                      //             ),
+                      //           ),
+                      //         );
+                      //       })
+                      //     :
+                      IconButton(
+                          icon: Icon(
+                            Icons.search,
+                            color: Colors.blue,
                           ),
-                          Tab(
-                            child: Text(
-                              '交友',
-                              maxLines: 1,
-                            ),
-                          ),
-                          Tab(
-                            child: Text(
-                              '聯誼',
-                              maxLines: 1,
-                            ),
-                          ),
-                        ],
-                      ),
-                    )),
-                    // _tabController.index == 0
-                    //     ? Consumer<ChatProvider>(
-                    //         builder: (context, value, child) {
-                    //         return GestureDetector(
-                    //           onTap: () {},
-                    //           child: Container(
-                    //             decoration: BoxDecoration(
-                    //                 color: value.search
-                    //                     ? Color(0xff77cc77)
-                    //                     : Colors.transparent,
-                    //                 shape: BoxShape.circle),
-                    //             padding: EdgeInsets.all(4),
-                    //             child: Icon(
-                    //               Icons.search,
-                    //               color: Colors.white,
-                    //             ),
-                    //           ),
-                    //         );
-                    //       })
-                    //     :
-                    IconButton(
-                            icon: Icon(
-                              Icons.search,
-                              color: Colors.transparent,
-                            ),
-                            onPressed: () {})
-                  ],
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => PushNotify()));
+                          })
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-          body: Consumer<ChatProvider>(
-            builder: (context, value, child) {
-              return Container(
-                color: Colors.white,
-                child: TabBarView(
-                  physics: NeverScrollableScrollPhysics(),
-                  controller: _tabController,
-                  children: [LivePage2(), DatePage(), MeetPage()],
-                ),
-              );
-            },
+            body: Consumer<ChatProvider>(
+              builder: (context, value, child) {
+                return Container(
+                  color: Colors.white,
+                  child: TabBarView(
+                    physics: NeverScrollableScrollPhysics(),
+                    controller: _tabController,
+                    children: [LivePage2(), DatePage(), MeetPage()],
+                  ),
+                );
+              },
+            ),
           ),
         ),
-      ),
         onWillPop: () async {
           MoveToBackground.moveTaskToBack();
           return false;
-        }
-    );
+        });
   }
 
   void setcolorindex(int index) {
