@@ -27,6 +27,7 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
   late TabController _tabController;
   int _current = 0;
   final CarouselController _controller = CarouselController();
+  //打招呼
   bool hi = true;
 
   @override
@@ -458,11 +459,10 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                                     builder: (context, value, child) {
                                   return Container(
                                     width: 200,
-                                    child: Text(
-                                        value.o2omemberlist!=null&&
-                                        value.o2omemberlist![0].date != null
-                                            ? '${value.o2omemberlist![0].date}'
-                                            : '不詳'),
+                                    child: Text(value.o2omemberlist != null &&
+                                            value.o2omemberlist![0].date != null
+                                        ? '${value.o2omemberlist![0].date}'
+                                        : '不詳'),
                                   );
                                 }),
                                 Padding(
@@ -518,12 +518,12 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                                       if (hi) {
                                         Provider.of<ChatProvider>(context,
                                                 listen: false)
-                                            .easyhi(
-                                                widget.chatroomid,
-                                                value
-                                                    .o2omemberlist![0].nickname,
-                                                value.o2omemberlist![0]
-                                                    .avatar_sub)
+                                            .easyhello(
+                                          widget.chatroomid,
+                                          value.o2omemberlist![0].nickname,
+                                          value.o2omemberlist![0].avatar_sub,
+                                          value.o2omemberlist![0].fcmtoken,
+                                        )
                                             .then((value) {
                                           if (!value) {
                                             ScaffoldMessenger.of(context)
@@ -609,6 +609,9 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                                                     avatar: value
                                                         .o2omemberlist![0]
                                                         .avatar_sub,
+                                                    fcmtoken: value
+                                                        .o2omemberlist![0]
+                                                        .fcmtoken,
                                                   )));
                                     } else {
                                       print('empty');

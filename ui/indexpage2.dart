@@ -1,7 +1,9 @@
-import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
+import 'dart:convert';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:ime_new/business_logic/model/push_model.dart';
 import 'package:ime_new/business_logic/provider/chat_provider.dart';
 import 'package:ime_new/ui/live/livepage2.dart';
 import 'package:ime_new/ui/me/profileoption.dart';
@@ -27,6 +29,7 @@ class _IndexPage2State extends State<IndexPage2> {
   String area = '';
   String age = '';
   String height = '';
+
   Future<void> setupInteractedMessage() async {
     //從中止狀態中 點擊 點開app
     FirebaseMessaging.instance
@@ -34,11 +37,14 @@ class _IndexPage2State extends State<IndexPage2> {
         .then((RemoteMessage? message) {
       if (message != null) {
         print('從終止獲得推播');
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => FakeMessage()));
+        Future.delayed(const Duration(milliseconds: 530), () {
+          var pushdata = PushNotifyModel.fromJson(message.data);
+          Navigator.pushNamed(context, '/message', arguments: pushdata);
+        });
       }
     });
 
+    //app內部
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       RemoteNotification? notification = message.notification;
       AndroidNotification? android = message.notification?.android;
@@ -48,15 +54,18 @@ class _IndexPage2State extends State<IndexPage2> {
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      print('A new onMessageOpenedApp event was published! $message');
-      Future.delayed(const Duration(milliseconds: 730), () {
+      print(
+          'A new onMessageOpenedApp event was published! ${message.data}');
+      Future.delayed(const Duration(milliseconds: 530), () {
+        var pushdata = PushNotifyModel.fromJson(message.data);
         Navigator.pushNamed(
-          context,
-          '/message',
+            context,
+            '/message',arguments: pushdata
         );
       });
     });
   }
+
   @override
   void initState() {
     _tabController = TabController(
@@ -65,6 +74,7 @@ class _IndexPage2State extends State<IndexPage2> {
       initialIndex: 1,
     );
     setupInteractedMessage();
+
     /// ios--後改
     /// mongodb
     // WidgetsBinding.instance?.addPostFrameCallback((_) async {
@@ -178,13 +188,13 @@ class _IndexPage2State extends State<IndexPage2> {
                       IconButton(
                           icon: Icon(
                             Icons.search,
-                            color: Colors.blue,
+                            color: Colors.transparent,
                           ),
                           onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => PushNotify()));
+                            // Navigator.push(
+                            //     context,
+                            //     MaterialPageRoute(
+                            //         builder: (context) => PushNotify()));
                           })
                     ],
                   ),

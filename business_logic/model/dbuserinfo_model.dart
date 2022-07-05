@@ -13,45 +13,45 @@ String dbUserinfoModelToJson(DbUserinfoModel data) =>
     json.encode(data.toJson());
 
 class DbUserinfoModel {
-  DbUserinfoModel({
-    this.memberid,
-    this.nickname,
-    this.account,
-    this.chatroomId,
-    this.avatar,
-    this.avatar_sub,
-    this.cover,
-    this.height,
-    this.age,
-    this.sex,
-    this.money,
-    this.constellation,
-    this.introduction,
-    this.size,
-    this.interest_list,
-    this.personality,
-    this.profession,
-    this.role,
-    this.area,
-    this.position,
-    this.date,
-    this.lookfor,
-    this.education,
-    this.language,
-    this.smoke,
-    this.drink,
-    this.voice_introduction,
-    this.profilepic_list,
-    this.little_profilepic_list,
-    this.followme_num,
-    this.default_chat_text,
-    this.follow_log_list,
-    this.birthday,
-    this.age_range,
-    this.distance_range,
-    this.vip,
-    this.tag,
-  });
+  DbUserinfoModel(
+      {this.memberid,
+      this.nickname,
+      this.account,
+      this.chatroomId,
+      this.avatar,
+      this.avatar_sub,
+      this.cover,
+      this.height,
+      this.age,
+      this.sex,
+      this.money,
+      this.constellation,
+      this.introduction,
+      this.size,
+      this.interest_list,
+      this.personality,
+      this.profession,
+      this.role,
+      this.area,
+      this.position,
+      this.date,
+      this.lookfor,
+      this.education,
+      this.language,
+      this.smoke,
+      this.drink,
+      this.voice_introduction,
+      this.profilepic_list,
+      this.little_profilepic_list,
+      this.followme_num,
+      this.default_chat_text,
+      this.follow_log_list,
+      this.birthday,
+      this.age_range,
+      this.distance_range,
+      this.vip,
+      this.tag,
+      this.fcmtoken});
 
   ObjectId? memberid;
   String? account;
@@ -80,6 +80,7 @@ class DbUserinfoModel {
   String? drink;
   String? voice_introduction;
   String? default_chat_text;
+  String? fcmtoken;
   List? profilepic_list;
   List? little_profilepic_list;
   List? interest_list;
@@ -115,6 +116,7 @@ class DbUserinfoModel {
         account: json["account"],
         chatroomId: json["chatroomid"],
         avatar: json["avatar"],
+        fcmtoken: json["fcm_token"],
         avatar_sub: json["avatar_sub"],
         birthday: json["birthday"],
         cover: json['cover'],
@@ -167,6 +169,7 @@ class DbUserinfoModel {
         "age_range": age_range,
         "role": role,
         "vip": vip,
+        "fcm_token": fcmtoken,
         "distance_range": distance_range,
         "avatar": avatar,
         "avatar_sub": avatar_sub,

@@ -7,8 +7,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:ime_new/business_logic/provider/TD_game.dart';
+import 'package:ime_new/ui/date/one2one_chat/o2ochatroom.dart';
 import 'package:ime_new/ui/loginpage/loginpage.dart';
 import 'package:ime_new/ui/push.dart';
+import 'package:ime_new/utils/route.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:provider/provider.dart';
 import 'business_logic/provider/chat_provider.dart';
@@ -36,7 +38,8 @@ Future<void> main() async {
       'High Importance Notifications', // titled
       importance: Importance.high,
     );
-    NotificationSettings settings = await FirebaseMessaging.instance.requestPermission(
+    NotificationSettings settings =
+        await FirebaseMessaging.instance.requestPermission(
       alert: true,
       badge: true,
       provisional: false,
@@ -93,8 +96,24 @@ class MyApp extends StatelessWidget {
           title: 'IME',
           // home: LeadPage(),
           debugShowCheckedModeBanner: false,
-          routes: {'/':(context) => LeadPage(),
-            '/message': (context) => FakeMessage()},
+          initialRoute: '/',
+          onGenerateRoute: MyRouter.generateRoute,
+          // routes: {
+          //   '/': (context) => LeadPage(),
+          //   '/message': (context, {aruments}) {
+          //     print('routerouterouteroute ${aruments}');
+          //     return
+          //     O2OChatroom(
+          //       memberid: aruments.memberid.toHexString(),
+          //       chatroomid: aruments.chatroomid.toHexString(),
+          //       nickname: aruments.nickname,
+          //       avatar: aruments.avatar_sub,
+          //       fcmtoken: aruments.fcmtoken,
+          //     );
+          //   },
+          //   '/sweetlive': (context) => FakeMessage(),
+          //   '/spylive': (context) => FakeMessage(),
+          // },
         ),
       ),
     );

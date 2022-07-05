@@ -14,13 +14,15 @@ class O2ORoomModel {
       this.chatto_id,
       this.nickname,
       this.avatar,
-      this.readed});
+      this.readed,
+      this.fcmtoken});
 
   ObjectId? id;
   ObjectId? memberid;
   ObjectId? chatto_id;
   String? nickname;
   String? avatar;
+  String? fcmtoken;
   bool? readed;
 
 //  建立room list的時候 傳入的圖片就是小圖
@@ -32,6 +34,7 @@ class O2ORoomModel {
         nickname: json["nickname"],
         avatar: json["avatar"],
         readed: json["readed"],
+        fcmtoken: json["fcmtoken"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -41,5 +44,6 @@ class O2ORoomModel {
         "nickname": nickname,
         "avatar": avatar,
         "readed": readed,
+        "fcmtoken": fcmtoken,
       };
 }

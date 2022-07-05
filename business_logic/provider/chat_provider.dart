@@ -30,6 +30,7 @@ import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:queue/queue.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
+import 'package:http/http.dart' as http;
 
 class ChatProvider with ChangeNotifier {
   ///mongo realm
@@ -279,6 +280,8 @@ class ChatProvider with ChangeNotifier {
                             .decode(utf8.decode(payload.codeUnits))["topic_id"],
                         sendtopicid: json
                             .decode(utf8.decode(payload.codeUnits))["memberid"],
+                        nickname: json
+                            .decode(utf8.decode(payload.codeUnits))["nickname"],
                         note:
                             json.decode(utf8.decode(payload.codeUnits))["note"],
                       ));
@@ -499,7 +502,7 @@ class ChatProvider with ChangeNotifier {
   //傳送mqtt消息 送出 聊天
   Future mqttpublish(
       text, chatto_topicid, receiverid, msgtype, chatto_nickname, mqtt_type,
-      {note, chatto_avatar}) async {
+      {note, chatto_avatar, fcmtoken}) async {
     ///topic 在這從object 分離出 在哪一個頻道說話
     ///chat to id
     ///只有私聊有紀錄 對象
@@ -552,7 +555,7 @@ class ChatProvider with ChangeNotifier {
       } else if (mqtt_type == "ime_o2o_chat") {
         print('資料庫加入o2o');
         //建立雙方紀錄
-        createo2olog(chatto_topicid, chatto_nickname, chatto_avatar);
+        createo2olog(chatto_topicid, chatto_nickname, chatto_avatar, fcmtoken);
         _mongoDB.inserttomongo(
           "o2ochatmsg",
           {
@@ -585,12 +588,61 @@ class ChatProvider with ChangeNotifier {
   }
 
   //私聊 私訊 我發送私訊給別人
-  Future o2ochat(
-      text, totopic, receiverid, msgtype, memberid, nickname, chatto_avatar,
+  Future o2ochat(text, totopic, receiverid, msgtype, memberid, nickname,
+      chatto_avatar, fcmtoken,
       {note}) async {
-    print('私聊$nickname,$msgtype');
+    //type  1 文字 / 2 圖片 / 3 貼圖 / 4 音頻 / 6 通知
+    print('私聊$nickname,$msgtype $fcmtoken');
+    //mqtt
     mqttpublish(text, totopic, receiverid, msgtype, nickname, "ime_o2o_chat",
-        note: note, chatto_avatar: chatto_avatar);
+        note: note, chatto_avatar: chatto_avatar, fcmtoken: fcmtoken);
+    //http
+    try {
+      await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
+          headers: <String, String>{
+            'Content-Type': 'application/json',
+            'Authorization':
+                'key=AAAAVIX69CM:APA91bFUnUlmT3HAubJSmRhhZBRaeEdYp73gm44xZBOQqMvZNcSuiOKs93xIeCxvq1dCShg79SOqQA9JXyNMkFdY1EQqK775y0S2nz0OX3nN86XuPbazILNR0J7EdViQQQX9eQglJVpu'
+          },
+          body: jsonEncode({
+            "to": fcmtoken,
+            'notification': {
+              'title': msgtype == 1
+                  ? '${remoteUserInfo[0].nickname}傳送新消息'
+                  : msgtype == 2
+                      ? '${remoteUserInfo[0].nickname}傳送一張圖片'
+                      : msgtype == 3
+                          ? '${remoteUserInfo[0].nickname}傳送貼圖'
+                          : msgtype == 4
+                              ? '${remoteUserInfo[0].nickname}傳送一個錄音'
+                              : msgtype == 6
+                                  ? '系統通知'
+                                  : 'test title',
+              'body': msgtype == 1
+                  ? '$text'
+                  : msgtype == 2
+                      ? '圖片'
+                      : msgtype == 3
+                          ? '貼圖'
+                          : msgtype == 4
+                              ? '錄音'
+                              : msgtype == 6
+                                  ? '系統通知內容'
+                                  : 'test code',
+            },
+            'data': {
+              'memberid': totopic.toHexString(),
+              'chatroomid': memberid.toHexString(),
+              'nickname': remoteUserInfo[0].nickname,
+              'avatar': little_profile_pic[0],
+              'fcmtoken': remoteUserInfo[0].fcmtoken,
+            },
+          }));
+      print('送出推播');
+    } catch (e) {
+      print('推播 例外 $e');
+    }
+
     print(
         'o2ochat test ::${account_id} // $text // $msgtype // totopic $totopic //receiverid $receiverid //memberid $memberid  nickname $nickname');
     o2omsglist_findindex(totopic.toHexString());
@@ -635,13 +687,36 @@ class ChatProvider with ChangeNotifier {
   }
 
   //打招呼按鈕
-  Future easyhi(chatroomid, nickname, avatar) async {
+  Future easyhello(chatroomid, nickname, avatar, fcmtoken) async {
     if (remoteUserInfo[0].default_chat_text != null &&
         remoteUserInfo[0].default_chat_text != '') {
       print('${remoteUserInfo[0].default_chat_text} $chatroomid');
       mqttpublish(remoteUserInfo[0].default_chat_text, chatroomid,
           remoteUserInfo[0].memberid, 1, nickname, "ime_o2o_chat",
           chatto_avatar: avatar);
+      //http
+      try {
+        await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
+            headers: <String, String>{
+              'Content-Type': 'application/json',
+              'Authorization':
+                  'key=AAAAVIX69CM:APA91bFUnUlmT3HAubJSmRhhZBRaeEdYp73gm44xZBOQqMvZNcSuiOKs93xIeCxvq1dCShg79SOqQA9JXyNMkFdY1EQqK775y0S2nz0OX3nN86XuPbazILNR0J7EdViQQQX9eQglJVpu'
+            },
+            body: jsonEncode({
+              "to": fcmtoken,
+              'notification': {
+                'title': '${remoteUserInfo[0].nickname}向你打招呼',
+                'body': '${remoteUserInfo[0].default_chat_text}',
+              },
+              'data': {
+                'o2o_chat_topic': '${remoteUserInfo[0].nickname}',
+              },
+            }));
+        print('送出推播');
+      } catch (e) {
+        print(e);
+      }
+
       return true;
     } else {
       print('未設置打招呼');
@@ -882,7 +957,14 @@ class ChatProvider with ChangeNotifier {
     }
   }
 
-  Future sendimg_o2o(topic, type, memberid, nickname, chatto_avatar) async {
+  Future sendimg_o2o(
+    topic,
+    type,
+    memberid,
+    nickname,
+    chatto_avatar,
+    fcmtoken,
+  ) async {
     print('傳送照片');
     // await pickimg();
     var name = 'pic/' + Uuid().v1().toString() + '.png';
@@ -912,6 +994,7 @@ class ChatProvider with ChangeNotifier {
               memberid,
               nickname,
               chatto_avatar,
+              fcmtoken,
               note: response.downloadLink.toString());
         } else if (type == 'ime_group_chat') {
           await groupchat(response2.downloadLink.toString(), topic, 2,
@@ -958,7 +1041,13 @@ class ChatProvider with ChangeNotifier {
   }
 
   Future sendimgwithcamera_o2o(
-      topic, type, memberid, nickname, chatto_avatar) async {
+    topic,
+    type,
+    memberid,
+    nickname,
+    chatto_avatar,
+    fcmtoken,
+  ) async {
     print('傳送照片');
     // await pickimg();
     var name = 'pic/' + Uuid().v1().toString() + '.png';
@@ -988,6 +1077,7 @@ class ChatProvider with ChangeNotifier {
               memberid,
               nickname,
               chatto_avatar,
+              fcmtoken,
               note: response.downloadLink.toString());
         } else if (type == 'ime_group_chat') {
           await groupchat(response2.downloadLink.toString(), topic, 2,
@@ -1583,7 +1673,15 @@ class ChatProvider with ChangeNotifier {
   }
 
   Future o2osendrecord(
-      topic, path, type, receiverid, memberid, nickname, chatto_avatar) async {
+    topic,
+    path,
+    type,
+    receiverid,
+    memberid,
+    nickname,
+    chatto_avatar,
+    fcmtoken,
+  ) async {
     var name = 'audio/' + Uuid().v1().toString() + '.png';
     _recordName = name;
     _recordBytes = File(path).readAsBytesSync();
@@ -1599,6 +1697,7 @@ class ChatProvider with ChangeNotifier {
           memberid,
           nickname,
           chatto_avatar,
+          fcmtoken,
         );
       } else if (type == 'ime_group_chat') {
         groupchat(
@@ -2490,16 +2589,16 @@ class ChatProvider with ChangeNotifier {
 
   Future deleteAllRoom() async {
     print('all delete');
-    // await _mongoDB.deletealltable('chatmsg');
-    // await _mongoDB.deletealltable('action');
-    // await _mongoDB.deletealltable('action_msg');
-    // await _mongoDB.deletealltable('groupchatmsg');
-    // await _mongoDB.deletealltable('o2ochatmsg');
-    // await _mongoDB.deletealltable('o2olog');
-    // await _mongoDB.deletealltable('block_log');
+    await _mongoDB.deletealltable('chatmsg');
+    await _mongoDB.deletealltable('action');
+    await _mongoDB.deletealltable('action_msg');
+    await _mongoDB.deletealltable('groupchatmsg');
+    await _mongoDB.deletealltable('o2ochatmsg');
+    await _mongoDB.deletealltable('o2olog');
+    await _mongoDB.deletealltable('block_log');
     await _mongoDB.deletealltable('follow_log');
-    // await _mongoDB.deletealltable('chatroom');
-    // await _mongoDB.deletealltable('member');
+    await _mongoDB.deletealltable('chatroom');
+    await _mongoDB.deletealltable('member');
   }
 
   void dbclose() {
@@ -2723,14 +2822,14 @@ class ChatProvider with ChangeNotifier {
       //     },
       //   );
       // }
-      var token = await  FirebaseMessaging.instance.getToken();
+      var token = await FirebaseMessaging.instance.getToken();
       await _mongoDB.upsertData2(
         "member",
         'account',
         account.uid,
         {
           'lastlogin': DateTime.now().add(Duration(hours: 8)),
-          'fcm_token':token.toString()
+          'fcm_token': token.toString()
           // 'area': placemarks[0].administrativeArea,
         },
       );
@@ -2738,14 +2837,18 @@ class ChatProvider with ChangeNotifier {
   }
 
   //雙方私聊紀錄 資訊
-  Future createo2olog(chatto_id, chatto_nickname, chatto_avatar) async {
+  Future createo2olog(
+      chatto_id, chatto_nickname, chatto_avatar, fcmtoken) async {
     print("createo2olog  $chatto_id");
     //紀錄 我的對象訊息
     await _mongoDB.upsertData("o2olog", 'member_id', remoteUserInfo[0].memberid,
         'chatto_id', chatto_id, {
       'nickname': chatto_nickname,
       'avatar': chatto_avatar,
-      'last_chat_time': DateTime.now().add(Duration(hours: 8)),
+      'last_chat_time': DateTime.now().add(
+        Duration(hours: 8),
+      ),
+      'fcmtoken': fcmtoken,
     });
     //我的對象要看的 我的資訊
     await _mongoDB.upsertData("o2olog", 'chatto_id', remoteUserInfo[0].memberid,
@@ -2754,6 +2857,7 @@ class ChatProvider with ChangeNotifier {
       'avatar': remoteUserInfo[0].avatar,
       'avatar_sub': remoteUserInfo[0].avatar_sub,
       'last_chat_time': DateTime.now().add(Duration(hours: 8)),
+      'fcmtoken': remoteUserInfo[0].fcmtoken,
     });
   }
 
@@ -2856,7 +2960,7 @@ class ChatProvider with ChangeNotifier {
         // follow數-1
         await _mongoDB.plus_num('member', "_id", follow_id, 'follow_num', -1);
       }
-    }else{
+    } else {
       print('加入關住');
       //沒關注 ->要關注
       // 加入log
@@ -2869,7 +2973,7 @@ class ChatProvider with ChangeNotifier {
       );
       // follow數+1
       await _mongoDB.plus_num('member', "_id", follow_id, 'follow_num', 1);
-      myfollowlog.add(FollowLogModel(list_id:[follow_id] ));
+      myfollowlog.add(FollowLogModel(list_id: [follow_id]));
       // myfollowlog[0].list_id.add(follow_id);
     }
     notifyListeners();
@@ -3872,40 +3976,5 @@ class ChatProvider with ChangeNotifier {
         ));
     print("countcountcount $readresult");
     return readresult;
-  }
-
-  /**.
-   *  設定
-   */
-
-  void set_o2ochat_text(text) {
-    _mongoDB.updateData_single(
-        "member", "account", account_id, {'default_chat': text});
-
-    notifyListeners();
-  }
-
-/**
- * 推播
- *
- */
-
-// Crude counter to make messages unique
-  int _messageCount = 0;
-
-  /// The API endpoint here accepts a raw FCM payload for demonstration purposes.
-  String constructFCMPayload(String? token) {
-    _messageCount++;
-    return jsonEncode({
-      'token': token,
-      'data': {
-        'via': 'FlutterFire Cloud Messaging!!!',
-        'count': _messageCount.toString(),
-      },
-      'notification': {
-        'title': 'Hello FlutterFire!',
-        'body': 'This notification (#$_messageCount) was created via FCM!',
-      },
-    });
   }
 }

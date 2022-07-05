@@ -153,6 +153,8 @@ class _OneChatState extends State<OneChat> {
                                               .o2ochatroomlist![index].nickname,
                                           avatar: value
                                               .o2ochatroomlist![index].avatar,
+                                          fcmtoken: value
+                                              .o2ochatroomlist![index].fcmtoken,
                                         )));
                               },
                             );
@@ -192,7 +194,8 @@ class _OneChatState extends State<OneChat> {
     await Future.delayed(Duration(milliseconds: 1000));
     // if failed,use refreshFailed()
     _refreshController.refreshCompleted();
-    await Provider.of<ChatProvider>(context, listen: false).geto2ochatroomlist();
+    await Provider.of<ChatProvider>(context, listen: false)
+        .geto2ochatroomlist();
   }
 
   void _onLoading() async {

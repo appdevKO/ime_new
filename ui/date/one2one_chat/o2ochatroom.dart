@@ -31,13 +31,15 @@ class O2OChatroom extends StatefulWidget {
       required this.chatroomid,
       required this.memberid,
       this.nickname,
-      this.avatar})
+      this.avatar,
+      this.fcmtoken})
       : super(key: key);
 
   final chatroomid;
   final memberid;
   final nickname;
   final avatar;
+  final fcmtoken;
 
   /// 1 揪團 2約會 3私聊
 
@@ -73,6 +75,10 @@ class _O2OChatroomState extends State<O2OChatroom> {
   late CustomPopupMenuController _controller;
   RefreshController _refreshController =
       RefreshController(initialRefresh: false);
+
+  // String fcmtoken = 'cZfAETdEQJWmG9gE-GQqne:APA91bESE-nD2QdBsBMgDCMXLhoLKUMXqu47tR68rOoQJwFyCfnVpQSAdq2o06ihCAKLMx3huN-poIG3aZQQb_javEtaZ-P6Hf8C3eOpdUyi0XaRJ0VQ0L7EBZZZKaiL5uetE9h7EBlC';
+  // String fcmtoken =
+  //     'ewIzEkGmTUYElPcxgF8syr:APA91bFot-nG03NJ2q6zDwcieyr8w1XVBdiVYoZc4Gos-qSoKKq-k6zA6R7hHBA8nZ5KnCT3RgWXb2qW83d2C2GzWId1zK5Cm4VDPUsja9ylofRnO05pJftv4dH_vDL9OyiZP92NYF12';
 
   @override
   void initState() {
@@ -129,7 +135,8 @@ class _O2OChatroomState extends State<O2OChatroom> {
                         }
                         Provider.of<ChatProvider>(context, listen: false)
                             .geto2ochatroomlist();
-                        Provider.of<ChatProvider>(context, listen: false).change_redpoint(1);
+                        Provider.of<ChatProvider>(context, listen: false)
+                            .change_redpoint(1);
                         Navigator.pop(context);
                       },
                     ),
@@ -482,13 +489,15 @@ class _O2OChatroomState extends State<O2OChatroom> {
                               )
                             : bottomEnter(),
                         value.myblocklog[0].list_id.indexWhere((element) =>
-                        element == widget.chatroomid) !=
-                            -1
-                            ?Container():bottomRecord(),
+                                    element == widget.chatroomid) !=
+                                -1
+                            ? Container()
+                            : bottomRecord(),
                         value.myblocklog[0].list_id.indexWhere((element) =>
-                        element == widget.chatroomid) !=
-                            -1
-                            ?Container(): bottomsticker()
+                                    element == widget.chatroomid) !=
+                                -1
+                            ? Container()
+                            : bottomsticker()
                       ],
                     );
                   },
@@ -517,15 +526,16 @@ class _O2OChatroomState extends State<O2OChatroom> {
                                         await Provider.of<ChatProvider>(context,
                                                 listen: false)
                                             .sendimg_o2o(
-                                                widget.chatroomid,
-                                                'ime_o2o_chat',
-                                                Provider.of<ChatProvider>(
-                                                        context,
-                                                        listen: false)
-                                                    .remoteUserInfo[0]
-                                                    .memberid,
-                                                widget.nickname,
-                                                widget.avatar);
+                                          widget.chatroomid,
+                                          'ime_o2o_chat',
+                                          Provider.of<ChatProvider>(context,
+                                                  listen: false)
+                                              .remoteUserInfo[0]
+                                              .memberid,
+                                          widget.nickname,
+                                          widget.avatar,
+                                          widget.fcmtoken,
+                                        );
 
                                         setState(() {
                                           topicindex =
@@ -552,7 +562,8 @@ class _O2OChatroomState extends State<O2OChatroom> {
                                                     .remoteUserInfo[0]
                                                     .memberid,
                                                 widget.nickname,
-                                                widget.avatar);
+                                                widget.avatar,
+                                                widget.fcmtoken);
 
                                         setState(() {
                                           topicindex =
@@ -754,17 +765,17 @@ class _O2OChatroomState extends State<O2OChatroom> {
                         if (_textController.text != '') {
                           Provider.of<ChatProvider>(context, listen: false)
                               .o2ochat(
-                                  _textController.text,
-                                  mongo.ObjectId.fromHexString(
-                                      widget.chatroomid),
-                                  widget.memberid,
-                                  1,
-                                  Provider.of<ChatProvider>(context,
-                                          listen: false)
-                                      .remoteUserInfo[0]
-                                      .memberid,
-                                  widget.nickname,
-                                  widget.avatar);
+                            _textController.text,
+                            mongo.ObjectId.fromHexString(widget.chatroomid),
+                            widget.memberid,
+                            1,
+                            Provider.of<ChatProvider>(context, listen: false)
+                                .remoteUserInfo[0]
+                                .memberid,
+                            widget.nickname,
+                            widget.avatar,
+                            widget.fcmtoken,
+                          );
 
                           _textController.clear();
                         }
@@ -813,7 +824,8 @@ class _O2OChatroomState extends State<O2OChatroom> {
                               .remoteUserInfo[0]
                               .memberid,
                           widget.nickname,
-                          widget.avatar);
+                          widget.avatar,
+                          widget.fcmtoken);
 
                   _textController.clear();
                   setState(() {
@@ -995,15 +1007,17 @@ class _O2OChatroomState extends State<O2OChatroom> {
                     onTap: () {
                       print('sticker :$index');
                       Provider.of<ChatProvider>(context, listen: false).o2ochat(
-                          index.toString(),
-                          mongo.ObjectId.fromHexString(widget.chatroomid),
-                          widget.memberid,
-                          3,
-                          Provider.of<ChatProvider>(context, listen: false)
-                              .remoteUserInfo[0]
-                              .memberid,
-                          widget.nickname,
-                          widget.avatar);
+                        index.toString(),
+                        mongo.ObjectId.fromHexString(widget.chatroomid),
+                        widget.memberid,
+                        3,
+                        Provider.of<ChatProvider>(context, listen: false)
+                            .remoteUserInfo[0]
+                            .memberid,
+                        widget.nickname,
+                        widget.avatar,
+                        widget.fcmtoken,
+                      );
                       //改變 純歷史訊息 到 歷史+當前 狀態
                       setState(() {
                         topicindex =
@@ -1252,25 +1266,30 @@ class _O2OChatroomState extends State<O2OChatroom> {
                                         '男'
                                 ? 'assets/default/sex_man.png'
                                 : 'assets/default/sex_woman.png') as ImageProvider,
-                      ),onTap: (){
-                      if (Provider.of<ChatProvider>(context, listen: false)
-                          .o2omemberlist![memberindex].account !=
-                          Provider.of<ChatProvider>(context, listen: false)
-                            .remoteUserInfo[0].account) {
-                        //成員橫排 點 單一頭像
-                        // 改成先進簡介
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    OtherProfilePage(
-                                      chatroomid: Provider.of<ChatProvider>(context, listen: false)
-                                          .o2omemberlist![memberindex].memberid,
-                                    )));
-                      } else {
-                        print('同一人');
-                      }
-                    },
+                      ),
+                      onTap: () {
+                        if (Provider.of<ChatProvider>(context, listen: false)
+                                .o2omemberlist![memberindex]
+                                .account !=
+                            Provider.of<ChatProvider>(context, listen: false)
+                                .remoteUserInfo[0]
+                                .account) {
+                          //成員橫排 點 單一頭像
+                          // 改成先進簡介
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => OtherProfilePage(
+                                        chatroomid: Provider.of<ChatProvider>(
+                                                context,
+                                                listen: false)
+                                            .o2omemberlist![memberindex]
+                                            .memberid,
+                                      )));
+                        } else {
+                          print('同一人');
+                        }
+                      },
                     ),
                     Text(
                       '地區',
@@ -1607,15 +1626,17 @@ class _O2OChatroomState extends State<O2OChatroom> {
       });
       await Provider.of<ChatProvider>(context, listen: false)
           .o2osendrecord(
-              mongo.ObjectId.fromHexString(topic),
-              recordpath,
-              'ime_o2o_chat',
-              widget.memberid,
-              Provider.of<ChatProvider>(context, listen: false)
-                  .remoteUserInfo[0]
-                  .memberid,
-              widget.nickname,
-              widget.avatar)
+            mongo.ObjectId.fromHexString(topic),
+            recordpath,
+            'ime_o2o_chat',
+            widget.memberid,
+            Provider.of<ChatProvider>(context, listen: false)
+                .remoteUserInfo[0]
+                .memberid,
+            widget.nickname,
+            widget.avatar,
+            widget.fcmtoken,
+          )
           .whenComplete(() => setState(() {
                 myrecord = recordState.notrecord;
               }));
