@@ -12,9 +12,9 @@ import 'package:ime_new/ui/me/profilesetting.dart';
 import 'package:ime_new/ui/me/setting/date_setting.dart';
 import 'package:ime_new/ui/me/setting/edit_hello.dart';
 import 'package:ime_new/ui/me/list/myfriends.dart';
-import 'package:ime_new/ui/me/setting/myincome.dart';
+import 'package:ime_new/ui/me/setting/store.dart';
 import 'package:provider/provider.dart';
-import '../date/square/upgrade_vip.dart';
+import 'upgrade_vip.dart';
 import 'list/likeme_list.dart';
 
 /**
@@ -519,7 +519,7 @@ class _ProfileOptionState extends State<ProfileOption> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => UpGradeVIP()));
+                                  builder: (context) => FakeStore()));
                         },
                       ),
                     ),

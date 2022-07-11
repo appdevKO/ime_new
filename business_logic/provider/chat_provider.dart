@@ -636,6 +636,7 @@ class ChatProvider with ChangeNotifier {
               'nickname': remoteUserInfo[0].nickname,
               'avatar': little_profile_pic[0],
               'fcmtoken': remoteUserInfo[0].fcmtoken,
+              'route':'/message'
             },
           }));
       print('送出推播');
@@ -1812,6 +1813,7 @@ class ChatProvider with ChangeNotifier {
   bool finishinfo = false;
 
   Future getaccountinfo() async {
+    finishinfo = false;
     print('獲得使用者資料 id $account_id');
     return Future.delayed(Duration(seconds: 2), () async {
       var readresult = await readremotemongodb(

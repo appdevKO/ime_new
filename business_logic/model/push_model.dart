@@ -8,19 +8,20 @@ PushNotifyModel pushNotifyFromJson(String str) =>
 String pushNotifyToJson(PushNotifyModel data) => json.encode(data.toJson());
 
 class PushNotifyModel {
-  PushNotifyModel({
-    this.memberid,
-    this.fcmtoken,
-    this.nickname,
-    this.chatroomid,
-    this.avatar,
-  });
+  PushNotifyModel(
+      {this.memberid,
+      this.fcmtoken,
+      this.nickname,
+      this.chatroomid,
+      this.avatar,
+      this.route});
 
   ObjectId? memberid;
   String? chatroomid;
   String? nickname;
   String? avatar;
   String? fcmtoken;
+  String? route;
 
   factory PushNotifyModel.fromJson(Map<String, dynamic> json) =>
       PushNotifyModel(
@@ -29,6 +30,7 @@ class PushNotifyModel {
         avatar: json["avatar"],
         fcmtoken: json["fcmtoken"],
         nickname: json["nickname"] == null ? null : json["nickname"],
+        route: json["route"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -37,5 +39,6 @@ class PushNotifyModel {
         'chatroomid': chatroomid,
         'avatar': avatar,
         'fcmtoken': fcmtoken,
+        'route': route,
       };
 }

@@ -516,81 +516,119 @@ class _O2OChatroomState extends State<O2OChatroom> {
                               child: Container(
                                 // height: 80,
                                 decoration: BoxDecoration(
-                                    color: Colors.grey,
+                                    color: Color(0xffd3d3d3),
                                     borderRadius: BorderRadius.circular(30)),
-                                child: Row(
-                                  children: [
-                                    IconButton(
-                                      icon: Icon(Icons.photo),
-                                      onPressed: () async {
-                                        await Provider.of<ChatProvider>(context,
-                                                listen: false)
-                                            .sendimg_o2o(
-                                          widget.chatroomid,
-                                          'ime_o2o_chat',
-                                          Provider.of<ChatProvider>(context,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 10),
+                                  child: Row(
+                                    children: [
+                                      GestureDetector(
+                                        child: Container(
+                                          height: 30,
+                                          width: 30,
+                                          child: Image.asset(
+                                              'assets/icon/button/sendpic.png'),
+                                        ),
+                                        onTap: () async {
+                                          await Provider.of<ChatProvider>(context,
                                                   listen: false)
-                                              .remoteUserInfo[0]
-                                              .memberid,
-                                          widget.nickname,
-                                          widget.avatar,
-                                          widget.fcmtoken,
-                                        );
+                                              .sendimg_o2o(
+                                            widget.chatroomid,
+                                            'ime_o2o_chat',
+                                            Provider.of<ChatProvider>(context,
+                                                    listen: false)
+                                                .remoteUserInfo[0]
+                                                .memberid,
+                                            widget.nickname,
+                                            widget.avatar,
+                                            widget.fcmtoken,
+                                          );
 
-                                        setState(() {
-                                          topicindex =
-                                              Provider.of<ChatProvider>(context,
-                                                      listen: false)
-                                                  .o2o_msglist
-                                                  ?.indexWhere((element) =>
-                                                      element.memberid ==
-                                                      widget.chatroomid);
-                                        });
-                                      },
-                                    ),
-                                    IconButton(
-                                      icon: Icon(Icons.camera_alt),
-                                      onPressed: () async {
-                                        await Provider.of<ChatProvider>(context,
-                                                listen: false)
-                                            .sendimgwithcamera_o2o(
-                                                widget.chatroomid,
-                                                'ime_o2o_chat',
-                                                Provider.of<ChatProvider>(
-                                                        context,
+                                          setState(() {
+                                            topicindex =
+                                                Provider.of<ChatProvider>(context,
                                                         listen: false)
-                                                    .remoteUserInfo[0]
-                                                    .memberid,
-                                                widget.nickname,
-                                                widget.avatar,
-                                                widget.fcmtoken);
+                                                    .o2o_msglist
+                                                    ?.indexWhere((element) =>
+                                                        element.memberid ==
+                                                        widget.chatroomid);
+                                          });
+                                        },
+                                      ),
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 12.0),
+                                        child: GestureDetector(
+                                          child: Container(
+                                            height: 30,
+                                            width: 30,
+                                            child: Image.asset(
+                                                'assets/icon/button/takepicture.png'),
+                                          ),
+                                          onTap: () async {
+                                            await Provider.of<ChatProvider>(
+                                                    context,
+                                                    listen: false)
+                                                .sendimgwithcamera_o2o(
+                                                    widget.chatroomid,
+                                                    'ime_o2o_chat',
+                                                    Provider.of<ChatProvider>(
+                                                            context,
+                                                            listen: false)
+                                                        .remoteUserInfo[0]
+                                                        .memberid,
+                                                    widget.nickname,
+                                                    widget.avatar,
+                                                    widget.fcmtoken);
 
-                                        setState(() {
-                                          topicindex =
-                                              Provider.of<ChatProvider>(context,
-                                                      listen: false)
-                                                  .o2o_msglist
-                                                  ?.indexWhere((element) =>
-                                                      element.memberid ==
-                                                      widget.chatroomid);
-                                        });
-                                      },
-                                    ),
-                                    //打開下方貼圖按鈕
-                                    IconButton(
-                                      icon: Icon(Icons.face),
-                                      onPressed: () {
-                                        stickerautoopen();
-                                      },
-                                    ),
-                                    //打開下方錄音按鈕
-                                    IconButton(
-                                      icon: Icon(Icons.mic),
-                                      onPressed: () {
-                                        audioautoopen();
-                                      },
-                                    ),
-                                  ],
+                                            setState(() {
+                                              topicindex =
+                                                  Provider.of<ChatProvider>(
+                                                          context,
+                                                          listen: false)
+                                                      .o2o_msglist
+                                                      ?.indexWhere((element) =>
+                                                          element.memberid ==
+                                                          widget.chatroomid);
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                      //打開下方貼圖按鈕
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 12.0),
+                                        child: GestureDetector(
+                                          child: Container(
+                                            height: 30,
+                                            width: 30,
+                                            child: Image.asset(
+                                                'assets/icon/button/sendtexture.png'),
+                                          ),
+                                          onTap: () {
+                                            stickerautoopen();
+                                          },
+                                        ),
+                                      ),
+                                      //打開下方錄音按鈕
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 12.0),
+                                        child: GestureDetector(
+                                          child: Container(
+                                            height: 30,
+                                            width: 30,
+                                            child: Image.asset(
+                                                'assets/icon/button/sendrecord.png'),
+                                          ),
+                                          onTap: () {
+                                            audioautoopen();
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             )
@@ -810,7 +848,14 @@ class _O2OChatroomState extends State<O2OChatroom> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5),
             child: GestureDetector(
-              child: Icon(Icons.send),
+              child: Container(
+                height: 40,
+                width: 40,
+                child: Image.asset(
+                  'assets/icon/button/send.png',
+                  color: Colors.black,
+                ),
+              ),
               onTap: () async {
                 if (_textController.text != '') {
                   ///先關起來

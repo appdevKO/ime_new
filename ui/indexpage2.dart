@@ -39,7 +39,8 @@ class _IndexPage2State extends State<IndexPage2> {
         print('從終止獲得推播');
         Future.delayed(const Duration(milliseconds: 530), () {
           var pushdata = PushNotifyModel.fromJson(message.data);
-          Navigator.pushNamed(context, '/message', arguments: pushdata);
+
+          Navigator.pushNamed(context, pushdata.route!, arguments: pushdata);
         });
       }
     });
@@ -54,14 +55,10 @@ class _IndexPage2State extends State<IndexPage2> {
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      print(
-          'A new onMessageOpenedApp event was published! ${message.data}');
+      print('A new onMessageOpenedApp event was published! ${message.data}');
       Future.delayed(const Duration(milliseconds: 530), () {
         var pushdata = PushNotifyModel.fromJson(message.data);
-        Navigator.pushNamed(
-            context,
-            '/message',arguments: pushdata
-        );
+        Navigator.pushNamed(context, pushdata.route!, arguments: pushdata);
       });
     });
   }

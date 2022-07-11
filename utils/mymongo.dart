@@ -95,11 +95,37 @@ class MongoDB {
   }
   Future sweetGetUserList(collection_name, account) async {
     var coll = db.collection(collection_name);
-    Map<String, dynamic> u =
-    await coll.findOne({"account": 'vO5gVqgW12MEr96Q1j5ShEy9lHq1'});
-    print('uuu ${u}');
-    return u;
+    Map<String, dynamic> data = await coll.findOne({"account": account});
+    print('uuu ${data}');
+    return data;
   }
+
+  Future sweetGetDonate(collection_name, account) async {
+    print("sweetGetDonate" + account);
+    var coll = db.collection(collection_name);
+    Map<String, dynamic> data = await coll.findOne({"account": account});
+    return data["get_donate_count"];
+  }
+
+  Future sweetGetAllGift(collection_name, func) async {
+    datalist = [];
+    var coll = db.collection(collection_name);
+    await coll
+        .modernFind(findOptions: mongo.FindOptions(maxTimeMS: 5000))
+        .forEach((v) {
+      print("gift data $v");
+      datalist.add(func(v));
+    });
+    return datalist;
+  }
+
+  Future sweetSendGift(collection_name, newValue) async {
+    var coll = db.collection(collection_name);
+    Map<String, dynamic> data = await coll.findOne({"account": ''});
+    print('donate1 ${data["get_donate_count"]}');
+    return data["get_donate_count"];
+  }
+
   // Future readdb2(
   //   collection_name,
   // ) async {

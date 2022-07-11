@@ -9,6 +9,8 @@ import 'package:ime_new/ui/live/sweet/sweetView.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:provider/provider.dart';
 import 'package:ime_new/business_logic/model/sweetRoom.dart';
+import 'package:ime_new/business_logic/model/audience.dart';
+import 'package:ime_new/business_logic/model/anchor.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 
 bool? identity;
@@ -66,13 +68,12 @@ class _SweetLiveListState extends State<SweetLiveList> {
                               child: InkWell(
                                   onTap: () {
                                     // 觀眾資料 傳給Server
-                                    var audienceJson = {};
-                                    audienceJson['"rid"'] =
+                                    var data = {};
+                                    data['"roomId"'] =
                                         ('"${_sweetProvider.rooms[index].id}"');
-                                    audienceJson['"nickname"'] =
+                                    data['"selfEncodeName"'] =
                                         ('"${strToEncode(nickName)}"');
-                                    audienceJson['"account"'] =
-                                        ('"${account}"');
+                                    data['"selfAccount"'] = ('"${account}"');
                                     //print(' audienceJson$audienceJson');
                                     sweetRoomId =
                                         _sweetProvider.rooms[index].id;
@@ -80,7 +81,7 @@ class _SweetLiveListState extends State<SweetLiveList> {
                                     var pubTopic = 'imeSweetUser/' + myUid;
                                     final builder = MqttClientPayloadBuilder();
                                     builder.addString(
-                                        "joinRoom," + audienceJson.toString());
+                                        "joinRoom," + data.toString());
                                     client.publishMessage(pubTopic,
                                         MqttQos.atLeastOnce, builder.payload!);
                                   },
@@ -174,7 +175,9 @@ class _SweetLiveListState extends State<SweetLiveList> {
                                                 padding: const EdgeInsets.only(
                                                     left: 3.0),
                                                 child: Text(
-                                                  '2',
+                                                  (_sweetProvider.rooms[index]
+                                                      .audienceCount
+                                                      .toString()),
                                                   style: TextStyle(
                                                       color: Colors.white),
                                                 ),
@@ -210,7 +213,7 @@ class _SweetLiveListState extends State<SweetLiveList> {
 /*
           ElevatedButton(*/
 Future<Future<String?>> openRoom(
-    BuildContext context, avatalUrl, nickName) async {
+    BuildContext context, avatalUrl, nickName, selfAccount) async {
   String roomName = '';
   String roomExplain = ' ';
   String _hintText = '名稱不可為空';
@@ -272,16 +275,15 @@ Future<Future<String?>> openRoom(
             onPressed: () {
               if (roomName != '') {
                 identity = true;
-                Codec<String, String> stringToBase64 = utf8.fuse(base64);
-                String enName = stringToBase64.encode(roomName);
-                String enExplain = stringToBase64.encode(roomExplain);
-                String enAnchorName = stringToBase64.encode(nickName);
-                print('enAnchorName $enAnchorName');
+                String enName = strToEncode(roomName);
+                String enExplain = strToEncode(roomExplain);
+                String enAnchorName = strToEncode(nickName);
                 var audienceJson = {};
-                audienceJson['"avatarUrl"'] = ('"${avatalUrl}"');
-                audienceJson['"enName"'] = ('"${enName}"');
-                audienceJson['"enExplain"'] = ('"${enExplain}"');
-                audienceJson['"anchorName"'] = ('"${enAnchorName}"');
+                audienceJson['"selfAvatar"'] = ('"${avatalUrl}"');
+                audienceJson['"encodeRoomName"'] = ('"${enName}"');
+                audienceJson['"encodeRoomExplain"'] = ('"${enExplain}"');
+                audienceJson['"selfEncodeName"'] = ('"${enAnchorName}"');
+                audienceJson['"selfAccount"'] = ('"${selfAccount}"');
                 print("joinNewRoom," + audienceJson.toString());
                 var pubTopic = 'imeSweetUser/' + myUid;
                 final builder = MqttClientPayloadBuilder();

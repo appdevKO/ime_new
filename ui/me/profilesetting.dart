@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ime_new/business_logic/provider/chat_provider.dart';
-import 'package:ime_new/ui/date/square/upgrade_vip.dart';
+import 'package:ime_new/ui/me/upgrade_vip.dart';
 import 'package:ime_new/ui/me/profilesetting2.dart';
 
 import 'package:provider/provider.dart';
@@ -175,7 +175,8 @@ class _ProfileSettingState extends State<ProfileSetting> {
                                                           onTap: () {
                                                             Navigator.pop(
                                                                 context);
-                                                            value.upload_pic(index);
+                                                            value.upload_pic(
+                                                                index);
                                                           },
                                                         ),
                                                       ],
@@ -258,10 +259,10 @@ class _ProfileSettingState extends State<ProfileSetting> {
                                 ),
                               ),
                               onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => UpGradeVIP()));
+                                // Navigator.push(
+                                //     context,
+                                //     MaterialPageRoute(
+                                //         builder: (context) => UpGradeVIP()));
                               },
                             ),
                           ),

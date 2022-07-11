@@ -601,7 +601,6 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
                           ? Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Container(
-                                // height: 80,
                                 decoration: BoxDecoration(
                                     color: Color(0xffd3d3d3),
                                     borderRadius: BorderRadius.circular(30)),
@@ -644,6 +643,7 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
                                           },
                                         ),
                                       ),
+                                      //打開下方貼圖按鈕
                                       Padding(
                                         padding:
                                             const EdgeInsets.only(left: 12.0),
@@ -659,6 +659,7 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
                                           },
                                         ),
                                       ),
+                                      //打開下方錄音按鈕
                                       Padding(
                                         padding:
                                             const EdgeInsets.only(left: 12.0),
@@ -674,56 +675,12 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
                                           },
                                         ),
                                       ),
-                                      // IconButton(
-                                      //   icon: Icon(Icons.photo),
-                                      //   onPressed: () async {
-                                      //     await Provider.of<ChatProvider>(context,
-                                      //             listen: false)
-                                      //         .sendimg_group(widget.chatroomid,
-                                      //             'ime_group_chat');
-                                      //   },
-                                      // ),
-                                      // IconButton(
-                                      //   icon: Icon(Icons.camera_alt),
-                                      //   onPressed: () {
-                                      //     Provider.of<ChatProvider>(context,
-                                      //             listen: false)
-                                      //         .sendimgwithcamera_group(
-                                      //             widget.chatroomid,
-                                      //             'ime_group_chat');
-                                      //   },
-                                      // ),
-                                      // //打開下方貼圖按鈕
-                                      // IconButton(
-                                      //   icon: Icon(Icons.face),
-                                      //   onPressed: () {
-                                      //     stickerautoopen();
-                                      //   },
-                                      // ),
-                                      // //打開下方錄音按鈕
-                                      // IconButton(
-                                      //   icon: Icon(Icons.mic),
-                                      //   onPressed: () {
-                                      //     audioautoopen();
-                                      //   },
-                                      // ),
                                     ],
                                   ),
                                 ),
                               ),
                             )
                           : Container(),
-
-                      // Container(
-                      //   height: bottomrecordheight,
-                      //   width: MediaQuery.of(context).size.width,
-                      //   color: Colors.red,
-                      // ),
-                      // Container(
-                      //   height: bottomstickerheight,
-                      //   width: MediaQuery.of(context).size.width,
-                      //   color: Colors.green,
-                      // ),
                     ],
                   ),
                 ),
@@ -862,26 +819,29 @@ class _GroupChatRoom2State extends State<GroupChatRoom2> {
           ),
           //傳送 發送 文字 箭頭 送出
 
-          GestureDetector(
-            child: Container(
-              height: 40,
-              width: 40,
-              child: Image.asset(
-                'assets/icon/button/send.png',
-                color: Colors.black,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5),
+            child: GestureDetector(
+              child: Container(
+                height: 40,
+                width: 40,
+                child: Image.asset(
+                  'assets/icon/button/send.png',
+                  color: Colors.black,
+                ),
               ),
+              onTap: () {
+                if (_textController.text != '') {
+                  Provider.of<ChatProvider>(context, listen: false).groupchat(
+                    _textController.text,
+                    widget.chatroomid,
+                    1,
+                  );
+                  _textController.clear();
+                }
+                _focus.unfocus();
+              },
             ),
-            onTap: () {
-              if (_textController.text != '') {
-                Provider.of<ChatProvider>(context, listen: false).groupchat(
-                  _textController.text,
-                  widget.chatroomid,
-                  1,
-                );
-                _textController.clear();
-              }
-              _focus.unfocus();
-            },
           ),
         ],
       ),

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:convert';
 import 'dart:math';
 import 'package:get/get.dart';
@@ -7,10 +8,15 @@ import 'package:ime_new/business_logic/model/dbuserinfo_model.dart';
 import 'package:ime_new/ui/live/sweet/sweetView.dart';
 import 'package:ime_new/ui/live/sweet/sweetlive_list.dart';
 import 'package:ime_new/business_logic/model/sweetRoom.dart';
+import 'package:ime_new/business_logic/model/audience.dart';
+import 'package:ime_new/business_logic/model/anchor.dart';
+import 'package:ime_new/business_logic/model/gift.dart';
+import 'package:ime_new/business_logic/model/sweetGif.dart';
 import 'package:ime_new/utils/mymongo.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:permission_handler/permission_handler.dart';
+
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:queue/queue.dart';
 
@@ -19,6 +25,7 @@ String myAgoraUid = myUid;
 String channelToken = '';
 String roomName = '';
 var sweetRoomId;
+final gifQueue = ListQueue<int>();
 
 ///之後要換掉 伺服器
 final client = MqttServerClient.withPort('iot.gotcash.me', myUid, 1883);
@@ -33,10 +40,12 @@ class ChatMessage {
 class sweetProvider with ChangeNotifier {
   var remoteUserInfo;
   var rooms;
-  var roomId;
   var anchorID;
   var anchorName;
+  var giftList;
   int? roomCount;
+  int donateCount = 0;
+  int sendCount = 1;
   List accountList = [];
   List audienceList = [];
   String audienceCount = '0';
@@ -45,13 +54,63 @@ class sweetProvider with ChangeNotifier {
   String inRoomAvatar = '';
   String selfAccount = '';
   String selfName = '';
+  String selfEncodeName = '';
   String vipName = '';
-  bool vdoSta = false;
-  bool getGift_1 = false;
+  String senderName = '';
+  String giftName = '';
+  String giftMusicUrl = '';
+  bool vdoStatus = false;
+  bool imAnchor = false;
+  bool giftAnime = false;
+  bool giftMusic = false;
   bool vipAnime = false;
+  bool cantTalk = false;
   MongoDB _mongoDB = MongoDB();
 
+  List borderList = List.filled(19, false, growable: true);
   List<ChatMessage> messages = [];
+  List giftIcon = [
+    "bag",
+    "bridal_sedan_chair",
+    "cupid",
+    "flower",
+    "helicopter",
+    "love99",
+    "necklace",
+    "perfume",
+    "private_aircraft",
+    "pumpkin_carriage",
+    'ring',
+    "shoes",
+    "sports_car",
+    "ten_thousand_years",
+    "victorias_secret",
+    'villa',
+    'whole_world',
+    'wrist_watch',
+    'yacht'
+  ];
+  List giftText = [
+    "包包",
+    "花轎",
+    "cupid",
+    "flower",
+    "helicopter",
+    "love99",
+    "necklace",
+    "perfume",
+    "private_aircraft",
+    "pumpkin_carriage",
+    'ring',
+    "shoes",
+    "sports_car",
+    "ten_thousand_years",
+    "victorias_secret",
+    'villa',
+    'whole_world',
+    'wrist_watch',
+    'yacht'
+  ];
   Future<MqttServerClient> connect() async {
     WidgetsFlutterBinding.ensureInitialized();
     await Permission.camera.request();
@@ -93,44 +152,61 @@ class sweetProvider with ChangeNotifier {
         Iterable l = json.decode('$pt');
         rooms =
             RxList<sweetRoom>.from(l.map((model) => sweetRoom.fromJson(model)));
-
-        //print('aaa');
-        //print(rooms[0].explain);
         notifyListeners();
       } else if ('${c[0].topic}' == 'imeSweetUser/' + myUid) {
         if ('$pt'.startsWith('anchor')) {
           //主播用
           print('anchor $pt');
-          Map<String, dynamic> json = jsonDecode("{" + pt.split(',{')[1]);
+          Map<String, dynamic> anchorMap = jsonDecode("{" + pt.split(',{')[1]);
+          var anchor = Anchor.fromJson(anchorMap);
+          //Map<String, dynamic> json = jsonDecode("{" + pt.split(',{')[1]);
           myRoomSeatIndex = 1;
-          sweetRoomId = json["rid"];
-          inRoomAvatar = json["avatarUrl"];
-          anchorName = encodeToString(json['anchorName']);
-          pushMqtt('imeSweetRoom/' + sweetRoomId, 'get/allAudience');
-          print('anchorName ${anchorName}');
+          sweetRoomId = anchor.roomId;
+          vdoStatus = anchor.vdoStatus;
+          notifyListeners();
+          print(sweetRoomId);
+          inRoomAvatar = anchor.selfAvatar;
+          selfEncodeName = anchor.selfEncodeName;
+
+          selfName = encodeToString(selfEncodeName);
+          anchorName = selfName;
+          selfAccount = anchor.selfAccount;
+
+          donateCount = (await _mongoDB.sweetGetDonate("member", selfAccount));
+          print('donateCount ${donateCount}');
           client.subscribe("imeSweetRoom/" + sweetRoomId, MqttQos.atLeastOnce);
 
           Get.to(sweetView(
             title: sweetRoomId,
           ));
           notifyListeners();
+          imAnchor = true;
         } else if ('$pt'.startsWith('audience,')) {
           //觀眾用
           print('audience $pt');
-          Map<String, dynamic> json = jsonDecode("{" + pt.split(',{')[1]);
+          Map<String, dynamic> audienceMap =
+              jsonDecode("{" + pt.split(',{')[1]);
+          var audience = Audience.fromJson(audienceMap);
+          anchorID = int.parse(audience.anchorId);
+          if (audience.vdoStatus == 'true') {
+            vdoStatus = true;
+          }
+          notifyListeners();
           print('audience json $json');
-          sweetRoomId = json["rid"];
-          inRoomAvatar = json["avatarUrl"];
+          sweetRoomId = audience.roomId;
+          inRoomAvatar = audience.anchorAvatar;
           client.subscribe("imeSweetRoom/" + sweetRoomId, MqttQos.atLeastOnce);
           pushMqtt('imeSweetRoom/' + sweetRoomId, 'get/allAudience');
-          selfAccount = json["selfAccount"];
-          selfName = json["nickname"];
-          if (json["vdoSta"] == 'true') {
-            vdoSta = true;
+          selfAccount = audience.selfAccount;
+          selfEncodeName = audience.selfEncodeName;
+          anchorName = encodeToString((audience.encodeAnchorName));
+          String anchorAccount = (audience.anchorAccount);
+          donateCount =
+              (await _mongoDB.sweetGetDonate("member", anchorAccount));
+          giftList = await _mongoDB.sweetGetAllGift('gift', Gift.fromJson);
+          for (int i = 0; i < 2; i++) {
+            print(giftList[i].icon_url);
           }
-          anchorID = int.parse(json["anchorId"]);
-          anchorName = encodeToString((json["anchorName"]));
-
           // if (json["vip"] == 'true') {
           //   pushMqtt('imeSweetRoom/' + sweetRoomId, 'vipIn,'+strToEncode(selfName));
           // }
@@ -158,12 +234,31 @@ class sweetProvider with ChangeNotifier {
           if (pt.split(',')[2] == selfAccount) {
             //self 變數歸0 觀眾數量-1
             //other 由java運算扣除後 get/allAudience 傳給所有in room 所有人
-            anchorID = null;
-            vdoSta = false;
+            donateCount = 0;
+            sendCount = 1;
+            accountList = [];
             audienceList = [];
             messages = [];
-            notifyListeners();
-          }
+            audienceCount = '0';
+            roomNam = '';
+            roomExplain = '';
+            inRoomAvatar = '';
+            selfAccount = '';
+            selfName = '';
+            selfEncodeName = '';
+            vipName = '';
+            senderName = '';
+            giftName = '';
+            giftMusicUrl = '';
+            giftMusic = false;
+            giftMusic = false;
+            vdoStatus = false;
+            giftAnime = false;
+            vipAnime = false;
+            cantTalk = false;
+            borderList = List.filled(19, false, growable: true);
+          } else {}
+          notifyListeners();
         } else if ('$pt'.startsWith('vip,')) {
           vipName = encodeToString(pt.split(',')[1]);
           vipAnime = true;
@@ -175,6 +270,7 @@ class sweetProvider with ChangeNotifier {
           });
         } else if ('$pt'.startsWith('addChatMsg')) {
           List msg = pt.split(',');
+          print('addChatMsg $msg');
           messages.addAll([
             ChatMessage(
                 account: encodeToString(msg[1]) + " : ",
@@ -185,11 +281,38 @@ class sweetProvider with ChangeNotifier {
           String _vdosta = '$pt'.split(',')[1];
           print('vdoHide $_vdosta');
           if (_vdosta == 'true') {
-            vdoSta = true;
+            vdoStatus = true;
           } else if (_vdosta == 'false') {
-            vdoSta = false;
+            vdoStatus = false;
           }
           notifyListeners();
+        } else if ('$pt'.startsWith('gif/enQue')) {
+          Map<String, dynamic> gifMap = jsonDecode("{" + pt.split(',{')[1]);
+          print('gif/enQue $gifMap');
+          var gif = SweetGif.fromJson(gifMap);
+          print('gif/enQue' + json.toString());
+          donateCount = gif.afterValue;
+          notifyListeners();
+          gifQueue.add(jsonDecode("{" + pt.split(',{')[1]));
+          print(gifQueue);
+        } else if ('$pt'.startsWith('gif/play')) {
+          gifQueue.removeFirst();
+          Map<String, dynamic> json = jsonDecode("{" + pt.split(',{')[1]);
+          print('gif/play' + json.toString());
+          senderName = encodeToString(json["senderName"]);
+          giftName = encodeToString(json["giftName"]);
+          giftMusicUrl = await encodeToString(json["musicUrl"]);
+          if ((giftMusicUrl.length) > 0) {
+            giftMusic = true;
+          }
+          giftAnime = true;
+          notifyListeners();
+        } else if ('$pt'.startsWith('ban/talk,')) {
+          String bannedName = encodeToString('$pt'.split(',')[1]);
+          if (bannedName == selfName) {
+            cantTalk = true;
+            notifyListeners();
+          }
         }
       }
     });

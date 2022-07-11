@@ -1,11 +1,6 @@
-import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
-import 'package:ime_new/ui/live/spylive/anchor/spy_anchor_live.dart';
-import 'package:ime_new/ui/live/spylive/player/spy_player_live.dart';
-import 'package:ime_new/ui/live/spylive/player/spy_player_missionlist.dart';
 
-import 'anchor/spy_anchor_missionlist.dart';
-import 'createmission.dart';
+import 'mission/missionpage.dart';
 
 class SpyLivePage extends StatefulWidget {
   const SpyLivePage({Key? key}) : super(key: key);
@@ -37,104 +32,980 @@ class _SpyLivePageState extends State<SpyLivePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                AnimatedToggleSwitch<bool>.dual(
-                  current: positive,
-                  first: false,
-                  second: true,
-                  dif: 50.0,
-                  borderColor: Colors.transparent,
-                  borderWidth: 2.0,
-                  height: 35,
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.black26,
-                      spreadRadius: 1,
-                      blurRadius: 2,
-                      offset: Offset(0, 1.5),
+      appBar: AppBar(
+        title: Text(
+          '特務直播',
+          textAlign: TextAlign.center,
+        ),
+      ),
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height * 0.88,
+          child: Column(
+            children: [
+              //上面按鈕
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    GestureDetector(
+                      child: Container(
+                        width: 150,
+                        height: 50,
+                        child: Center(
+                            child: Text(
+                          'Mission',
+                          style: TextStyle(color: Colors.white),
+                        )),
+                        decoration: BoxDecoration(
+                            color: Colors.black,
+                            borderRadius: BorderRadius.circular(30),
+                            border: Border.all(
+                              width: 2.5,
+                              color: Color(0xff35B4CF),
+                            )),
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => MissionPage()));
+                      },
                     ),
-                  ],
-                  onChanged: (value) => setState(() => positive = value),
-                  colorBuilder: (b) => b ? Color(0xffffbbbb) : Colors.blue,
-                  iconBuilder: (value) => value
-                      ? Icon(Icons.coronavirus_rounded)
-                      : Icon(Icons.tag_faces_rounded),
-                  textBuilder: (value) => value
-                      ? Center(child: Text('任務欄'))
-                      : Center(child: Text('直播')),
-                ),
-                GestureDetector(
-                  child: Container(
-                    width: 120,
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                    decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(5)),
-                    child: Center(
-                        child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.touch_app_sharp,
-                          color: Colors.white,
-                        ),
-                        Text(
-                          '我要發任務',
+                    Container(
+                      width: 150,
+                      height: 50,
+                      child: Center(
+                        child: Text(
+                          'ShowTime',
                           style: TextStyle(color: Colors.white),
                         ),
-                      ],
-                    )),
-                  ),
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => CreateMission()));
-                  },
-                )
-              ],
-            ),
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Flexible(
+                child: Container(
+                    width: MediaQuery.of(context).size.width,
+                    child: ListView.builder(
+                      itemBuilder: (context, index) => Padding(
+                        padding: EdgeInsetsDirectional.fromSTEB(16, 8, 16, 0),
+                        child: Container(
+                          width: MediaQuery.of(context).size.width,
+                          height: 150,
+                          decoration: BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                blurRadius: 3,
+                                color: Color(0x20000000),
+                                offset: Offset(0, 1),
+                              )
+                            ],
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(0, 8, 0, 0),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.max,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Column(
+                                    mainAxisSize: MainAxisSize.max,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                            16, 0, 0, 0),
+                                        child: Image.network(
+                                          'https://picsum.photos/seed/556/600',
+                                          width: 100,
+                                          height: 100,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                      Container(
+                                        width: 100,
+                                        height: 30,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.only(
+                                            bottomLeft: Radius.circular(12),
+                                            bottomRight: Radius.circular(0),
+                                            topLeft: Radius.circular(0),
+                                            topRight: Radius.circular(12),
+                                          ),
+                                          color: Colors.grey,
+                                          shape: BoxShape.rectangle,
+                                        ),
+                                        child: Padding(
+                                          padding:
+                                              EdgeInsetsDirectional.fromSTEB(
+                                                  0, 5, 0, 0),
+                                          child: Text(
+                                            '觀看人數',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.w700),
+                                          ),
+                                        ),
+                                      ),
+                                    ]),
+                                Expanded(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.max,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                            10, 10, 0, 0),
+                                        child: Text(
+                                          '任務標題',
+                                          textAlign: TextAlign.start,
+                                          style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w700),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                            10, 0, 0, 0),
+                                        child: Text(
+                                          '任務內容',
+                                          style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w700),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                            0, 0, 10, 0),
+                                        child: Text(
+                                          '懸賞獎金\$6666666',
+                                          style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w700),
+                                        ),
+                                      ),
+                                      Row(
+                                        mainAxisSize: MainAxisSize.max,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          Container(
+                                            width: 100,
+                                            height: 30,
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.only(
+                                                bottomLeft: Radius.circular(0),
+                                                bottomRight:
+                                                    Radius.circular(12),
+                                                topLeft: Radius.circular(12),
+                                                topRight: Radius.circular(0),
+                                              ),
+                                            ),
+                                            child: Padding(
+                                              padding: EdgeInsetsDirectional
+                                                  .fromSTEB(0, 5, 0, 0),
+                                              child: Text(
+                                                'Mission',
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      itemCount: 12,
+                    )
+
+                    // ListView(
+                    //   padding: EdgeInsets.zero,
+                    //   shrinkWrap: true,
+                    //   scrollDirection: Axis.vertical,
+                    //   children: [
+                    //
+                    //     Padding(
+                    //       padding: EdgeInsetsDirectional.fromSTEB(16, 8, 16, 0),
+                    //       child: Container(
+                    //         width: double.infinity,
+                    //         height: 150,
+                    //         decoration: BoxDecoration(
+                    //           boxShadow: [
+                    //             BoxShadow(
+                    //               blurRadius: 3,
+                    //               color: Color(0x20000000),
+                    //               offset: Offset(0, 1),
+                    //             )
+                    //           ],
+                    //           borderRadius: BorderRadius.circular(12),
+                    //         ),
+                    //         child: Padding(
+                    //           padding: EdgeInsetsDirectional.fromSTEB(0, 8, 0, 0),
+                    //           child: Row(
+                    //             mainAxisSize: MainAxisSize.max,
+                    //             crossAxisAlignment: CrossAxisAlignment.start,
+                    //             children: [
+                    //               Column(
+                    //                 mainAxisSize: MainAxisSize.max,
+                    //                 mainAxisAlignment:
+                    //                     MainAxisAlignment.spaceBetween,
+                    //                 crossAxisAlignment: CrossAxisAlignment.start,
+                    //                 children: [
+                    //                   Padding(
+                    //                     padding: EdgeInsetsDirectional.fromSTEB(
+                    //                         16, 0, 0, 0),
+                    //                     child: Image.network(
+                    //                       'https://picsum.photos/seed/556/600',
+                    //                       width: 100,
+                    //                       height: 100,
+                    //                       fit: BoxFit.cover,
+                    //                     ),
+                    //                   ),
+                    //                   Container(
+                    //                     width: 100,
+                    //                     height: 30,
+                    //                     decoration: BoxDecoration(
+                    //                       borderRadius: BorderRadius.only(
+                    //                         bottomLeft: Radius.circular(12),
+                    //                         bottomRight: Radius.circular(0),
+                    //                         topLeft: Radius.circular(0),
+                    //                         topRight: Radius.circular(12),
+                    //                       ),
+                    //                     ),
+                    //                     child: Padding(
+                    //                       padding: EdgeInsetsDirectional.fromSTEB(
+                    //                           0, 5, 0, 0),
+                    //                       child: Text(
+                    //                         '觀看人數',
+                    //                         textAlign: TextAlign.center,
+                    //                       ),
+                    //                     ),
+                    //                   ),
+                    //                 ],
+                    //               ),
+                    //               Expanded(
+                    //                 child: Column(
+                    //                   mainAxisSize: MainAxisSize.max,
+                    //                   mainAxisAlignment:
+                    //                       MainAxisAlignment.spaceBetween,
+                    //                   crossAxisAlignment:
+                    //                       CrossAxisAlignment.center,
+                    //                   children: [
+                    //                     Padding(
+                    //                       padding: EdgeInsetsDirectional.fromSTEB(
+                    //                           10, 10, 0, 0),
+                    //                       child: Text(
+                    //                         '任務標題',
+                    //                         textAlign: TextAlign.start,
+                    //                       ),
+                    //                     ),
+                    //                     Padding(
+                    //                       padding: EdgeInsetsDirectional.fromSTEB(
+                    //                           10, 0, 0, 0),
+                    //                       child: Text(
+                    //                         '任務內容',
+                    //                       ),
+                    //                     ),
+                    //                     Padding(
+                    //                       padding: EdgeInsetsDirectional.fromSTEB(
+                    //                           0, 0, 10, 0),
+                    //                       child: Text(
+                    //                         '懸賞獎金\$6666666',
+                    //                       ),
+                    //                     ),
+                    //                     Row(
+                    //                       mainAxisSize: MainAxisSize.max,
+                    //                       mainAxisAlignment:
+                    //                           MainAxisAlignment.end,
+                    //                       children: [
+                    //                         Container(
+                    //                           width: 100,
+                    //                           height: 30,
+                    //                           decoration: BoxDecoration(
+                    //                             borderRadius: BorderRadius.only(
+                    //                               bottomLeft: Radius.circular(0),
+                    //                               bottomRight:
+                    //                                   Radius.circular(12),
+                    //                               topLeft: Radius.circular(12),
+                    //                               topRight: Radius.circular(0),
+                    //                             ),
+                    //                           ),
+                    //                           child: Padding(
+                    //                             padding: EdgeInsetsDirectional
+                    //                                 .fromSTEB(0, 5, 0, 0),
+                    //                             child: Text(
+                    //                               'ShowTime',
+                    //                               textAlign: TextAlign.center,
+                    //                             ),
+                    //                           ),
+                    //                         ),
+                    //                       ],
+                    //                     ),
+                    //                   ],
+                    //                 ),
+                    //               ),
+                    //             ],
+                    //           ),
+                    //         ),
+                    //       ),
+                    //     ),
+                    //     Padding(
+                    //       padding: EdgeInsetsDirectional.fromSTEB(16, 8, 16, 0),
+                    //       child: Container(
+                    //         width: double.infinity,
+                    //         height: 150,
+                    //         decoration: BoxDecoration(
+                    //           boxShadow: [
+                    //             BoxShadow(
+                    //               blurRadius: 3,
+                    //               color: Color(0x20000000),
+                    //               offset: Offset(0, 1),
+                    //             )
+                    //           ],
+                    //           borderRadius: BorderRadius.circular(12),
+                    //         ),
+                    //         child: Padding(
+                    //           padding: EdgeInsetsDirectional.fromSTEB(0, 8, 0, 0),
+                    //           child: Row(
+                    //             mainAxisSize: MainAxisSize.max,
+                    //             crossAxisAlignment: CrossAxisAlignment.start,
+                    //             children: [
+                    //               Column(
+                    //                 mainAxisSize: MainAxisSize.max,
+                    //                 mainAxisAlignment:
+                    //                     MainAxisAlignment.spaceBetween,
+                    //                 crossAxisAlignment: CrossAxisAlignment.start,
+                    //                 children: [
+                    //                   Padding(
+                    //                     padding: EdgeInsetsDirectional.fromSTEB(
+                    //                         16, 0, 0, 0),
+                    //                     child: Image.network(
+                    //                       'https://picsum.photos/seed/556/600',
+                    //                       width: 100,
+                    //                       height: 100,
+                    //                       fit: BoxFit.cover,
+                    //                     ),
+                    //                   ),
+                    //                   Container(
+                    //                     width: 100,
+                    //                     height: 30,
+                    //                     decoration: BoxDecoration(
+                    //                       borderRadius: BorderRadius.only(
+                    //                         bottomLeft: Radius.circular(12),
+                    //                         bottomRight: Radius.circular(0),
+                    //                         topLeft: Radius.circular(0),
+                    //                         topRight: Radius.circular(12),
+                    //                       ),
+                    //                     ),
+                    //                     child: Padding(
+                    //                       padding: EdgeInsetsDirectional.fromSTEB(
+                    //                           0, 5, 0, 0),
+                    //                       child: Text(
+                    //                         '觀看人數',
+                    //                         textAlign: TextAlign.center,
+                    //                       ),
+                    //                     ),
+                    //                   ),
+                    //                 ],
+                    //               ),
+                    //               Expanded(
+                    //                 child: Column(
+                    //                   mainAxisSize: MainAxisSize.max,
+                    //                   mainAxisAlignment:
+                    //                       MainAxisAlignment.spaceBetween,
+                    //                   crossAxisAlignment:
+                    //                       CrossAxisAlignment.center,
+                    //                   children: [
+                    //                     Padding(
+                    //                       padding: EdgeInsetsDirectional.fromSTEB(
+                    //                           10, 10, 0, 0),
+                    //                       child: Text(
+                    //                         '任務標題',
+                    //                         textAlign: TextAlign.start,
+                    //                       ),
+                    //                     ),
+                    //                     Padding(
+                    //                       padding: EdgeInsetsDirectional.fromSTEB(
+                    //                           10, 0, 0, 0),
+                    //                       child: Text(
+                    //                         '任務內容',
+                    //                       ),
+                    //                     ),
+                    //                     Padding(
+                    //                       padding: EdgeInsetsDirectional.fromSTEB(
+                    //                           0, 0, 10, 0),
+                    //                       child: Text(
+                    //                         '懸賞獎金\$6666666',
+                    //                       ),
+                    //                     ),
+                    //                     Row(
+                    //                       mainAxisSize: MainAxisSize.max,
+                    //                       mainAxisAlignment:
+                    //                           MainAxisAlignment.end,
+                    //                       children: [
+                    //                         Container(
+                    //                           width: 100,
+                    //                           height: 30,
+                    //                           decoration: BoxDecoration(
+                    //                             borderRadius: BorderRadius.only(
+                    //                               bottomLeft: Radius.circular(0),
+                    //                               bottomRight:
+                    //                                   Radius.circular(12),
+                    //                               topLeft: Radius.circular(12),
+                    //                               topRight: Radius.circular(0),
+                    //                             ),
+                    //                           ),
+                    //                           child: Padding(
+                    //                             padding: EdgeInsetsDirectional
+                    //                                 .fromSTEB(0, 5, 0, 0),
+                    //                             child: Text(
+                    //                               'ShowTime',
+                    //                               textAlign: TextAlign.center,
+                    //                             ),
+                    //                           ),
+                    //                         ),
+                    //                       ],
+                    //                     ),
+                    //                   ],
+                    //                 ),
+                    //               ),
+                    //             ],
+                    //           ),
+                    //         ),
+                    //       ),
+                    //     ),
+                    //     Padding(
+                    //       padding: EdgeInsetsDirectional.fromSTEB(16, 8, 16, 0),
+                    //       child: Container(
+                    //         width: double.infinity,
+                    //         height: 150,
+                    //         decoration: BoxDecoration(
+                    //           boxShadow: [
+                    //             BoxShadow(
+                    //               blurRadius: 3,
+                    //               color: Color(0x20000000),
+                    //               offset: Offset(0, 1),
+                    //             )
+                    //           ],
+                    //           borderRadius: BorderRadius.circular(12),
+                    //         ),
+                    //         child: Padding(
+                    //           padding: EdgeInsetsDirectional.fromSTEB(0, 8, 0, 0),
+                    //           child: Row(
+                    //             mainAxisSize: MainAxisSize.max,
+                    //             crossAxisAlignment: CrossAxisAlignment.start,
+                    //             children: [
+                    //               Column(
+                    //                 mainAxisSize: MainAxisSize.max,
+                    //                 mainAxisAlignment:
+                    //                     MainAxisAlignment.spaceBetween,
+                    //                 crossAxisAlignment: CrossAxisAlignment.start,
+                    //                 children: [
+                    //                   Padding(
+                    //                     padding: EdgeInsetsDirectional.fromSTEB(
+                    //                         16, 0, 0, 0),
+                    //                     child: Image.network(
+                    //                       'https://picsum.photos/seed/556/600',
+                    //                       width: 100,
+                    //                       height: 100,
+                    //                       fit: BoxFit.cover,
+                    //                     ),
+                    //                   ),
+                    //                   Container(
+                    //                     width: 100,
+                    //                     height: 30,
+                    //                     decoration: BoxDecoration(
+                    //                       borderRadius: BorderRadius.only(
+                    //                         bottomLeft: Radius.circular(12),
+                    //                         bottomRight: Radius.circular(0),
+                    //                         topLeft: Radius.circular(0),
+                    //                         topRight: Radius.circular(12),
+                    //                       ),
+                    //                     ),
+                    //                     child: Padding(
+                    //                       padding: EdgeInsetsDirectional.fromSTEB(
+                    //                           0, 5, 0, 0),
+                    //                       child: Text(
+                    //                         '觀看人數',
+                    //                         textAlign: TextAlign.center,
+                    //                       ),
+                    //                     ),
+                    //                   ),
+                    //                 ],
+                    //               ),
+                    //               Expanded(
+                    //                 child: Column(
+                    //                   mainAxisSize: MainAxisSize.max,
+                    //                   mainAxisAlignment:
+                    //                       MainAxisAlignment.spaceBetween,
+                    //                   crossAxisAlignment:
+                    //                       CrossAxisAlignment.center,
+                    //                   children: [
+                    //                     Padding(
+                    //                       padding: EdgeInsetsDirectional.fromSTEB(
+                    //                           10, 10, 0, 0),
+                    //                       child: Text(
+                    //                         '任務標題',
+                    //                         textAlign: TextAlign.start,
+                    //                       ),
+                    //                     ),
+                    //                     Padding(
+                    //                       padding: EdgeInsetsDirectional.fromSTEB(
+                    //                           10, 0, 0, 0),
+                    //                       child: Text(
+                    //                         '任務內容',
+                    //                       ),
+                    //                     ),
+                    //                     Padding(
+                    //                       padding: EdgeInsetsDirectional.fromSTEB(
+                    //                           0, 0, 10, 0),
+                    //                       child: Text(
+                    //                         '懸賞獎金\$6666666',
+                    //                       ),
+                    //                     ),
+                    //                     Row(
+                    //                       mainAxisSize: MainAxisSize.max,
+                    //                       mainAxisAlignment:
+                    //                           MainAxisAlignment.end,
+                    //                       children: [
+                    //                         Container(
+                    //                           width: 100,
+                    //                           height: 30,
+                    //                           decoration: BoxDecoration(
+                    //                             borderRadius: BorderRadius.only(
+                    //                               bottomLeft: Radius.circular(0),
+                    //                               bottomRight:
+                    //                                   Radius.circular(12),
+                    //                               topLeft: Radius.circular(12),
+                    //                               topRight: Radius.circular(0),
+                    //                             ),
+                    //                           ),
+                    //                           child: Padding(
+                    //                             padding: EdgeInsetsDirectional
+                    //                                 .fromSTEB(0, 5, 0, 0),
+                    //                             child: Text(
+                    //                               'ShowTime',
+                    //                               textAlign: TextAlign.center,
+                    //                             ),
+                    //                           ),
+                    //                         ),
+                    //                       ],
+                    //                     ),
+                    //                   ],
+                    //                 ),
+                    //               ),
+                    //             ],
+                    //           ),
+                    //         ),
+                    //       ),
+                    //     ),
+                    //     Padding(
+                    //       padding: EdgeInsetsDirectional.fromSTEB(16, 8, 16, 0),
+                    //       child: Container(
+                    //         width: double.infinity,
+                    //         height: 150,
+                    //         decoration: BoxDecoration(
+                    //           boxShadow: [
+                    //             BoxShadow(
+                    //               blurRadius: 3,
+                    //               color: Color(0x20000000),
+                    //               offset: Offset(0, 1),
+                    //             )
+                    //           ],
+                    //           borderRadius: BorderRadius.circular(12),
+                    //         ),
+                    //         child: Padding(
+                    //           padding: EdgeInsetsDirectional.fromSTEB(0, 8, 0, 0),
+                    //           child: Row(
+                    //             mainAxisSize: MainAxisSize.max,
+                    //             crossAxisAlignment: CrossAxisAlignment.start,
+                    //             children: [
+                    //               Column(
+                    //                 mainAxisSize: MainAxisSize.max,
+                    //                 mainAxisAlignment:
+                    //                     MainAxisAlignment.spaceBetween,
+                    //                 crossAxisAlignment: CrossAxisAlignment.start,
+                    //                 children: [
+                    //                   Padding(
+                    //                     padding: EdgeInsetsDirectional.fromSTEB(
+                    //                         16, 0, 0, 0),
+                    //                     child: Image.network(
+                    //                       'https://picsum.photos/seed/556/600',
+                    //                       width: 100,
+                    //                       height: 100,
+                    //                       fit: BoxFit.cover,
+                    //                     ),
+                    //                   ),
+                    //                   Container(
+                    //                     width: 100,
+                    //                     height: 30,
+                    //                     decoration: BoxDecoration(
+                    //                       borderRadius: BorderRadius.only(
+                    //                         bottomLeft: Radius.circular(12),
+                    //                         bottomRight: Radius.circular(0),
+                    //                         topLeft: Radius.circular(0),
+                    //                         topRight: Radius.circular(12),
+                    //                       ),
+                    //                     ),
+                    //                     child: Padding(
+                    //                       padding: EdgeInsetsDirectional.fromSTEB(
+                    //                           0, 5, 0, 0),
+                    //                       child: Text(
+                    //                         '觀看人數',
+                    //                         textAlign: TextAlign.center,
+                    //                       ),
+                    //                     ),
+                    //                   ),
+                    //                 ],
+                    //               ),
+                    //               Expanded(
+                    //                 child: Column(
+                    //                   mainAxisSize: MainAxisSize.max,
+                    //                   mainAxisAlignment:
+                    //                       MainAxisAlignment.spaceBetween,
+                    //                   crossAxisAlignment:
+                    //                       CrossAxisAlignment.center,
+                    //                   children: [
+                    //                     Padding(
+                    //                       padding: EdgeInsetsDirectional.fromSTEB(
+                    //                           10, 10, 0, 0),
+                    //                       child: Text(
+                    //                         '任務標題',
+                    //                         textAlign: TextAlign.start,
+                    //                       ),
+                    //                     ),
+                    //                     Padding(
+                    //                       padding: EdgeInsetsDirectional.fromSTEB(
+                    //                           10, 0, 0, 0),
+                    //                       child: Text(
+                    //                         '任務內容',
+                    //                       ),
+                    //                     ),
+                    //                     Padding(
+                    //                       padding: EdgeInsetsDirectional.fromSTEB(
+                    //                           0, 0, 10, 0),
+                    //                       child: Text(
+                    //                         '懸賞獎金\$6666666',
+                    //                       ),
+                    //                     ),
+                    //                     Row(
+                    //                       mainAxisSize: MainAxisSize.max,
+                    //                       mainAxisAlignment:
+                    //                           MainAxisAlignment.end,
+                    //                       children: [
+                    //                         Container(
+                    //                           width: 100,
+                    //                           height: 30,
+                    //                           decoration: BoxDecoration(
+                    //                             borderRadius: BorderRadius.only(
+                    //                               bottomLeft: Radius.circular(0),
+                    //                               bottomRight:
+                    //                                   Radius.circular(12),
+                    //                               topLeft: Radius.circular(12),
+                    //                               topRight: Radius.circular(0),
+                    //                             ),
+                    //                           ),
+                    //                           child: Padding(
+                    //                             padding: EdgeInsetsDirectional
+                    //                                 .fromSTEB(0, 5, 0, 0),
+                    //                             child: Text(
+                    //                               'ShowTime',
+                    //                               textAlign: TextAlign.center,
+                    //                             ),
+                    //                           ),
+                    //                         ),
+                    //                       ],
+                    //                     ),
+                    //                   ],
+                    //                 ),
+                    //               ),
+                    //             ],
+                    //           ),
+                    //         ),
+                    //       ),
+                    //     ),
+                    //     Padding(
+                    //       padding: EdgeInsetsDirectional.fromSTEB(16, 8, 16, 0),
+                    //       child: Container(
+                    //         width: double.infinity,
+                    //         height: 150,
+                    //         decoration: BoxDecoration(
+                    //           boxShadow: [
+                    //             BoxShadow(
+                    //               blurRadius: 3,
+                    //               color: Color(0x20000000),
+                    //               offset: Offset(0, 1),
+                    //             )
+                    //           ],
+                    //           borderRadius: BorderRadius.circular(12),
+                    //         ),
+                    //         child: Padding(
+                    //           padding: EdgeInsetsDirectional.fromSTEB(0, 8, 0, 0),
+                    //           child: Row(
+                    //             mainAxisSize: MainAxisSize.max,
+                    //             crossAxisAlignment: CrossAxisAlignment.start,
+                    //             children: [
+                    //               Column(
+                    //                 mainAxisSize: MainAxisSize.max,
+                    //                 mainAxisAlignment:
+                    //                     MainAxisAlignment.spaceBetween,
+                    //                 crossAxisAlignment: CrossAxisAlignment.start,
+                    //                 children: [
+                    //                   Padding(
+                    //                     padding: EdgeInsetsDirectional.fromSTEB(
+                    //                         16, 0, 0, 0),
+                    //                     child: Image.network(
+                    //                       'https://picsum.photos/seed/556/600',
+                    //                       width: 100,
+                    //                       height: 100,
+                    //                       fit: BoxFit.cover,
+                    //                     ),
+                    //                   ),
+                    //                   Container(
+                    //                     width: 100,
+                    //                     height: 30,
+                    //                     decoration: BoxDecoration(
+                    //                       borderRadius: BorderRadius.only(
+                    //                         bottomLeft: Radius.circular(12),
+                    //                         bottomRight: Radius.circular(0),
+                    //                         topLeft: Radius.circular(0),
+                    //                         topRight: Radius.circular(12),
+                    //                       ),
+                    //                     ),
+                    //                     child: Padding(
+                    //                       padding: EdgeInsetsDirectional.fromSTEB(
+                    //                           0, 5, 0, 0),
+                    //                       child: Text(
+                    //                         '觀看人數',
+                    //                         textAlign: TextAlign.center,
+                    //                       ),
+                    //                     ),
+                    //                   ),
+                    //                 ],
+                    //               ),
+                    //               Expanded(
+                    //                 child: Column(
+                    //                   mainAxisSize: MainAxisSize.max,
+                    //                   mainAxisAlignment:
+                    //                       MainAxisAlignment.spaceBetween,
+                    //                   crossAxisAlignment:
+                    //                       CrossAxisAlignment.center,
+                    //                   children: [
+                    //                     Padding(
+                    //                       padding: EdgeInsetsDirectional.fromSTEB(
+                    //                           10, 10, 0, 0),
+                    //                       child: Text(
+                    //                         '任務標題',
+                    //                         textAlign: TextAlign.start,
+                    //                       ),
+                    //                     ),
+                    //                     Padding(
+                    //                       padding: EdgeInsetsDirectional.fromSTEB(
+                    //                           10, 0, 0, 0),
+                    //                       child: Text(
+                    //                         '任務內容',
+                    //                       ),
+                    //                     ),
+                    //                     Padding(
+                    //                       padding: EdgeInsetsDirectional.fromSTEB(
+                    //                           0, 0, 10, 0),
+                    //                       child: Text(
+                    //                         '懸賞獎金\$6666666',
+                    //                       ),
+                    //                     ),
+                    //                     Row(
+                    //                       mainAxisSize: MainAxisSize.max,
+                    //                       mainAxisAlignment:
+                    //                           MainAxisAlignment.end,
+                    //                       children: [
+                    //                         Container(
+                    //                           width: 100,
+                    //                           height: 30,
+                    //                           decoration: BoxDecoration(
+                    //                             borderRadius: BorderRadius.only(
+                    //                               bottomLeft: Radius.circular(0),
+                    //                               bottomRight:
+                    //                                   Radius.circular(12),
+                    //                               topLeft: Radius.circular(12),
+                    //                               topRight: Radius.circular(0),
+                    //                             ),
+                    //                           ),
+                    //                           child: Padding(
+                    //                             padding: EdgeInsetsDirectional
+                    //                                 .fromSTEB(0, 5, 0, 0),
+                    //                             child: Text(
+                    //                               'ShowTime',
+                    //                               textAlign: TextAlign.center,
+                    //                             ),
+                    //                           ),
+                    //                         ),
+                    //                       ],
+                    //                     ),
+                    //                   ],
+                    //                 ),
+                    //               ),
+                    //             ],
+                    //           ),
+                    //         ),
+                    //       ),
+                    //     ),
+                    //     Padding(
+                    //       padding: EdgeInsetsDirectional.fromSTEB(16, 8, 16, 0),
+                    //       child: Container(
+                    //         width: double.infinity,
+                    //         height: 150,
+                    //         decoration: BoxDecoration(
+                    //           boxShadow: [
+                    //             BoxShadow(
+                    //               blurRadius: 3,
+                    //               color: Color(0x20000000),
+                    //               offset: Offset(0, 1),
+                    //             )
+                    //           ],
+                    //           borderRadius: BorderRadius.circular(12),
+                    //         ),
+                    //         child: Padding(
+                    //           padding: EdgeInsetsDirectional.fromSTEB(0, 8, 0, 0),
+                    //           child: Row(
+                    //             mainAxisSize: MainAxisSize.max,
+                    //             crossAxisAlignment: CrossAxisAlignment.start,
+                    //             children: [
+                    //               Column(
+                    //                 mainAxisSize: MainAxisSize.max,
+                    //                 mainAxisAlignment:
+                    //                     MainAxisAlignment.spaceBetween,
+                    //                 crossAxisAlignment: CrossAxisAlignment.start,
+                    //                 children: [
+                    //                   Padding(
+                    //                     padding: EdgeInsetsDirectional.fromSTEB(
+                    //                         16, 0, 0, 0),
+                    //                     child: Image.network(
+                    //                       'https://picsum.photos/seed/556/600',
+                    //                       width: 100,
+                    //                       height: 100,
+                    //                       fit: BoxFit.cover,
+                    //                     ),
+                    //                   ),
+                    //                   Container(
+                    //                     width: 100,
+                    //                     height: 30,
+                    //                     decoration: BoxDecoration(
+                    //                       borderRadius: BorderRadius.only(
+                    //                         bottomLeft: Radius.circular(12),
+                    //                         bottomRight: Radius.circular(0),
+                    //                         topLeft: Radius.circular(0),
+                    //                         topRight: Radius.circular(12),
+                    //                       ),
+                    //                     ),
+                    //                     child: Padding(
+                    //                       padding: EdgeInsetsDirectional.fromSTEB(
+                    //                           0, 5, 0, 0),
+                    //                       child: Text(
+                    //                         '觀看人數',
+                    //                         textAlign: TextAlign.center,
+                    //                       ),
+                    //                     ),
+                    //                   ),
+                    //                 ],
+                    //               ),
+                    //               Expanded(
+                    //                 child: Column(
+                    //                   mainAxisSize: MainAxisSize.max,
+                    //                   mainAxisAlignment:
+                    //                       MainAxisAlignment.spaceBetween,
+                    //                   crossAxisAlignment:
+                    //                       CrossAxisAlignment.center,
+                    //                   children: [
+                    //                     Padding(
+                    //                       padding: EdgeInsetsDirectional.fromSTEB(
+                    //                           10, 10, 0, 0),
+                    //                       child: Text(
+                    //                         '任務標題',
+                    //                         textAlign: TextAlign.start,
+                    //                       ),
+                    //                     ),
+                    //                     Padding(
+                    //                       padding: EdgeInsetsDirectional.fromSTEB(
+                    //                           10, 0, 0, 0),
+                    //                       child: Text(
+                    //                         '任務內容',
+                    //                       ),
+                    //                     ),
+                    //                     Padding(
+                    //                       padding: EdgeInsetsDirectional.fromSTEB(
+                    //                           0, 0, 10, 0),
+                    //                       child: Text(
+                    //                         '懸賞獎金\$6666666',
+                    //                       ),
+                    //                     ),
+                    //                     Row(
+                    //                       mainAxisSize: MainAxisSize.max,
+                    //                       mainAxisAlignment:
+                    //                           MainAxisAlignment.end,
+                    //                       children: [
+                    //                         Container(
+                    //                           width: 100,
+                    //                           height: 30,
+                    //                           decoration: BoxDecoration(
+                    //                             borderRadius: BorderRadius.only(
+                    //                               bottomLeft: Radius.circular(0),
+                    //                               bottomRight:
+                    //                                   Radius.circular(12),
+                    //                               topLeft: Radius.circular(12),
+                    //                               topRight: Radius.circular(0),
+                    //                             ),
+                    //                           ),
+                    //                           child: Padding(
+                    //                             padding: EdgeInsetsDirectional
+                    //                                 .fromSTEB(0, 5, 0, 0),
+                    //                             child: Text(
+                    //                               'ShowTime',
+                    //                               textAlign: TextAlign.center,
+                    //                             ),
+                    //                           ),
+                    //                         ),
+                    //                       ],
+                    //                     ),
+                    //                   ],
+                    //                 ),
+                    //               ),
+                    //             ],
+                    //           ),
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   ],
+                    // ),
+                    ),
+              ),
+            ],
           ),
-          Container(
-            height: 30,
-            color: Colors.white,
-            child: TabBar(
-              controller: _tabController,
-              indicatorColor: Colors.red,
-              labelColor: Colors.red,
-              labelStyle: TextStyle(fontSize: 12),
-              unselectedLabelStyle: TextStyle(fontSize: 10),
-              unselectedLabelColor: Colors.grey,
-              tabs: [
-                Tab(
-                  text: '玩家',
-                ),
-                Tab(
-                  text: '直播主',
-                ),
-              ],
-            ),
-          ),
-          positive
-              ? Expanded(
-                  child: TabBarView(
-                    controller: _tabController,
-                    children: [SpyPlayerMission(), SpyAnchorMission()],
-                  ),
-                )
-              : Expanded(
-                  child: TabBarView(
-                    controller: _tabController,
-                    children: [SpyPlayerLive(), SpyAnchorLive()],
-                  ),
-                ),
-        ],
+        ),
       ),
     );
   }

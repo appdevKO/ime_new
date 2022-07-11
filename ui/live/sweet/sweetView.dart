@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:agora_rtc_engine/rtc_engine.dart';
@@ -19,7 +20,7 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:flutter/services.dart';
-//import 'package:flutter_gifimage/flutter_gifimage.dart';
+import 'package:just_audio/just_audio.dart';
 
 int myRoomSeatIndex = 0;
 String T_D_player = "";
@@ -37,17 +38,26 @@ class sweetView extends StatefulWidget {
 class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
   String msg = "";
   String _selfAccount = "";
+  String _selfencodeName = "";
   String? memberId;
   AnimationController? _controller;
   RtcEngine? engine;
   bool isJoined = false;
   bool moreView = false;
-  bool isSelfMute = false;
-  bool isSelfHide = false;
+  late bool isSelfMute;
+  late bool isSelfHide;
+  bool _cantalk = false;
+  bool playing = false;
+  String giftMoney = '';
+  String giftName = '';
+  String giftChName = '';
+  String giftMusic = '';
   List<int> remoteUid = [];
   final _gridViewKey = GlobalKey();
   final TextEditingController _chatController = new TextEditingController();
   final List<Widget> _message = [];
+
+  late AudioPlayer player;
 
   List<List<String>> _imageList = <List<String>>[
     <String>['wild', '6D', '7D', '8D', '9D', '10D', 'QD', 'KD', 'AD', 'wild'],
@@ -63,8 +73,14 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _controller =
-        AnimationController(vsync: this, duration: const Duration(seconds: 2));
+    if (identity == true) {
+      isSelfMute = true;
+      isSelfHide = true;
+    } else {
+      isSelfMute = false;
+      isSelfHide = false;
+    }
+    player = AudioPlayer();
     // myUid = getUid();
     // MqttListen().resetSeats();
     Future(() async {
@@ -84,6 +100,16 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
         }
       });
     });
+    if (identity == true) {
+      Future(() async {
+        Timer.periodic(Duration(seconds: 3), (timer) {
+          if (playing == false && gifQueue.isNotEmpty) {
+            pushMqtt("imeSweetRoom/" + sweetRoomId,
+                "gif/play," + gifQueue.first.toString());
+          }
+        });
+      });
+    }
 
     client.subscribe("imeSweetRoom/" + sweetRoomId, MqttQos.atLeastOnce);
 
@@ -91,13 +117,14 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
   }
 
   @override
-  void deactivate() {
+  Future<void> deactivate() async {
+    myRoomSeatIndex = 0;
     engine!.muteAllRemoteVideoStreams(true);
     engine!.muteAllRemoteAudioStreams(true);
     engine!.disableVideo();
     engine!.leaveChannel();
     this._deinitEngine();
-    myRoomSeatIndex=0;
+
     client.subscribe("imeSweetRoom/info", MqttQos.atLeastOnce);
     final builder = MqttClientPayloadBuilder();
     builder.addString("leaveRoom," + identity.toString() + ',' + _selfAccount);
@@ -105,14 +132,17 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
         "imeSweetRoom/" + sweetRoomId, MqttQos.atLeastOnce, builder.payload!);
     client.unsubscribe("imeSweetRoom/" + sweetRoomId);
     client.unsubscribe("imeSweetUser/" + myUid);
-    myUid = getUid();
+    //sprint('old $myUid');
+    myUid = await getUid();
+    //print('訂閱新Uid $myUid');
     client.subscribe("imeSweetUser/" + myUid, MqttQos.atLeastOnce);
-    print('訂閱新Uid $myUid');
     super.deactivate();
   }
 
   @override
   void dispose() {
+    player.dispose();
+
     super.dispose();
     // this._deinitEngine();
   }
@@ -173,9 +203,23 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
     // await engine!.destroy();
   }
 
-  void _submitText(String text) {
-    msg = text;
+  void _submitText(String encodeSelfName) {
+    if (_cantalk == false) {
+      pushMqtt(
+          'imeSweetRoom/' + sweetRoomId,
+          'addChatMsg,' +
+              _selfencodeName +
+              ',' +
+              strToEncode(_chatController.text));
+    } else {
+      cantTalk(context);
+    }
     _chatController.clear();
+  }
+
+  Future<void> playMusic(String url) async {
+    await player.setUrl(url);
+    player.play();
   }
 
   @override
@@ -191,16 +235,29 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
               children: <Widget>[
                 Consumer<sweetProvider>(
                     builder: (context, _sweetProvider, child) {
+                  _selfAccount = _sweetProvider.selfAccount;
+                  _selfencodeName = _sweetProvider.selfEncodeName;
+                  _cantalk = _sweetProvider.cantTalk;
+                  if (_sweetProvider.giftMusic == true) {
+                    if (playing == false) {
+                      playMusic(_sweetProvider.giftMusicUrl);
+                    }
+                    playing = true;
+                  } else {
+                    player.stop();
+                    playing = false;
+                  }
+                  int iconCount = _sweetProvider.giftIcon.length.toInt();
                   return Consumer<ChatProvider>(
                       builder: (context, _ChatProvider, child) {
-                    _selfAccount = _sweetProvider.selfAccount;
-                    if (_sweetProvider.vipAnime == false) {
+                    if (_sweetProvider.vipAnime == false ||
+                        _sweetProvider.giftAnime == false) {
                       imageCache?.clear();
                     }
                     return Stack(children: <Widget>[
                       Container(
                         height: MediaQuery.of(context).size.height,
-                        child: _sweetProvider.vdoSta == false
+                        child: _sweetProvider.vdoStatus == false
                             ? Image.network(
                                 _sweetProvider.inRoomAvatar,
                                 fit: BoxFit.cover,
@@ -222,7 +279,7 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
                         left: 0,
                         right: 0,
                         child: Container(
-                          height: 120,
+                          height: 100,
                           child: Stack(
                             children: [
                               Align(
@@ -232,7 +289,8 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
                                     Row(
                                       children: [
                                         Container(
-                                            height: 70,
+                                            // name
+                                            height: 60,
                                             width: 200,
                                             decoration: new BoxDecoration(
                                                 //背景
@@ -255,7 +313,8 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
                                                   color: Colors.white),
                                             ))),
                                         Container(
-                                          height: 70,
+                                          //audience
+                                          height: 60,
                                           width: 100,
                                           decoration: new BoxDecoration(
                                             //背景
@@ -290,7 +349,8 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
                                         Stack(
                                           children: [
                                             Container(
-                                              height: 50,
+                                              //禮物count
+                                              height: 40,
                                               width: 125,
                                               decoration: new BoxDecoration(
                                                 //背景
@@ -305,14 +365,32 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
                                                   color: Colors.transparent,
                                                 ),
                                               ),
-                                            ),
-                                            Image.network(
-                                              "https://i.ibb.co/mBhTmgL/image.png",
+                                              // child: Align(
+                                              //   alignment: Alignment.center,
+                                              //   child: Text('123'),
+                                              // ),
+                                              child: Row(
+                                                children: [
+                                                  Image.network(
+                                                      "https://i.ibb.co/mBhTmgL/image.png"),
+                                                  SizedBox(
+                                                    width: 15,
+                                                  ),
+                                                  Text(
+                                                      _sweetProvider.donateCount
+                                                          .toString(),
+                                                      style: TextStyle(
+                                                        fontSize: 12.5,
+                                                        color: Colors.black,
+                                                      ))
+                                                ],
+                                              ),
                                             ),
                                           ],
                                         ),
                                         Container(
-                                          height: 50,
+                                          //donate top
+                                          height: 40,
                                           width: 150,
                                           decoration: new BoxDecoration(
                                             //背景
@@ -504,35 +582,333 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
                                         )
                                       ] else if (identity == false) ...[
                                         //送禮清單
-                                        Stack(
-                                          children: [
-                                            Container(
-                                              height: 150,
-                                              decoration: new BoxDecoration(
-                                                //背景
-                                                color: Colors.white,
-                                                //设置四周圆角 角度
-                                                borderRadius: BorderRadius.all(
-                                                    Radius.circular(20)),
-                                                //设置四周边框
-                                                border: new Border.all(
-                                                    width: 1,
-                                                    color: Colors.red),
-                                              ),
+
+                                        Container(
+                                            height: (MediaQuery.of(context)
+                                                    .size
+                                                    .height) *
+                                                0.4,
+                                            decoration: new BoxDecoration(
+                                              //背景
+                                              color: Colors.white,
+                                              //设置四周圆角 角度
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(20)),
+                                              //设置四周边框
+                                              border: new Border.all(
+                                                  width: 1, color: Colors.red),
                                             ),
-                                            Row(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.stretch,
                                               children: [
-                                                for (var i in _imageList)
-                                                  IconButton(
-                                                    icon: Image.asset(
-                                                        'assets/images/bag.png'),
-                                                    iconSize: 3,
-                                                    onPressed: () {},
+                                                Container(
+                                                  height:
+                                                      (MediaQuery.of(context)
+                                                              .size
+                                                              .height) *
+                                                          0.3,
+                                                  child: ListView(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            10.0),
+                                                    shrinkWrap: true,
+                                                    children: [
+                                                      Column(
+                                                        children: [
+                                                          for (int i = 0;
+                                                              i < 5;
+                                                              i++) ...[
+                                                            Row(
+                                                              children: [
+                                                                for (int j = 1;
+                                                                    j < 5;
+                                                                    j++) ...[
+                                                                  if (i ==
+                                                                      0) ...[
+                                                                    GestureDetector(
+                                                                      onTap:
+                                                                          () {
+                                                                        giftMusic = _sweetProvider
+                                                                            .giftList[j -
+                                                                                1]
+                                                                            .music;
+                                                                        giftMoney = _sweetProvider
+                                                                            .giftList[j -
+                                                                                1]
+                                                                            .money;
+                                                                        giftName = _sweetProvider
+                                                                            .giftList[j -
+                                                                                1]
+                                                                            .name;
+                                                                        giftChName = _sweetProvider
+                                                                            .giftList[j -
+                                                                                1]
+                                                                            .ch_name;
+                                                                        _sweetProvider
+                                                                            .sendCount = 1;
+                                                                        for (int index =
+                                                                                0;
+                                                                            index <
+                                                                                _sweetProvider.borderList.length;
+                                                                            index++) {
+                                                                          if (index ==
+                                                                              j - 1) {
+                                                                            _sweetProvider.borderList[index] =
+                                                                                true;
+                                                                          } else {
+                                                                            _sweetProvider.borderList[index] =
+                                                                                false;
+                                                                          }
+                                                                        }
+                                                                      },
+                                                                      child:
+                                                                          Container(
+                                                                        width: (MediaQuery.of(context).size.width) *
+                                                                            0.235,
+                                                                        decoration:
+                                                                            BoxDecoration(
+                                                                          borderRadius:
+                                                                              BorderRadius.all(Radius.circular(10.0)),
+                                                                          border: (_sweetProvider.borderList[j - 1] == false)
+                                                                              ? Border.all(
+                                                                                  style: BorderStyle.none, //BorderSide
+                                                                                )
+                                                                              : Border.all(
+                                                                                  width: 2.0,
+                                                                                  color: Colors.pinkAccent,
+                                                                                ),
+                                                                        ),
+                                                                        child:
+                                                                            Column(
+                                                                          children: [
+                                                                            IconButton(
+                                                                              icon: Image.network(_sweetProvider.giftList[j - 1].icon_url),
+                                                                              iconSize: 60,
+                                                                              onPressed: () {},
+                                                                            ),
+                                                                            Text(
+                                                                              _sweetProvider.giftList[j - 1].ch_name,
+                                                                              style: TextStyle(fontSize: 12.5),
+                                                                            ),
+                                                                            Row(
+                                                                              mainAxisAlignment: MainAxisAlignment.center,
+                                                                              children: [
+                                                                                Image.asset(
+                                                                                  'assets/images/sweet/coin.png',
+                                                                                  height: 15,
+                                                                                  width: 15,
+                                                                                ),
+                                                                                Text(_sweetProvider.giftList[j - 1].money)
+                                                                              ],
+                                                                            )
+                                                                          ],
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ] else if (i *
+                                                                              4 +
+                                                                          j >
+                                                                      _sweetProvider
+                                                                          .giftList
+                                                                          .length
+                                                                          .toInt()) ...[
+                                                                    Container(
+                                                                      height: 0,
+                                                                      width: 0,
+                                                                    )
+                                                                  ] else if (i !=
+                                                                      0) ...[
+                                                                    GestureDetector(
+                                                                      onTap:
+                                                                          () {
+                                                                        giftMusic = _sweetProvider
+                                                                            .giftList[i * 4 +
+                                                                                j -
+                                                                                1]
+                                                                            .music;
+                                                                        giftMoney = _sweetProvider
+                                                                            .giftList[i * 4 +
+                                                                                j -
+                                                                                1]
+                                                                            .money;
+                                                                        giftName = _sweetProvider
+                                                                            .giftList[i * 4 +
+                                                                                j -
+                                                                                1]
+                                                                            .name;
+                                                                        giftChName = _sweetProvider
+                                                                            .giftList[i * 4 +
+                                                                                j -
+                                                                                1]
+                                                                            .ch_name;
+                                                                        _sweetProvider
+                                                                            .sendCount = 1;
+                                                                        for (int index =
+                                                                                0;
+                                                                            index <
+                                                                                _sweetProvider.borderList.length;
+                                                                            index++) {
+                                                                          if (index ==
+                                                                              i * 4 + j - 1) {
+                                                                            _sweetProvider.borderList[index] =
+                                                                                true;
+                                                                          } else {
+                                                                            _sweetProvider.borderList[index] =
+                                                                                false;
+                                                                          }
+                                                                        }
+                                                                      },
+                                                                      child:
+                                                                          Container(
+                                                                        width: (MediaQuery.of(context).size.width) *
+                                                                            0.235,
+                                                                        decoration:
+                                                                            BoxDecoration(
+                                                                          borderRadius:
+                                                                              BorderRadius.all(Radius.circular(10.0)),
+                                                                          border: (_sweetProvider.borderList[i * 4 + j - 1] == false)
+                                                                              ? Border.all(
+                                                                                  style: BorderStyle.none, //BorderSide
+                                                                                )
+                                                                              : Border.all(
+                                                                                  width: 2.0,
+                                                                                  color: Colors.pinkAccent,
+                                                                                ),
+                                                                        ),
+                                                                        child:
+                                                                            Column(
+                                                                          children: [
+                                                                            IconButton(
+                                                                              icon: Image.network(_sweetProvider.giftList[i * 4 + j - 1].icon_url),
+                                                                              iconSize: 60,
+                                                                              onPressed: () {},
+                                                                            ),
+                                                                            Text(
+                                                                              _sweetProvider.giftList[i * 4 + j - 1].ch_name,
+                                                                              style: TextStyle(fontSize: 12.5),
+                                                                            ),
+                                                                            Row(
+                                                                              mainAxisAlignment: MainAxisAlignment.center,
+                                                                              children: [
+                                                                                Image.asset(
+                                                                                  'assets/images/sweet/coin.png',
+                                                                                  height: 15,
+                                                                                  width: 15,
+                                                                                ),
+                                                                                Text(_sweetProvider.giftList[i * 4 + j - 1].money)
+                                                                              ],
+                                                                            )
+                                                                          ],
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ]
+                                                                ]
+                                                              ],
+                                                            ),
+                                                          ]
+                                                        ],
+                                                      ),
+                                                    ],
                                                   ),
+                                                ),
+                                                Align(
+                                                  alignment:
+                                                      Alignment.bottomCenter,
+                                                  child: Container(
+                                                      height: (MediaQuery.of(
+                                                                  context)
+                                                              .size
+                                                              .height) *
+                                                          0.0975,
+                                                      child: Stack(
+                                                        children: [
+                                                          Align(
+                                                            alignment: Alignment
+                                                                .center,
+                                                            child: (Container(
+                                                              height: (MediaQuery.of(
+                                                                          context)
+                                                                      .size
+                                                                      .height) *
+                                                                  0.085,
+                                                              width: 200,
+                                                              decoration:
+                                                                  new BoxDecoration(
+                                                                //背景
+                                                                color: Colors
+                                                                    .white,
+                                                                //设置四周圆角 角度
+                                                                borderRadius: BorderRadius
+                                                                    .all(Radius
+                                                                        .circular(
+                                                                            45)),
+                                                                //设置四周边框
+                                                                border: new Border
+                                                                        .all(
+                                                                    width: 1,
+                                                                    color: Colors
+                                                                        .pink),
+                                                              ),
+                                                              child: Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceEvenly,
+                                                                children: [
+                                                                  Row(
+                                                                    children: [
+                                                                      Text(
+                                                                        _sweetProvider
+                                                                            .sendCount
+                                                                            .toString(),
+                                                                        style: TextStyle(
+                                                                            fontSize:
+                                                                                20),
+                                                                      ),
+                                                                      IconButton(
+                                                                          onPressed:
+                                                                              () {
+                                                                            _sweetProvider.sendCount +=
+                                                                                1;
+                                                                          },
+                                                                          icon:
+                                                                              const Icon(Icons.expand_less)),
+                                                                    ],
+                                                                  ),
+                                                                  ElevatedButton(
+                                                                    style: ElevatedButton
+                                                                        .styleFrom(
+                                                                      primary:
+                                                                          Color(
+                                                                              0xffff7090),
+                                                                    ),
+                                                                    onPressed:
+                                                                        () {
+                                                                      SendGift(
+                                                                          _sweetProvider
+                                                                              .selfEncodeName,
+                                                                          _sweetProvider
+                                                                              .anchorName,
+                                                                          _sweetProvider
+                                                                              .sendCount,
+                                                                          giftMoney,
+                                                                          giftName,
+                                                                          giftMusic,
+                                                                          giftChName);
+                                                                    },
+                                                                    child: Text(
+                                                                        '贈送'),
+                                                                  )
+                                                                ],
+                                                              ),
+                                                            )),
+                                                          )
+                                                        ],
+                                                      )),
+                                                )
                                               ],
-                                            )
-                                          ],
-                                        )
+                                            )),
                                       ]
                                     ] else ...[
                                       Container(
@@ -551,9 +927,11 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
                                                 onTap: () async {
                                                   (await userInfo(
                                                       context,
-                                                      _sweetProvider
-                                                          .messages[index]
-                                                          .account));
+                                                      encodeToString(
+                                                          _sweetProvider
+                                                              .messages[index]
+                                                              .account),
+                                                      sweetRoomId));
                                                 },
                                                 child: Container(
                                                   padding: EdgeInsets.only(
@@ -664,21 +1042,30 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
                                       FloatingActionButton(
                                         //回頭補 鍵盤return 送出mqtt
                                         onPressed: () {
-                                          if ((_chatController.text.length)
-                                                  .toInt() >
-                                              0) {
-                                            pushMqtt(
-                                                'imeSweetRoom/' + sweetRoomId,
-                                                'addChatMsg,' +
-                                                    _sweetProvider.selfName +
-                                                    ',' +
-                                                    strToEncode(
-                                                        _chatController.text));
-
-                                            _submitText(_chatController.text);
+                                          if (_sweetProvider.cantTalk ==
+                                              false) {
+                                            if ((_chatController.text.length)
+                                                    .toInt() >
+                                                0) {
+                                              pushMqtt(
+                                                  'imeSweetRoom/' + sweetRoomId,
+                                                  'addChatMsg,' +
+                                                      _sweetProvider
+                                                          .selfEncodeName +
+                                                      ',' +
+                                                      strToEncode(
+                                                          _chatController
+                                                              .text));
+                                              _chatController.clear();
+                                            }
+                                            FocusScope.of(context)
+                                                .requestFocus(FocusNode());
+                                          } else {
+                                            cantTalk(context);
+                                            FocusScope.of(context)
+                                                .requestFocus(FocusNode());
+                                            _chatController.clear();
                                           }
-                                          FocusScope.of(context)
-                                              .requestFocus(FocusNode());
                                         },
                                         child: Icon(
                                           Icons.send,
@@ -697,7 +1084,7 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
                         ),
                       ),
 
-                      //送禮gif
+                      //gif
                       _sweetProvider.vipAnime
                           ? Align(
                               alignment: Alignment.center,
@@ -716,6 +1103,24 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
                                 ],
                               ))
                           : Container(width: 0, height: 0),
+                      _sweetProvider.giftAnime
+                          ? Align(
+                              alignment: Alignment.center,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Image.network(
+                                    'https://storage.googleapis.com/ime-gift/gif/' +
+                                        (_sweetProvider.giftName) +
+                                        '.gif',
+                                    width: 100,
+                                    height: 100,
+                                  ),
+                                  Text(_sweetProvider.senderName + " 送給主播 "),
+                                ],
+                              ))
+                          : Container(width: 0, height: 0),
                     ]);
                   });
                 })
@@ -726,13 +1131,14 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
   }
 }
 
-Future<Future<String?>> userInfo(BuildContext context, account) async {
+Future<Future<String?>> userInfo(
+    BuildContext context, bannedName, roomid) async {
   return showDialog<String>(
     context: context,
-    barrierDismissible: false, //控制點擊對話框以外的區域是否隱藏對話框
+    barrierDismissible: true, //控制點擊對話框以外的區域是否隱藏對話框
     builder: (BuildContext context) {
       return AlertDialog(
-        title: Text(account),
+        title: Text(''),
         content: new Row(
           children: <Widget>[new Text('')],
         ),
@@ -742,7 +1148,7 @@ Future<Future<String?>> userInfo(BuildContext context, account) async {
               primary: Color(0xffff7090),
             ),
             onPressed: () {
-              var pubTopic = 'imeSweetRoom/';
+              pushMqtt('imeSweetRoom/' + roomid, 'ban/talk,' + bannedName);
               Navigator.of(context).pop();
               FocusScope.of(context).unfocus();
             },
@@ -752,6 +1158,47 @@ Future<Future<String?>> userInfo(BuildContext context, account) async {
       );
     },
   );
+}
+
+Future<Future<String?>> cantTalk(BuildContext context) async {
+  return showDialog<String>(
+    context: context,
+    barrierDismissible: true, //控制點擊對話框以外的區域是否隱藏對話框
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Center(child: Text('您已被禁言！！')),
+        // content: Column(
+        //   mainAxisSize: MainAxisSize.min,
+        //   children: <Widget>[],
+        // ),
+      );
+    },
+  );
+}
+
+SendGift(
+    selfEncodeName, anchorName, count, money, giftName, giftMusic, giftCnName) {
+  var sendGiftJson = {};
+  sendGiftJson['"dbName"'] = ("ime");
+  sendGiftJson['"coll"'] = ("member");
+  sendGiftJson['"eqKey"'] = ('nickname');
+  sendGiftJson['"eqValue"'] = //("5q2k5Lmf5piv");
+      ('"${strToEncode(anchorName)}"');
+  sendGiftJson['"setKey"'] = ("get_donate_count");
+  sendGiftJson['"setValue"'] = ('"${money}"');
+  sendGiftJson['"senderName"'] = ('"${selfEncodeName}"');
+  sendGiftJson['"sendCount"'] = ('"${count}"');
+  sendGiftJson['"giftName"'] = ('"${strToEncode(giftName)}"');
+  sendGiftJson['"musicUrl"'] = ('"${strToEncode(giftMusic)}"');
+  print("sendGiftJson," + sendGiftJson.toString());
+  pushMqtt(
+      'imeSweetRoom/' + sweetRoomId, "send/gift," + sendGiftJson.toString());
+  pushMqtt(
+      'imeSweetRoom/' + sweetRoomId,
+      'addChatMsg,' +
+          selfEncodeName +
+          ',' +
+          strToEncode('送給了主播' + count.toString() + '個' + giftCnName));
 }
 
 _showUserList(BuildContext context, accountList) {
