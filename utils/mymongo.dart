@@ -214,7 +214,7 @@ class MongoDB {
           mongo.where.eq(con_field, con_value), mongo.modify.inc(value, offset),
           upsert: true);
     } catch (e) {
-      print('mongo deleteall exception :: $e');
+      print('mongo plus_num exception :: $e');
     }
   }
 

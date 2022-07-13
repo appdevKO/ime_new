@@ -12,6 +12,7 @@ import 'package:ime_new/ui/me/profilesetting.dart';
 import 'package:ime_new/ui/me/setting/date_setting.dart';
 import 'package:ime_new/ui/me/setting/edit_hello.dart';
 import 'package:ime_new/ui/me/list/myfriends.dart';
+import 'package:ime_new/ui/me/setting/mywallet.dart';
 import 'package:ime_new/ui/me/setting/store.dart';
 import 'package:provider/provider.dart';
 import 'upgrade_vip.dart';
@@ -149,7 +150,10 @@ class _ProfileOptionState extends State<ProfileOption> {
                   ),
                 ),
               )),
-          callback: () {}),
+          callback: () {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => MyWallet()));
+          }),
       SettingOption(
           title: '特務任務',
           icon: CircleAvatar(
@@ -450,10 +454,10 @@ class _ProfileOptionState extends State<ProfileOption> {
                               children: [
                                 Consumer<ChatProvider>(
                                     builder: (context, value, child) {
-                                      return Text(value.myfollowlog is List
-                                          ? '${value.myfollowlog.length}'
-                                          : '加載中');
-                                    }),
+                                  return Text(value.myfollowlog is List
+                                      ? '${value.myfollowlog.length}'
+                                      : '加載中');
+                                }),
                                 Row(
                                   children: [
                                     Icon(
@@ -469,10 +473,13 @@ class _ProfileOptionState extends State<ProfileOption> {
                                   ],
                                 )
                               ],
-                            ),  onTap: () {
-                            Navigator.push(context,
-                                MaterialPageRoute(builder: (context) => MyFollowPage()));
-                          },
+                            ),
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => MyFollowPage()));
+                            },
                           ),
                           Container(
                             width: 20,
@@ -516,10 +523,7 @@ class _ProfileOptionState extends State<ProfileOption> {
                           ),
                         ),
                         onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => FakeStore()));
+
                         },
                       ),
                     ),

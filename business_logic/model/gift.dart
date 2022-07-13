@@ -12,6 +12,7 @@ class Gift {
     required this.music,
     required this.icon_url,
     required this.gif_url,
+    required this.ms,
   });
 
   String name;
@@ -20,6 +21,7 @@ class Gift {
   String money;
   String icon_url;
   String gif_url;
+  String ms;
 
   factory Gift.fromJson(Map<String, dynamic> json) => Gift(
         name: json["name"],
@@ -28,6 +30,7 @@ class Gift {
         music: json["music"],
         icon_url: json["icon_url"],
         gif_url: json["gif_url"],
+        ms: json["ms"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -37,5 +40,6 @@ class Gift {
         "music": music,
         "icon_url": icon_url,
         "gif_url": gif_url,
+        "ms": ms,
       };
 }

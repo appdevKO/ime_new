@@ -12,6 +12,7 @@ import 'package:ime_new/business_logic/model/sweetRoom.dart';
 import 'package:ime_new/business_logic/model/audience.dart';
 import 'package:ime_new/business_logic/model/anchor.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
+import 'package:ime_new/ui/live/livepage2.dart';
 
 bool? identity;
 
@@ -24,9 +25,7 @@ class SweetLiveList extends StatefulWidget {
 
 class _SweetLiveListState extends State<SweetLiveList> {
   var count;
-  String avatar = "https://i.ibb.co/cFFSzdK/sex-man.png";
-  String nickName = "";
-  String account = "";
+
   @override
   Widget build(BuildContext context) {
     return Consumer<sweetProvider>(builder: (context, _sweetProvider, child) {
@@ -36,13 +35,6 @@ class _SweetLiveListState extends State<SweetLiveList> {
         count = 0;
       }
       return Consumer<ChatProvider>(builder: (context, _ChatProvider, child) {
-        try {
-          if (_ChatProvider.remoteUserInfo[0] != null) {
-            nickName = _ChatProvider.remoteUserInfo[0].nickname;
-            account = _ChatProvider.remoteUserInfo[0].account;
-          }
-        } catch (err) {}
-
         return count != 0
             ? Stack(
                 children: [
@@ -72,8 +64,9 @@ class _SweetLiveListState extends State<SweetLiveList> {
                                     data['"roomId"'] =
                                         ('"${_sweetProvider.rooms[index].id}"');
                                     data['"selfEncodeName"'] =
-                                        ('"${strToEncode(nickName)}"');
-                                    data['"selfAccount"'] = ('"${account}"');
+                                        ('"${strToEncode(_ChatProvider.remoteUserInfo[0].nickname)}"');
+                                    data['"selfAccount"'] =
+                                        ('"${_ChatProvider.remoteUserInfo[0].account}"');
                                     //print(' audienceJson$audienceJson');
                                     sweetRoomId =
                                         _sweetProvider.rooms[index].id;

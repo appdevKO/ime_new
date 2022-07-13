@@ -51,7 +51,8 @@ class DbUserinfoModel {
       this.distance_range,
       this.vip,
       this.tag,
-      this.fcmtoken});
+      this.fcmtoken,
+      this.icoin});
 
   ObjectId? memberid;
   String? account;
@@ -64,6 +65,7 @@ class DbUserinfoModel {
   int? height;
   int? age;
   int? followme_num;
+  int? icoin;
   String? money;
   String? constellation;
   String? introduction;
@@ -121,6 +123,7 @@ class DbUserinfoModel {
         birthday: json["birthday"],
         cover: json['cover'],
         role: json['role'],
+        icoin: json['i_coin'] != null ? json['i_coin'] : 0,
         vip: json['vip'],
         height: json['height'] != null ? json['height'] : null,
         age: json['age'] != null ? json['age'] : null,
@@ -177,6 +180,7 @@ class DbUserinfoModel {
         "height": height,
         "birthday": birthday,
         "age": age,
+        "i_coin": icoin,
         "sex": sex,
         "money": money,
         "constellation": constellation,

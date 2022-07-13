@@ -636,7 +636,7 @@ class ChatProvider with ChangeNotifier {
               'nickname': remoteUserInfo[0].nickname,
               'avatar': little_profile_pic[0],
               'fcmtoken': remoteUserInfo[0].fcmtoken,
-              'route':'/message'
+              'route': '/message'
             },
           }));
       print('送出推播');
@@ -1593,23 +1593,26 @@ class ChatProvider with ChangeNotifier {
    *  特務直播
    */
   Future upload_spy_mission(
-    text,
-  ) async {
-    print('上傳任務到資料庫 $text');
+      title, content, price, starttime, endtime, type) async {
+    print('上傳任務到資料庫 ');
     try {
       //傳上db
       _mongoDB.inserttomongo(
         "spy_mission",
         {
-          "text": text,
-          "time": DateTime.now().add(Duration(hours: 8)),
+          "title": title,
+          "content": content,
+          "price": price,
+          "starttime": starttime,
+          "endtime": endtime,
+          "type": type,
           "memberid": remoteUserInfo[0].memberid,
           "nickname": remoteUserInfo[0].nickname,
           'avatar': remoteUserInfo[0].avatar,
         },
       );
     } catch (e) {
-      print('上傳動態留言失敗  $e');
+      print('上傳任務到資料庫  $e');
     }
   }
 
@@ -2787,6 +2790,7 @@ class ChatProvider with ChangeNotifier {
         'default_chat': '',
         'vip': false,
         'get_donate_count': 0,
+        'i_coin': 0,
       });
 
       // 每次登入都刷新
@@ -3978,5 +3982,17 @@ class ChatProvider with ChangeNotifier {
         ));
     print("countcountcount $readresult");
     return readresult;
+  }
+
+  Future add_money(num) async {
+    try {
+      print('資料庫添加 \$\$\$');
+      print('${remoteUserInfo[0].memberid}');
+
+      await _mongoDB.plus_num(
+          'member', "_id", remoteUserInfo[0].memberid, 'i_coin', num);
+    } catch (e) {
+      print('資料庫添加money exception $e');
+    }
   }
 }

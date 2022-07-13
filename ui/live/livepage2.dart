@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ime_new/ui/live/spylive/spylivepage.dart';
-import 'package:ime_new/ui/live/sweet/sweetlive_list.dart';
 import 'package:ime_new/business_logic/provider/chat_provider.dart';
-import 'package:ime_new/ui/live/sweetlivepage.dart';
+import 'package:ime_new/ui/live/sweet/sweetlivepage.dart';
 
 import 'package:provider/provider.dart';
 
@@ -14,35 +13,9 @@ class LivePage2 extends StatefulWidget {
 }
 
 class _LivePage2State extends State<LivePage2> {
-  int pageIndex = 0;
-  String avatar = "https://i.ibb.co/cFFSzdK/sex-man.png";
-  String nickName = "";
-  String account = "";
-
-  // final pages = [
-  //   SweetLiveList(),
-  //   Container(),
-  //   SpyLivePage(),
-  // ];
-
   @override
   Widget build(BuildContext context) {
     return Consumer<ChatProvider>(builder: (context, ChatProvider1, child) {
-      try {
-        if (ChatProvider1.remoteUserInfo[0].avatar == null) {
-          if ((ChatProvider1.remoteUserInfo[0].sex) == '男') {
-            avatar = "https://i.ibb.co/cFFSzdK/sex-man.png";
-          } else if ((ChatProvider1.remoteUserInfo[0].sex) == '女') {
-            avatar = "https://i.ibb.co/kJxyvc4/sex-woman.png";
-          }
-        } else {
-          avatar = ChatProvider1.remoteUserInfo[0].avatar;
-          nickName = ChatProvider1.remoteUserInfo[0].nickname;
-          account = ChatProvider1.remoteUserInfo[0].account;
-        }
-      } catch (err) {
-        ChatProvider1.getaccountinfo();
-      }
       return SafeArea(
           child: Scaffold(
               body: Column(
@@ -61,7 +34,10 @@ class _LivePage2State extends State<LivePage2> {
                         )
                       ],
                     )),
-                onTap: () {
+                onTap: () async {
+                  _fetchData(context);
+                  await Provider.of<ChatProvider>(context, listen: false)
+                      .getaccountinfo();
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => SweetLivePage()));
                 }),
@@ -241,4 +217,37 @@ class _LivePage2State extends State<LivePage2> {
               ));
     });
   }
+}
+
+_fetchData(BuildContext context) async {
+  // show the loading dialog
+  showDialog(
+      // The user CANNOT close this dialog  by pressing outsite it
+      barrierDismissible: false,
+      context: context,
+      builder: (_) {
+        return Dialog(
+          // The background color
+          backgroundColor: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                // The loading indicator
+                CircularProgressIndicator(),
+                SizedBox(
+                  height: 15,
+                ),
+                // Some text
+                Text('Loading...')
+              ],
+            ),
+          ),
+        );
+      });
+  await Future.delayed(const Duration(milliseconds: 2000));
+
+  // Close the dialog programmatically
+  Navigator.of(context).pop();
 }
