@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:ime_new/business_logic/provider/chat_provider.dart';
-import 'package:ime_new/utils/color_config.dart';
+import 'package:ime_new/utils/viewconfig.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -171,6 +171,7 @@ class _CreateMissionState extends State<CreateMission> {
                                   style:
                                       TextStyle(height: 1, color: Colors.white),
                                   keyboardType: TextInputType.number,
+                                  toolbarOptions: ToolbarOptions(paste: false),
                                   controller: _pricecontroller,
                                   decoration: InputDecoration(
                                     border: OutlineInputBorder(
@@ -237,16 +238,20 @@ class _CreateMissionState extends State<CreateMission> {
                                               ),
                                             ],
                                           )
-                                        : Text(
-                                            '${DateFormat('yyyy/MM/dd').format(startDateTime!)}',
-                                            style: TextStyle(
-                                              color: Color(
-                                                0xff808080,
+                                        : Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 4),
+                                          child: Text(
+                                              '${DateFormat('yyyy/MM/dd').format(startDateTime!)}',
+                                              style: TextStyle(
+                                                color: Color(
+                                                  0xff808080,
+                                                ),
                                               ),
                                             ),
-                                          ),
+                                        ),
                                   ),
                                   onTap: () {
+                                    FocusScope.of(context).unfocus();
                                     DatePicker.showDatePicker(context,
                                         showTitleActions: true,
                                         minTime: DateTime.now(),
@@ -302,16 +307,20 @@ class _CreateMissionState extends State<CreateMission> {
                                               ),
                                             ],
                                           )
-                                        : Text(
-                                            '${DateFormat('yyyy/MM/dd').format(endDateTime!)}',
-                                            style: TextStyle(
-                                              color: Color(
-                                                0xff808080,
+                                        : Padding(
+                                          padding: const EdgeInsets.symmetric(vertical: 4),
+                                          child: Text(
+                                              '${DateFormat('yyyy/MM/dd').format(endDateTime!)}',
+                                              style: TextStyle(
+                                                color: Color(
+                                                  0xff808080,
+                                                ),
                                               ),
                                             ),
-                                          ),
+                                        ),
                                   ),
                                   onTap: () {
+                                    FocusScope.of(context).unfocus();
                                     DatePicker.showDatePicker(context,
                                         showTitleActions: true,
                                         minTime: DateTime.now(),
@@ -502,10 +511,18 @@ class _CreateMissionState extends State<CreateMission> {
                                   horizontal: 100, vertical: 20),
                               decoration: BoxDecoration(
                                   gradient: LinearGradient(
-                                    colors: [
-                                      spy_gradient_light_purple,
-                                      spy_gradient_light_blue,
-                                    ],
+                                    colors: _titlecontroller.text != '' &&
+                                            _contentcontroller.text != '' &&
+                                            _pricecontroller.text != '' &&
+                                            startDateTime != null &&
+                                            endDateTime != null &&
+                                            type != 0 &&
+                                            checkvalue
+                                        ? [
+                                            spy_gradient_light_purple,
+                                            spy_gradient_light_blue,
+                                          ]
+                                        : [Colors.grey, Colors.grey],
                                   ),
                                   borderRadius: BorderRadius.circular(15)),
                               child: Text(
@@ -513,16 +530,35 @@ class _CreateMissionState extends State<CreateMission> {
                                 style: TextStyle(color: Colors.white),
                               ),
                             ),
-                            onTap: () {
-                              Provider.of<ChatProvider>(context, listen: false)
+                            onTap: () async {
+                              showDialog(
+                                  context: context,
+                                  barrierDismissible: false,
+                                  builder: (_) {
+                                    return AlertDialog(
+                                        title: Text('任務上傳中 請稍候'),
+                                        content: SizedBox(
+                                            height: 50,
+                                            width: 50,
+                                            child: Center(
+                                                child:
+                                                    CircularProgressIndicator())));
+                                  });
+                              await Provider.of<ChatProvider>(context,
+                                      listen: false)
                                   .upload_spy_mission(
-                                      _titlecontroller.text,
-                                      _contentcontroller.text,
-                                      _pricecontroller.text,
-                                      startDateTime,
-                                      endDateTime,
-                                      type);
-                              Navigator.pop(context);
+                                    type,
+                                    _titlecontroller.text,
+                                    _contentcontroller.text,
+                                    _pricecontroller.text,
+                                    starttime: startDateTime,
+                                    endtime: endDateTime,
+                                  )
+                                  .whenComplete(() => Future.delayed(
+                                          Duration(seconds: 2), () async {
+                                        Navigator.pop(context);
+                                        Navigator.pop(context);
+                                      }));
                             },
                           ),
                         ],

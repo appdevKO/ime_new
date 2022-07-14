@@ -27,6 +27,7 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
   late TabController _tabController;
   int _current = 0;
   final CarouselController _controller = CarouselController();
+
   //打招呼
   bool hi = true;
 
@@ -242,6 +243,39 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                                                                 .birthday !=
                                                             ''
                                                     ? '${DateFormat('yyyy-MM-dd').format(value.remoteUserInfo[0].birthday)}'
+                                                    : '生日不詳'
+                                                : '加載中',
+                                            style:
+                                                TextStyle(color: Colors.grey),
+                                          );
+                                        }),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 8.0),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.star_border,
+                                        size: 15,
+                                        color: Colors.grey,
+                                      ),
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 5.0),
+                                        child: Consumer<ChatProvider>(
+                                            builder: (context, value, child) {
+                                          return Text(
+                                            value.o2omemberlist != null
+                                                ? value.o2omemberlist![0]
+                                                                .birthday !=
+                                                            null &&
+                                                        value.o2omemberlist![0]
+                                                                .birthday !=
+                                                            ''
+                                                    ? '${birthday_trans_star(value.remoteUserInfo[0].birthday)}'
                                                     : '生日不詳'
                                                 : '加載中',
                                             style:

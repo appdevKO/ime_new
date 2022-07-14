@@ -18,6 +18,7 @@ import 'package:ime_new/business_logic/model/chatroomsetting_model.dart';
 import 'package:ime_new/business_logic/model/dbuserinfo_model.dart';
 import 'package:ime_new/business_logic/model/follow_action_model.dart';
 import 'package:ime_new/business_logic/model/follow_log_model.dart';
+import 'package:ime_new/business_logic/model/mission_model.dart';
 import 'package:ime_new/business_logic/model/mqtt_model.dart';
 import 'package:ime_new/business_logic/model/o2ochatroom_model.dart';
 
@@ -1593,27 +1594,125 @@ class ChatProvider with ChangeNotifier {
    *  特務直播
    */
   Future upload_spy_mission(
-      title, content, price, starttime, endtime, type) async {
+    type,
+    title,
+    content,
+    price, {
+    starttime,
+    endtime,
+  }) async {
     print('上傳任務到資料庫 ');
+    // type =1私密 ,=2公開,=3 showtime
+    // status =0 init
+    // =1未指定 =2已指定 =3募資中 =4任務中 =5結束）(主播點) < =6募資失敗 =7任務成功 =8任務失敗 >
+
     try {
-      //傳上db
-      _mongoDB.inserttomongo(
-        "spy_mission",
-        {
-          "title": title,
-          "content": content,
-          "price": price,
-          "starttime": starttime,
-          "endtime": endtime,
-          "type": type,
-          "memberid": remoteUserInfo[0].memberid,
-          "nickname": remoteUserInfo[0].nickname,
-          'avatar': remoteUserInfo[0].avatar,
-        },
-      );
+      if (type != 3) {
+        // showtime
+        //傳上db
+        _mongoDB.inserttomongo(
+          "spy_mission",
+          {
+            'status': 0,
+            "title": title,
+            "content": content,
+            "price": price,
+            "starttime": starttime,
+            "endtime": endtime,
+            "type": type,
+            "memberid": remoteUserInfo[0].memberid,
+            "nickname": remoteUserInfo[0].nickname,
+          },
+        );
+      } else {
+        // mission
+        _mongoDB.inserttomongo(
+          "spy_mission",
+          {
+            'status': 0,
+            "title": title,
+            "content": content,
+            "goal_price": price,
+            "actual_price": 0,
+            "starttime": DateTime.now().add(Duration(hours: 8)),
+            "type": type,
+            "memberid": remoteUserInfo[0].memberid,
+            "nickname": remoteUserInfo[0].nickname,
+          },
+        );
+        //test
+        _mongoDB.inserttomongo(
+          "spy_mission",
+          {
+            'status': 5,
+            "title": title,
+            "content": content,
+            "goal_price": price,
+            "actual_price": 0,
+            "starttime": DateTime.now().add(Duration(hours: 8)),
+            "type": type,
+            "memberid": remoteUserInfo[0].memberid,
+            "nickname": remoteUserInfo[0].nickname,
+          },
+        );
+        _mongoDB.inserttomongo(
+          "spy_mission",
+          {
+            'status': 3,
+            "title": title,
+            "content": content,
+            "goal_price": price,
+            "actual_price": 0,
+            "starttime": DateTime.now().add(Duration(hours: 8)),
+            "type": type,
+            "memberid": remoteUserInfo[0].memberid,
+            "nickname": remoteUserInfo[0].nickname,
+          },
+        );
+      }
     } catch (e) {
       print('上傳任務到資料庫  $e');
     }
+  }
+
+  var spy_streaming_list;
+  int spy_streaminglist_value = 1;
+  var spy_streaming_mission_list;
+  int spy_streaminglist_mission_value = 1;
+  var spy_streaming_showtime_list;
+  int spy_streaminglist_showtime_value = 1;
+
+  Future get_spy_streaminglist() async {
+    spy_streaminglist_value = 1;
+    print('獲得現在直播中任務列表');
+    spy_streaming_list = await readremotemongodb(
+        MissionModel.fromJson, 'spy_mission',
+        field: mongo.where.limit(pagesize));
+    print('任務列表$spy_streaming_list');
+
+    notifyListeners();
+  }
+
+  Future get_spy_mission_streaminglist() async {
+    spy_streaminglist_mission_value = 1;
+    print('獲得現在直播中任務列表');
+    spy_streaming_mission_list = await readremotemongodb(
+        MissionModel.fromJson, 'spy_mission',
+        field: mongo.where.ne('type', 3).limit(pagesize));
+    print('任務列表$spy_streaming_mission_list');
+
+    notifyListeners();
+  }
+
+  Future get_spy_showtime_streaminglist() async {
+    spy_streaminglist_showtime_value = 1;
+    print('獲得現在直播中任務列表');
+    spy_streaming_showtime_list = await readremotemongodb(
+        MissionModel.fromJson, 'spy_mission',
+        field: mongo.where.eq('type', 3).limit(pagesize));
+    print('任務列表$spy_streaming_showtime_list');
+
+    notifyListeners();
   }
 
   /**
@@ -2594,16 +2693,17 @@ class ChatProvider with ChangeNotifier {
 
   Future deleteAllRoom() async {
     print('all delete');
-    await _mongoDB.deletealltable('chatmsg');
-    await _mongoDB.deletealltable('action');
-    await _mongoDB.deletealltable('action_msg');
-    await _mongoDB.deletealltable('groupchatmsg');
-    await _mongoDB.deletealltable('o2ochatmsg');
-    await _mongoDB.deletealltable('o2olog');
-    await _mongoDB.deletealltable('block_log');
-    await _mongoDB.deletealltable('follow_log');
-    await _mongoDB.deletealltable('chatroom');
-    await _mongoDB.deletealltable('member');
+    // await _mongoDB.deletealltable('chatmsg');
+    // await _mongoDB.deletealltable('action');
+    // await _mongoDB.deletealltable('action_msg');
+    // await _mongoDB.deletealltable('groupchatmsg');
+    // await _mongoDB.deletealltable('o2ochatmsg');
+    // await _mongoDB.deletealltable('o2olog');
+    // await _mongoDB.deletealltable('block_log');
+    // await _mongoDB.deletealltable('follow_log');
+    // await _mongoDB.deletealltable('chatroom');
+    // await _mongoDB.deletealltable('member');
+    await _mongoDB.deletealltable('spy_mission');
   }
 
   void dbclose() {

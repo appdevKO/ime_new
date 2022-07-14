@@ -351,7 +351,7 @@ class _ProfileSetting2State extends State<ProfileSetting2> {
                             child: TextField(
                               // focusNode: _focus2,
                               controller: _agecontroller,
-                              keyboardType: TextInputType.number,
+                              keyboardType: TextInputType.number, toolbarOptions: ToolbarOptions(paste: false),
                               inputFormatters: [
                                 FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
                               ],maxLength: 2,
@@ -388,7 +388,7 @@ class _ProfileSetting2State extends State<ProfileSetting2> {
                           Container(
                             width: 200,
                             child: TextField(
-                              controller: _heightcontroller,
+                              controller: _heightcontroller, toolbarOptions: ToolbarOptions(paste: false),
                               keyboardType: TextInputType.number,inputFormatters: [
                               FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
                             ],maxLength: 3,

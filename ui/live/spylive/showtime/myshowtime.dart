@@ -1,8 +1,7 @@
-import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:ime_new/business_logic/provider/chat_provider.dart';
 import 'package:ime_new/ui/live/spylive/contract/becomespy.dart';
-import 'package:ime_new/utils/color_config.dart';
+import 'package:ime_new/utils/viewconfig.dart';
 import 'package:provider/provider.dart';
 
 class MyShowTime extends StatefulWidget {
@@ -366,58 +365,38 @@ class _MyShowTimeState extends State<MyShowTime> {
                                                     color: Colors.white,
                                                   )),
                                             ),
-                                            index % 2 == 0
-                                                ? Container(
-                                                    width: 100,
-                                                    height: 30,
-                                                    decoration: BoxDecoration(
-                                                      color: spy_bar_purple,
-                                                      borderRadius:
-                                                          BorderRadius.only(
-                                                        bottomLeft:
-                                                            Radius.circular(12),
-                                                        bottomRight:
-                                                            Radius.circular(12),
-                                                        topLeft:
-                                                            Radius.circular(12),
-                                                        topRight:
-                                                            Radius.circular(0),
-                                                      ),
-                                                    ),
-                                                    child: Icon(
-                                                      Icons.close_outlined,
-                                                      color: Colors.white,
-                                                      size: 22,
-                                                    ),
-                                                  )
-                                                : Container(
-                                                    width: 100,
-                                                    height: 30,
-                                                    decoration: BoxDecoration(
-                                                      gradient: LinearGradient(
-                                                          colors: [
+                                            Container(
+                                              width: 100,
+                                              height: 30,
+                                              decoration: BoxDecoration(
+                                                gradient: LinearGradient(
+                                                    colors: index % 2 == 0
+                                                        ? [
+                                                            spy_bar_purple,
+                                                            spy_bar_purple
+                                                          ]
+                                                        : [
                                                             spy_gradient_light_blue,
                                                             spy_gradient_light_purple,
                                                           ]),
-                                                      borderRadius:
-                                                          BorderRadius.only(
-                                                        bottomLeft:
-                                                            Radius.circular(12),
-                                                        bottomRight:
-                                                            Radius.circular(12),
-                                                        topLeft:
-                                                            Radius.circular(12),
-                                                        topRight:
-                                                            Radius.circular(0),
-                                                      ),
-                                                    ),
-                                                    child: Icon(
-                                                      Icons
-                                                          .check_circle_outline,
-                                                      color: Colors.white,
-                                                      size: 22,
-                                                    ),
-                                                  ),
+                                                borderRadius: BorderRadius.only(
+                                                  bottomLeft:
+                                                      Radius.circular(12),
+                                                  bottomRight:
+                                                      Radius.circular(12),
+                                                  topLeft: Radius.circular(12),
+                                                  topRight: Radius.circular(0),
+                                                ),
+                                              ),
+                                              child: Icon(
+                                                index % 2 == 0
+                                                    ? Icons.close
+                                                    : Icons
+                                                        .check_circle_outline,
+                                                color: Colors.white,
+                                                size: 22,
+                                              ),
+                                            ),
                                           ],
                                         ),
                                       ],

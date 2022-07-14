@@ -1,6 +1,6 @@
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
-import 'package:ime_new/utils/color_config.dart';
+import 'package:ime_new/utils/viewconfig.dart';
 
 class MyMission extends StatefulWidget {
   const MyMission({Key? key}) : super(key: key);
@@ -55,7 +55,7 @@ class _MyMissionState extends State<MyMission> {
                       ])),
                     ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 10),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [

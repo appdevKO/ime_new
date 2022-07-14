@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 List<List<Color>> colorlist = [
-
   [
     Color(0xff1a79e8),
     Color(0xff7fb1ec),
@@ -30,3 +30,43 @@ String userhead3 =
 
 String default_cover =
     'https://www.crazybackground.com/wp-content/uploads/2019/12/vector-abstract-gray-background-low-poly-textured-triangle-shapes-in-random-pattern-trendy-lowpoly-background.jpg';
+
+String birthday_trans_star(datetime) {
+  String time = DateFormat('MMdd').format(datetime);
+  int timeInt = int.parse(time);
+  if (timeInt >= 321 && timeInt <= 419) {
+    return '牡羊座';
+  } else if (timeInt >= 420 && timeInt <= 520) {
+    return '金牛座';
+  } else if (timeInt >= 521 && timeInt <= 621) {
+    return '雙子座';
+  } else if (timeInt >= 622 && timeInt <= 722) {
+    return '巨蟹座';
+  } else if (timeInt >= 723 && timeInt <= 822) {
+    return '獅子座';
+  } else if (timeInt >= 823 && timeInt <= 922) {
+    return '處女座';
+  } else if (timeInt >= 923 && timeInt <= 1023) {
+    return '天秤座';
+  } else if (timeInt >= 1024 && timeInt <= 1122) {
+    return '天蠍座';
+  } else if (timeInt >= 1123 && timeInt <= 1221) {
+    return '射手座';
+  }else if (timeInt >= 120 && timeInt <= 218) {
+    return '水瓶座';
+  }else if (timeInt >= 219 && timeInt <= 320) {
+    return '雙魚座';
+  }
+  return '摩羯座';
+}
+//畫面底色
+Color background_white = Color(0xffffffff);
+Color spy_gradient_light_blue = Color(0xff24d7f7);
+Color spy_gradient_light_purple = Color(0xffcb27f7);
+Color spy_button_blue = Color(0xff00ccff);
+Color spy_button_purple = Color(0xff9900cc);
+Color spy_bar_blue = Color(0xff336666);
+Color spy_bar_purple = Color(0xff9900cc);
+Color spy_card_background = Color(0xff25253d);
+Color spy_card_border_background = Color(0xff27283D);
+Color spy_mission_money = Color(0xffff6699);

@@ -116,20 +116,32 @@ class _DateSquareState extends State<DateSquare>
                                                     crossAxisAlignment:
                                                         CrossAxisAlignment.end,
                                                     children: [
-                                                      Text(
-                                                        value.last_login_memberlist![i].nickname ==
-                                                                    null ||
-                                                                value.last_login_memberlist![i]
-                                                                        .nickname ==
-                                                                    ''
-                                                            ? '不詳'
-                                                            : '${value.last_login_memberlist![i].nickname}',
-                                                        style: TextStyle(
-                                                            fontSize: 30,
-                                                            color: Colors.white,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .w700),
+                                                      Container(
+                                                        width: 200,
+                                                        child: RichText(
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          strutStyle:
+                                                              StrutStyle(
+                                                                  fontSize:
+                                                                      12.0),
+                                                          text: TextSpan(
+                                                            style: TextStyle(
+                                                                fontSize: 30,
+                                                                color: Colors
+                                                                    .white,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w700),
+                                                            text: value.last_login_memberlist![i].nickname ==
+                                                                        null ||
+                                                                    value.last_login_memberlist![i]
+                                                                            .nickname ==
+                                                                        ''
+                                                                ? '不詳'
+                                                                : '${value.last_login_memberlist![i].nickname}',
+                                                          ),
+                                                        ),
                                                       ),
                                                       Padding(
                                                         padding:

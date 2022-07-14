@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ime_new/ui/live/spylive/contract/signingpage.dart';
-import 'package:ime_new/utils/color_config.dart';
+import 'package:ime_new/utils/viewconfig.dart';
 import 'package:signature/signature.dart';
 
 class BecomeSpy extends StatefulWidget {

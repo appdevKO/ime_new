@@ -90,6 +90,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 // focusNode: _focus1,
                                 maxLength: 10,
                                 controller: _nicknamecontroller,
+                                toolbarOptions: ToolbarOptions(paste: false),
                                 decoration: InputDecoration(
                                     border: OutlineInputBorder(
                                         borderSide: BorderSide(
