@@ -273,37 +273,42 @@ class _CreateShowTimeState extends State<CreateShowTime> {
                               ),
                             ),
                             onTap: () async {
-                              showDialog(
-                                  context: context,
-                                  barrierDismissible: false,
-                                  builder: (_) {
-                                    return AlertDialog(
-                                        title: Text('建立showtime 請稍候'),
-                                        content: SizedBox(
-                                            height: 50,
-                                            width: 50,
-                                            child: Center(
-                                                child:
-                                                    CircularProgressIndicator())));
-                                  });
-                              await Provider.of<ChatProvider>(context,
-                                      listen: false)
-                                  .upload_spy_mission(
-                                    3,
-                                    _titlecontroller.text,
-                                    _contentcontroller.text,
-                                    _pricecontroller.text,
-                                  )
-                                  .whenComplete(() => Future.delayed(
-                                          Duration(seconds: 2), () async {
-                                        Navigator.pop(context);
-                                        Navigator.pop(context);
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    FakeStream()));
-                                      }));
+                              if (_titlecontroller.text != '' &&
+                                  _contentcontroller.text != '' &&
+                                  _pricecontroller.text != '' &&
+                                  checkvalue) {
+                                showDialog(
+                                    context: context,
+                                    barrierDismissible: false,
+                                    builder: (_) {
+                                      return AlertDialog(
+                                          title: Text('建立showtime 請稍候'),
+                                          content: SizedBox(
+                                              height: 50,
+                                              width: 50,
+                                              child: Center(
+                                                  child:
+                                                      CircularProgressIndicator())));
+                                    });
+                                await Provider.of<ChatProvider>(context,
+                                        listen: false)
+                                    .upload_spy_mission(
+                                      3,
+                                      _titlecontroller.text,
+                                      _contentcontroller.text,
+                                      int.parse(_pricecontroller.text),
+                                    )
+                                    .whenComplete(() => Future.delayed(
+                                            Duration(seconds: 2), () async {
+                                          Navigator.pop(context);
+                                          Navigator.pop(context);
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      FakeStream()));
+                                        }));
+                              }
                             },
                           ),
                         ],

@@ -239,8 +239,9 @@ class _CreateMissionState extends State<CreateMission> {
                                             ],
                                           )
                                         : Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 4),
-                                          child: Text(
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 4),
+                                            child: Text(
                                               '${DateFormat('yyyy/MM/dd').format(startDateTime!)}',
                                               style: TextStyle(
                                                 color: Color(
@@ -248,7 +249,7 @@ class _CreateMissionState extends State<CreateMission> {
                                                 ),
                                               ),
                                             ),
-                                        ),
+                                          ),
                                   ),
                                   onTap: () {
                                     FocusScope.of(context).unfocus();
@@ -308,8 +309,9 @@ class _CreateMissionState extends State<CreateMission> {
                                             ],
                                           )
                                         : Padding(
-                                          padding: const EdgeInsets.symmetric(vertical: 4),
-                                          child: Text(
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 4),
+                                            child: Text(
                                               '${DateFormat('yyyy/MM/dd').format(endDateTime!)}',
                                               style: TextStyle(
                                                 color: Color(
@@ -317,7 +319,7 @@ class _CreateMissionState extends State<CreateMission> {
                                                 ),
                                               ),
                                             ),
-                                        ),
+                                          ),
                                   ),
                                   onTap: () {
                                     FocusScope.of(context).unfocus();
@@ -531,34 +533,42 @@ class _CreateMissionState extends State<CreateMission> {
                               ),
                             ),
                             onTap: () async {
-                              showDialog(
-                                  context: context,
-                                  barrierDismissible: false,
-                                  builder: (_) {
-                                    return AlertDialog(
-                                        title: Text('任務上傳中 請稍候'),
-                                        content: SizedBox(
-                                            height: 50,
-                                            width: 50,
-                                            child: Center(
-                                                child:
-                                                    CircularProgressIndicator())));
-                                  });
-                              await Provider.of<ChatProvider>(context,
-                                      listen: false)
-                                  .upload_spy_mission(
-                                    type,
-                                    _titlecontroller.text,
-                                    _contentcontroller.text,
-                                    _pricecontroller.text,
-                                    starttime: startDateTime,
-                                    endtime: endDateTime,
-                                  )
-                                  .whenComplete(() => Future.delayed(
-                                          Duration(seconds: 2), () async {
-                                        Navigator.pop(context);
-                                        Navigator.pop(context);
-                                      }));
+                              if (_titlecontroller.text != '' &&
+                                  _contentcontroller.text != '' &&
+                                  _pricecontroller.text != '' &&
+                                  startDateTime != null &&
+                                  endDateTime != null &&
+                                  type != 0 &&
+                                  checkvalue) {
+                                showDialog(
+                                    context: context,
+                                    barrierDismissible: false,
+                                    builder: (_) {
+                                      return AlertDialog(
+                                          title: Text('任務上傳中 請稍候'),
+                                          content: SizedBox(
+                                              height: 50,
+                                              width: 50,
+                                              child: Center(
+                                                  child:
+                                                      CircularProgressIndicator())));
+                                    });
+                                await Provider.of<ChatProvider>(context,
+                                        listen: false)
+                                    .upload_spy_mission(
+                                      type,
+                                      _titlecontroller.text,
+                                      _contentcontroller.text,
+                                      int.parse(_pricecontroller.text),
+                                      starttime: startDateTime,
+                                      endtime: endDateTime,
+                                    )
+                                    .whenComplete(() => Future.delayed(
+                                            Duration(seconds: 2), () async {
+                                          Navigator.pop(context);
+                                          Navigator.pop(context);
+                                        }));
+                              }
                             },
                           ),
                         ],

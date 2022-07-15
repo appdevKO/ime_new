@@ -274,7 +274,7 @@ class _SpyLivePageState extends State<SpyLivePage> {
                                                                   .center,
                                                           children: [
                                                             Text(
-                                                              '任務標題',
+                                                              '${value.spy_streaming_list[index].title}',
                                                               textAlign:
                                                                   TextAlign
                                                                       .start,
@@ -331,15 +331,29 @@ class _SpyLivePageState extends State<SpyLivePage> {
                                                             EdgeInsetsDirectional
                                                                 .fromSTEB(10, 0,
                                                                     0, 0),
-                                                        child: Text(
-                                                          '任務內容',
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.white,
-                                                              fontSize: 16,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w700),
+                                                        child: Container(
+                                                          height: 40,
+                                                          width: 180,
+                                                          child: RichText(
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            strutStyle:
+                                                                StrutStyle(
+                                                                    fontSize:
+                                                                        12.0),
+                                                            text: TextSpan(
+                                                              style: TextStyle(
+                                                                  fontSize: 16,
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w700),
+                                                              text:
+                                                                  '${value.spy_streaming_list[index].content}',
+                                                            ),
+                                                          ),
                                                         ),
                                                       ),
                                                       Padding(
@@ -348,7 +362,7 @@ class _SpyLivePageState extends State<SpyLivePage> {
                                                                 .fromSTEB(0, 0,
                                                                     10, 0),
                                                         child: Text(
-                                                          '懸賞獎金\$6666666',
+                                                          '懸賞獎金\$${value.spy_streaming_list[index].price}',
                                                           style: TextStyle(
                                                               color:
                                                                   spy_mission_money,

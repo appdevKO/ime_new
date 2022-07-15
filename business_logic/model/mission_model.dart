@@ -8,23 +8,26 @@ MissionModel missionModelFromJson(String str) =>
 String missionModelToJson(MissionModel data) => json.encode(data.toJson());
 
 class MissionModel {
-  MissionModel({
-    this.id,
-    this.title,
-    this.content,
-    this.price,
-    this.starttime,
-    this.endtime,
-    this.type,
-    this.memberid,
-    this.nickname,
-    this.avatar,
-  });
+  MissionModel(
+      {this.id,
+      this.title,
+      this.content,
+      this.price,
+      this.actual_price,
+      this.starttime,
+      this.endtime,
+      this.type,
+      this.memberid,
+      this.nickname,
+      this.avatar,
+      this.status});
 
   ObjectId? id;
   String? title;
   String? content;
-  String? price;
+  int? price;
+  int? status;
+  int? actual_price;
   DateTime? starttime;
   DateTime? endtime;
   int? type;
@@ -37,9 +40,11 @@ class MissionModel {
         title: json["title"],
         content: json["content"],
         price: json["price"],
+        actual_price: json["actual_price"],
         starttime: json["starttime"],
         endtime: json["endtime"],
         type: json["type"],
+        status: json["status"],
         memberid: json["memberid"],
         nickname: json["nickname"],
         avatar: json["avatar"],
@@ -50,6 +55,8 @@ class MissionModel {
         "title": title,
         "content": content,
         "price": price,
+        "actual_price": actual_price,
+        "status": status,
         "starttime": starttime,
         "endtime": endtime,
         "type": type,

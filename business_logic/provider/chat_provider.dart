@@ -1608,12 +1608,12 @@ class ChatProvider with ChangeNotifier {
 
     try {
       if (type != 3) {
-        // showtime
+        // mission
         //傳上db
         _mongoDB.inserttomongo(
           "spy_mission",
           {
-            'status': 0,
+            'status': 1,
             "title": title,
             "content": content,
             "price": price,
@@ -1624,15 +1624,46 @@ class ChatProvider with ChangeNotifier {
             "nickname": remoteUserInfo[0].nickname,
           },
         );
-      } else {
-        // mission
+        //test
         _mongoDB.inserttomongo(
           "spy_mission",
           {
-            'status': 0,
+            'status': 4,
             "title": title,
             "content": content,
-            "goal_price": price,
+            "price": price,
+            "starttime": starttime,
+            "endtime": endtime,
+            "type": type,
+            "memberid": remoteUserInfo[0].memberid,
+            "nickname": remoteUserInfo[0].nickname,
+          },
+        );
+        _mongoDB.inserttomongo(
+          "spy_mission",
+          {
+            'status': 2,
+            "title": title,
+            "content": content,
+            "price": price,
+            "actual_price": 0,
+            "starttime": starttime,
+            "endtime": endtime,
+            "type": type,
+            "memberid": remoteUserInfo[0].memberid,
+            "nickname": remoteUserInfo[0].nickname,
+          },
+        );
+      } else {
+        // showtime
+
+        _mongoDB.inserttomongo(
+          "spy_mission",
+          {
+            'status': 3,
+            "title": title,
+            "content": content,
+            "price": price,
             "actual_price": 0,
             "starttime": DateTime.now().add(Duration(hours: 8)),
             "type": type,
@@ -1647,7 +1678,7 @@ class ChatProvider with ChangeNotifier {
             'status': 5,
             "title": title,
             "content": content,
-            "goal_price": price,
+            "price": price,
             "actual_price": 0,
             "starttime": DateTime.now().add(Duration(hours: 8)),
             "type": type,
@@ -1661,7 +1692,21 @@ class ChatProvider with ChangeNotifier {
             'status': 3,
             "title": title,
             "content": content,
-            "goal_price": price,
+            "price": price,
+            "actual_price": 0,
+            "starttime": DateTime.now().add(Duration(hours: 8)),
+            "type": type,
+            "memberid": remoteUserInfo[0].memberid,
+            "nickname": remoteUserInfo[0].nickname,
+          },
+        );
+        _mongoDB.inserttomongo(
+          "spy_mission",
+          {
+            'status': 4,
+            "title": title,
+            "content": content,
+            "price": price,
             "actual_price": 0,
             "starttime": DateTime.now().add(Duration(hours: 8)),
             "type": type,
@@ -1677,8 +1722,12 @@ class ChatProvider with ChangeNotifier {
 
   var spy_streaming_list;
   int spy_streaminglist_value = 1;
+
   var spy_streaming_mission_list;
+  var spy_accessible_mission_list;
   int spy_streaminglist_mission_value = 1;
+  int spy_accessiblelist_mission_value = 1;
+
   var spy_streaming_showtime_list;
   int spy_streaminglist_showtime_value = 1;
 
@@ -1687,7 +1736,7 @@ class ChatProvider with ChangeNotifier {
     print('獲得現在直播中任務列表');
     spy_streaming_list = await readremotemongodb(
         MissionModel.fromJson, 'spy_mission',
-        field: mongo.where.limit(pagesize));
+        field: mongo.where.eq('status', 4).limit(pagesize));
     print('任務列表$spy_streaming_list');
 
     notifyListeners();
@@ -1698,8 +1747,25 @@ class ChatProvider with ChangeNotifier {
     print('獲得現在直播中任務列表');
     spy_streaming_mission_list = await readremotemongodb(
         MissionModel.fromJson, 'spy_mission',
-        field: mongo.where.ne('type', 3).limit(pagesize));
+        field: mongo.where
+            .ne('type', 3)
+            .and(mongo.where.eq('status', 4))
+            .limit(pagesize));
     print('任務列表$spy_streaming_mission_list');
+
+    notifyListeners();
+  }
+
+  Future get_spy_mission_accessible_list() async {
+    spy_accessiblelist_mission_value = 1;
+    print('獲得可接任務列表');
+    spy_accessible_mission_list = await readremotemongodb(
+        MissionModel.fromJson, 'spy_mission',
+        field: mongo.where
+            .ne('type', 3)
+            .and(mongo.where.eq('status', 1))
+            .limit(pagesize));
+    print('可接任務列表$spy_accessible_mission_list');
 
     notifyListeners();
   }
@@ -1709,8 +1775,137 @@ class ChatProvider with ChangeNotifier {
     print('獲得現在直播中任務列表');
     spy_streaming_showtime_list = await readremotemongodb(
         MissionModel.fromJson, 'spy_mission',
-        field: mongo.where.eq('type', 3).limit(pagesize));
+        field: mongo.where
+            .eq('type', 3)
+            .and(mongo.where.eq('status', 4))
+            .limit(pagesize));
     print('任務列表$spy_streaming_showtime_list');
+
+    notifyListeners();
+  }
+
+  //my showtime
+  var myshowtime_streaming_list;
+  int myshowtime_streaming_list_value = 1;
+
+  Future get_spy_myshowtime_streaminglist() async {
+    //進行中
+    myshowtime_streaming_list_value = 1;
+    print('獲得myshowtime現在直播中任務列表');
+    myshowtime_streaming_list = await readremotemongodb(
+        MissionModel.fromJson, 'spy_mission',
+        field: mongo.where
+            .eq('type', 3)
+            .and(mongo.where.lt('status', 5))
+            .limit(pagesize));
+    print('myshowtime現在直播中任務列表$myshowtime_streaming_list');
+
+    notifyListeners();
+  }
+
+  var myshowtime_ended_list;
+  int myshowtime_ended_list_value = 1;
+
+  Future get_spy_myshowtime_endedlist() async {
+    myshowtime_ended_list_value = 1;
+    print('獲得myshowtime ended任務列表');
+    myshowtime_ended_list = await readremotemongodb(
+        MissionModel.fromJson, 'spy_mission',
+        field: mongo.where
+            .eq('type', 3)
+            .and(mongo.where.gte('status', 5))
+            .limit(pagesize));
+    print('myshowtime ended任務列表$myshowtime_ended_list');
+
+    notifyListeners();
+  }
+
+  var myshowtime_hadcreated_list;
+  int myshowtime_hadcreated_list_value = 1;
+
+  Future get_spy_myshowtime_hadcreatedlist() async {
+    // only 直播主
+    myshowtime_hadcreated_list_value = 1;
+    print('獲得曾經發起showtime任務列表');
+    myshowtime_hadcreated_list = await readremotemongodb(
+        MissionModel.fromJson, 'spy_mission',
+        field: mongo.where
+            .eq('type', 3)
+            .and(mongo.where.eq('memberid', remoteUserInfo[0].memberid))
+            .limit(pagesize));
+    print('曾經發起showtime任務列表$myshowtime_hadcreated_list');
+
+    notifyListeners();
+  }
+
+  //mymission
+  var mymission_icatch_startyet_list;
+  int mymission_icatch_startyet_list_value = 1;
+
+  Future get_spy_mymission_icatch_startyetlist() async {
+    //進行中
+    mymission_icatch_startyet_list_value = 1;
+    print('mymission 我接的 未進行任務列表');
+    mymission_icatch_startyet_list = await readremotemongodb(
+        MissionModel.fromJson, 'spy_mission',
+        field: mongo.where
+            .eq('type', 3)
+            .and(mongo.where.lt('status', 5))
+            .limit(pagesize));
+    print('mymission 我接的 未進行任務列表$mymission_icatch_startyet_list');
+
+    notifyListeners();
+  }
+
+  var mymission_icatch_applied_list;
+  int mymission_icatch_applied_list_value = 1;
+
+  Future get_spy_mymission_icatch_appliedlist() async {
+    mymission_icatch_applied_list_value = 1;
+    print('獲得mymission 我接的 已申請任務列表');
+    mymission_icatch_applied_list = await readremotemongodb(
+        MissionModel.fromJson, 'spy_mission',
+        field: mongo.where
+            .eq('type', 3)
+            .and(mongo.where.gte('status', 5))
+            .limit(pagesize));
+    print('mymission 我接的 已申請任務列表$mymission_icatch_applied_list');
+
+    notifyListeners();
+  }
+
+  var mymission_icatch_success_list;
+  int mymission_icatch_success_list_value = 1;
+
+  Future get_spy_mymission_icatch_successlist() async {
+    // only 直播主
+    mymission_icatch_success_list_value = 1;
+    print('獲得mymission 我接的 成功列表');
+    mymission_icatch_success_list = await readremotemongodb(
+        MissionModel.fromJson, 'spy_mission',
+        field: mongo.where
+            .eq('type', 3)
+            .and(mongo.where.eq('memberid', remoteUserInfo[0].memberid))
+            .limit(pagesize));
+    print('mymission 我接的 成功任務列表$mymission_icatch_success_list');
+
+    notifyListeners();
+  }
+
+  var mymission_icatch_fail_list;
+  int mymission_icatch_fail_list_value = 1;
+
+  Future get_spy_mymission_icatch_faillist() async {
+
+    mymission_icatch_fail_list_value = 1;
+    print('獲得mymission 我接的 fail任務列表');
+    mymission_icatch_fail_list = await readremotemongodb(
+        MissionModel.fromJson, 'spy_mission',
+        field: mongo.where
+            .eq('type', 3)
+            .and(mongo.where.eq('memberid', remoteUserInfo[0].memberid))
+            .limit(pagesize));
+    print('mymission 我接的 fail任務列表$mymission_icatch_fail_list');
 
     notifyListeners();
   }
