@@ -93,8 +93,9 @@ class MongoDB {
 
     return datalist;
   }
-  Future sweetGetUserList(collection_name, account) async {
+  Future sweetGetUserInfo(collection_name, account) async {
     var coll = db.collection(collection_name);
+    print(account);
     Map<String, dynamic> data = await coll.findOne({"account": account});
     print('uuu ${data}');
     return data;

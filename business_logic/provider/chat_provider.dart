@@ -1608,8 +1608,7 @@ class ChatProvider with ChangeNotifier {
 
     try {
       if (type != 3) {
-        // mission
-        //傳上db
+        // mission 未選定 開始
         _mongoDB.inserttomongo(
           "spy_mission",
           {
@@ -1622,41 +1621,12 @@ class ChatProvider with ChangeNotifier {
             "type": type,
             "memberid": remoteUserInfo[0].memberid,
             "nickname": remoteUserInfo[0].nickname,
-          },
-        );
-        //test
-        _mongoDB.inserttomongo(
-          "spy_mission",
-          {
-            'status': 4,
-            "title": title,
-            "content": content,
-            "price": price,
-            "starttime": starttime,
-            "endtime": endtime,
-            "type": type,
-            "memberid": remoteUserInfo[0].memberid,
-            "nickname": remoteUserInfo[0].nickname,
-          },
-        );
-        _mongoDB.inserttomongo(
-          "spy_mission",
-          {
-            'status': 2,
-            "title": title,
-            "content": content,
-            "price": price,
-            "actual_price": 0,
-            "starttime": starttime,
-            "endtime": endtime,
-            "type": type,
-            "memberid": remoteUserInfo[0].memberid,
-            "nickname": remoteUserInfo[0].nickname,
+            'apply_list': [],
+            'fcmtoken': remoteUserInfo[0].fcmtoken,
           },
         );
       } else {
-        // showtime
-
+        // showtime 募資中開始
         _mongoDB.inserttomongo(
           "spy_mission",
           {
@@ -1669,49 +1639,8 @@ class ChatProvider with ChangeNotifier {
             "type": type,
             "memberid": remoteUserInfo[0].memberid,
             "nickname": remoteUserInfo[0].nickname,
-          },
-        );
-        //test
-        _mongoDB.inserttomongo(
-          "spy_mission",
-          {
-            'status': 5,
-            "title": title,
-            "content": content,
-            "price": price,
-            "actual_price": 0,
-            "starttime": DateTime.now().add(Duration(hours: 8)),
-            "type": type,
-            "memberid": remoteUserInfo[0].memberid,
-            "nickname": remoteUserInfo[0].nickname,
-          },
-        );
-        _mongoDB.inserttomongo(
-          "spy_mission",
-          {
-            'status': 3,
-            "title": title,
-            "content": content,
-            "price": price,
-            "actual_price": 0,
-            "starttime": DateTime.now().add(Duration(hours: 8)),
-            "type": type,
-            "memberid": remoteUserInfo[0].memberid,
-            "nickname": remoteUserInfo[0].nickname,
-          },
-        );
-        _mongoDB.inserttomongo(
-          "spy_mission",
-          {
-            'status': 4,
-            "title": title,
-            "content": content,
-            "price": price,
-            "actual_price": 0,
-            "starttime": DateTime.now().add(Duration(hours: 8)),
-            "type": type,
-            "memberid": remoteUserInfo[0].memberid,
-            "nickname": remoteUserInfo[0].nickname,
+            'pay_list': [],
+            'fcmtoken': remoteUserInfo[0].fcmtoken,
           },
         );
       }
@@ -1764,6 +1693,7 @@ class ChatProvider with ChangeNotifier {
         field: mongo.where
             .ne('type', 3)
             .and(mongo.where.eq('status', 1))
+            .and(mongo.where.ne('memberid', remoteUserInfo[0].memberid))
             .limit(pagesize));
     print('可接任務列表$spy_accessible_mission_list');
 
@@ -1839,6 +1769,7 @@ class ChatProvider with ChangeNotifier {
   }
 
   //mymission
+  //  我接取的
   var mymission_icatch_startyet_list;
   int mymission_icatch_startyet_list_value = 1;
 
@@ -1849,8 +1780,9 @@ class ChatProvider with ChangeNotifier {
     mymission_icatch_startyet_list = await readremotemongodb(
         MissionModel.fromJson, 'spy_mission',
         field: mongo.where
-            .eq('type', 3)
-            .and(mongo.where.lt('status', 5))
+            .ne('type', 3)
+            .and(mongo.where.eq('status', 2))
+            .and(mongo.where.eq('executor', remoteUserInfo[0].memberid))
             .limit(pagesize));
     print('mymission 我接的 未進行任務列表$mymission_icatch_startyet_list');
 
@@ -1866,8 +1798,9 @@ class ChatProvider with ChangeNotifier {
     mymission_icatch_applied_list = await readremotemongodb(
         MissionModel.fromJson, 'spy_mission',
         field: mongo.where
-            .eq('type', 3)
-            .and(mongo.where.gte('status', 5))
+            .ne('type', 3)
+            .and(mongo.where.lt('status', 2))
+            .and(mongo.where.eq('apply_list', remoteUserInfo[0].memberid))
             .limit(pagesize));
     print('mymission 我接的 已申請任務列表$mymission_icatch_applied_list');
 
@@ -1878,14 +1811,14 @@ class ChatProvider with ChangeNotifier {
   int mymission_icatch_success_list_value = 1;
 
   Future get_spy_mymission_icatch_successlist() async {
-    // only 直播主
     mymission_icatch_success_list_value = 1;
     print('獲得mymission 我接的 成功列表');
     mymission_icatch_success_list = await readremotemongodb(
         MissionModel.fromJson, 'spy_mission',
         field: mongo.where
-            .eq('type', 3)
-            .and(mongo.where.eq('memberid', remoteUserInfo[0].memberid))
+            .ne('type', 3)
+            .and(mongo.where.eq('status', 7))
+            .and(mongo.where.eq('executor', remoteUserInfo[0].memberid))
             .limit(pagesize));
     print('mymission 我接的 成功任務列表$mymission_icatch_success_list');
 
@@ -1896,18 +1829,268 @@ class ChatProvider with ChangeNotifier {
   int mymission_icatch_fail_list_value = 1;
 
   Future get_spy_mymission_icatch_faillist() async {
-
     mymission_icatch_fail_list_value = 1;
     print('獲得mymission 我接的 fail任務列表');
     mymission_icatch_fail_list = await readremotemongodb(
         MissionModel.fromJson, 'spy_mission',
         field: mongo.where
-            .eq('type', 3)
-            .and(mongo.where.eq('memberid', remoteUserInfo[0].memberid))
+            .ne('type', 3)
+            .and(mongo.where.eq('status', 6))
+            .and(mongo.where.eq('executor', remoteUserInfo[0].memberid))
             .limit(pagesize));
     print('mymission 我接的 fail任務列表$mymission_icatch_fail_list');
 
     notifyListeners();
+  }
+
+//  我發起的
+  var mymission_ilaunch_startyet_list;
+  int mymission_ilaunch_startyet_list_value = 1;
+
+  Future get_spy_mymission_ilaunch_startyetlist() async {
+    //進行中
+    mymission_ilaunch_startyet_list_value = 1;
+    print('mymission 我發起的 未進行任務列表');
+    mymission_ilaunch_startyet_list = await readremotemongodb(
+        MissionModel.fromJson, 'spy_mission',
+        field: mongo.where
+            .ne('type', 3)
+            .and(mongo.where.eq('status', 2))
+            .and(mongo.where.eq('memberid', remoteUserInfo[0].memberid))
+            .limit(pagesize));
+    print('mymission 我發起的 未進行任務列表$mymission_ilaunch_startyet_list');
+
+    notifyListeners();
+  }
+
+  var mymission_ilaunch_streaming_list;
+  int mymission_ilaunch_streaming_list_value = 1;
+
+  Future get_spy_mymission_ilaunch_streaminglist() async {
+    mymission_ilaunch_streaming_list_value = 1;
+    print('獲得mymission 發起 進行中任務列表');
+    mymission_ilaunch_streaming_list = await readremotemongodb(
+        MissionModel.fromJson, 'spy_mission',
+        field: mongo.where
+            .ne('type', 3)
+            .and(mongo.where.eq('status', 4))
+            .and(mongo.where.eq('memberid', remoteUserInfo[0].memberid))
+            .limit(pagesize));
+    print('mymission  發起 進行中任務列表$mymission_ilaunch_streaming_list');
+
+    notifyListeners();
+  }
+
+  var mymission_ilaunch_notcatched_list;
+  int mymission_ilaunch_notcatched_list_value = 1;
+
+  Future get_spy_mymission_ilaunch_notcatchedlist() async {
+    // only 直播主
+    mymission_ilaunch_notcatched_list_value = 1;
+    print('獲得mymission 我發起 還沒有人接取列表');
+    mymission_ilaunch_notcatched_list = await readremotemongodb(
+        MissionModel.fromJson, 'spy_mission',
+        field: mongo.where
+            .ne('type', 3)
+            .and(mongo.where.eq('status', 1))
+            .and(mongo.where.eq('memberid', remoteUserInfo[0].memberid))
+            .limit(pagesize));
+    print('mymission 我發起 還沒有人接取 列表$mymission_ilaunch_notcatched_list');
+
+    notifyListeners();
+  }
+
+  var mymission_ilaunch_finish_list;
+  int mymission_ilaunch_finish_list_value = 1;
+
+  Future get_spy_mymission_ilaunch_finishlist() async {
+    mymission_ilaunch_finish_list_value = 1;
+    print('獲得mymission 我發起的 finish任務列表');
+    mymission_ilaunch_finish_list = await readremotemongodb(
+        MissionModel.fromJson, 'spy_mission',
+        field: mongo.where
+            .ne('type', 3)
+            .and(mongo.where.gte('status', 5))
+            .and(mongo.where.eq('memberid', remoteUserInfo[0].memberid))
+            .limit(pagesize));
+    print('mymission 我發起的 finish任務列表$mymission_ilaunch_finish_list');
+
+    notifyListeners();
+  }
+
+  Future submit_mission(id) async {
+    print('申請這個任務 $id');
+
+    await _mongoDB.updateData_addSet(
+      "spy_mission",
+      "_id",
+      id,
+      'apply_list',
+      remoteUserInfo[0].memberid,
+    );
+  }
+
+  Future choose_mission_executor(id, memberid) async {
+    print('選擇 執行人 $id// $memberid //');
+
+    await await _mongoDB.updateData_single(
+      "spy_mission",
+      "_id",
+      id,
+      {"status": 2, 'executor': memberid},
+    );
+  }
+
+  var mission_detail;
+
+  Future get_mission_detail_apply(id) async {
+    final pipeline = mongo.AggregationPipelineBuilder()
+          ..addStage(mongo.Match(mongo.where.eq('_id', id).map['\$query']))
+          ..addStage(
+            mongo.Lookup(
+              from: 'member',
+              as: 'executor_info',
+              foreignField: '_id',
+              localField: 'executor',
+            ),
+          )
+        // ..addStage(mongo.Lookup(
+        //   from: 'member',
+        //   as: 'applyedlist',
+        //   foreignField: '_id',
+        //   localField: 'apply_list',
+        // ))
+        // mongo.Lookup(
+        //   from: 'member',
+        //   as: 'executor_info',
+        //   foreignField: '_id',
+        //   localField: 'executor',
+        // ),
+        // mongo.Lookup(
+        // from: 'member',
+        // as: 'applyedlist',
+        // foreignField: '_id',
+        // localField: 'apply_list',
+        // )
+        ;
+
+    var result = await lookupmongodb(
+      MissionModel.fromJson,
+      'spy_mission',
+      pipeline,
+    );
+    print("get_mission_detail $result");
+    mission_detail = result;
+    notifyListeners();
+  }
+
+  Future get_mission_detail_choose(id) async {
+    final pipeline = mongo.AggregationPipelineBuilder()
+          ..addStage(mongo.Match(mongo.where.eq('_id', id).map['\$query']))
+          ..addStage(
+            mongo.Lookup(
+              from: 'member',
+              as: 'executor_info',
+              foreignField: '_id',
+              localField: 'executor',
+            ),
+          )
+        // ..addStage(mongo.Lookup(
+        //   from: 'member',
+        //   as: 'applyedlist',
+        //   foreignField: '_id',
+        //   localField: 'apply_list',
+        // ))
+        // mongo.Lookup(
+        //   from: 'member',
+        //   as: 'executor_info',
+        //   foreignField: '_id',
+        //   localField: 'executor',
+        // ),
+        // mongo.Lookup(
+        // from: 'member',
+        // as: 'applyedlist',
+        // foreignField: '_id',
+        // localField: 'apply_list',
+        // )
+        ;
+
+    var result = await lookupmongodb(
+      MissionModel.fromJson,
+      'spy_mission',
+      pipeline,
+    );
+    print("get_mission_detail $result");
+    mission_detail = result;
+    notifyListeners();
+  }
+  Future find_missiondetail(title) async {
+    final pipeline = mongo.AggregationPipelineBuilder()
+      ..addStage(mongo.Match(mongo.where.eq('title', title).map['\$query']))
+      ..addStage(
+        mongo.Lookup(
+          from: 'member',
+          as: 'executor_info',
+          foreignField: '_id',
+          localField: 'executor',
+        ),
+      )
+    // ..addStage(mongo.Lookup(
+    //   from: 'member',
+    //   as: 'applyedlist',
+    //   foreignField: '_id',
+    //   localField: 'apply_list',
+    // ))
+    // mongo.Lookup(
+    //   from: 'member',
+    //   as: 'executor_info',
+    //   foreignField: '_id',
+    //   localField: 'executor',
+    // ),
+    // mongo.Lookup(
+    // from: 'member',
+    // as: 'applyedlist',
+    // foreignField: '_id',
+    // localField: 'apply_list',
+    // )
+        ;
+
+    var result = await lookupmongodb(
+      MissionModel.fromJson,
+      'spy_mission',
+      pipeline,
+    );
+    print("get_mission_detail $result");
+    mission_detail = result;
+    notifyListeners();
+  }
+  Future finish_mission(missionid) async {
+    print('關閉直播 改變任務狀態  ');
+
+    await change_mission_status(missionid, 5);
+  }
+
+  Future start_mission(missionid) async {
+    print('開啟直播 改變任務狀態  ');
+    //4任務中
+    await change_mission_status(missionid, 4);
+  }
+
+  Future start_showtime(missionid) async {
+    print('開啟直播 改變任務狀態  ');
+    //3募資中
+    await change_mission_status(missionid, 3);
+  }
+
+  Future change_mission_status(id, status) async {
+    await _mongoDB.updateData_single(
+      "spy_mission",
+      "_id",
+      id,
+      {
+        "status": status,
+      },
+    );
   }
 
   /**

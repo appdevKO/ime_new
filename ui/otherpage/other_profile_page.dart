@@ -366,7 +366,7 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                                                                         .o2omemberlist![
                                                                             0]
                                                                         .tag[
-                                                                            index]
+                                                                            index].data
                                                                         .length *
                                                                     16.0 +
                                                                 45,
@@ -378,7 +378,7 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                                                                       .grey,
                                                                 ),
                                                                 Text(
-                                                                  '${value.o2omemberlist![0].tag[index]}',
+                                                                  '${value.o2omemberlist![0].tag[index].data}',
                                                                   style: TextStyle(
                                                                       color: Colors
                                                                           .black),
@@ -442,7 +442,7 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                                                                         .o2omemberlist![
                                                                             0]
                                                                         .interest_list[
-                                                                            index]
+                                                                            index].data
                                                                         .length *
                                                                     16.0 +
                                                                 45,
@@ -454,7 +454,7 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                                                                       .grey,
                                                                 ),
                                                                 Text(
-                                                                  '${value.o2omemberlist![0].interest_list[index]}',
+                                                                  '${value.o2omemberlist![0].interest_list[index].data}',
                                                                   style: TextStyle(
                                                                       color: Colors
                                                                           .black),
@@ -623,10 +623,10 @@ class _OtherProfilePagePageState extends State<OtherProfilePage> {
                                   onTap: () {
                                     print('進入聊天室');
                                     if (value.o2omemberlist != null) {
-                                      print(
-                                          'o2omemberlist ${value.remoteUserInfo[0].memberid}');
-                                      print(
-                                          'o2o list to memberid ${value.remoteUserInfo[0].memberid},chatroom id ${widget.chatroomid.toHexString()}');
+                                      // print(
+                                      //     'o2omemberlist ${value.remoteUserInfo[0].memberid}');
+                                      // print(
+                                      //     'o2o list to memberid ${value.remoteUserInfo[0].memberid},chatroom id ${widget.chatroomid.toHexString()}');
                                       Navigator.push(
                                           context,
                                           MaterialPageRoute(

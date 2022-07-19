@@ -13,7 +13,7 @@ class Anchor {
     required this.agoraId,
     required this.selfAccount,
     required this.selfEncodeName,
-    required this.selfAvatar,
+    required this.anchorAvatar,
     required this.encodeRoomName,
     required this.encodeRoomExplain,
     required this.roomId,
@@ -23,7 +23,7 @@ class Anchor {
   String agoraId;
   String selfAccount;
   String selfEncodeName;
-  String selfAvatar;
+  String anchorAvatar;
   String encodeRoomName;
   String encodeRoomExplain;
   String roomId;
@@ -33,7 +33,7 @@ class Anchor {
         agoraId: json["agoraId"],
         selfAccount: json["selfAccount"],
         selfEncodeName: json["selfEncodeName"],
-        selfAvatar: json["selfAvatar"],
+        anchorAvatar: json["anchorAvatar"],
         encodeRoomName: json["encodeRoomName"],
         encodeRoomExplain: json["encodeRoomExplain"],
         roomId: json["roomId"],
@@ -44,7 +44,7 @@ class Anchor {
         "agoraId": agoraId,
         "selfAccount": selfAccount,
         "selfEncodeName": selfEncodeName,
-        "selfAvatar": selfAvatar,
+        "anchorAvatar": anchorAvatar,
         "encodeRoomName": encodeRoomName,
         "encodeRoomExplain": encodeRoomExplain,
         "roomId": roomId,

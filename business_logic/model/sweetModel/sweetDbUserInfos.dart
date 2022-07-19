@@ -6,14 +6,14 @@ import 'dart:convert';
 
 import 'package:mongo_dart/mongo_dart.dart';
 
-DbUserinfoModel dbUserinfoModelFromJson(String str) =>
-    DbUserinfoModel.fromJson(json.decode(str));
+sweetDbUserInfos dbUserinfoModelFromJson(String str) =>
+    sweetDbUserInfos.fromJson(json.decode(str));
 
-String dbUserinfoModelToJson(DbUserinfoModel data) =>
+String dbUserinfoModelToJson(sweetDbUserInfos data) =>
     json.encode(data.toJson());
 
-class DbUserinfoModel {
-  DbUserinfoModel(
+class sweetDbUserInfos {
+  sweetDbUserInfos(
       {this.memberid,
       this.nickname,
       this.account,
@@ -52,7 +52,7 @@ class DbUserinfoModel {
       this.vip,
       this.tag,
       this.fcmtoken,
-      this.icoin});
+      this.get_donate_count});
 
   ObjectId? memberid;
   String? account;
@@ -64,8 +64,8 @@ class DbUserinfoModel {
   String? cover;
   int? height;
   int? age;
+  int? get_donate_count;
   int? followme_num;
-  int? icoin;
   String? money;
   String? constellation;
   String? introduction;
@@ -90,35 +90,28 @@ class DbUserinfoModel {
   DateTime? birthday;
   double? distance_range;
   int? age_range;
-
-  //1 玩家 2直播主
   int? role;
   bool? vip;
-  List<TagData>? tag = [];
+  List? tag = [];
 
-  factory DbUserinfoModel.fromJson(Map<String, dynamic> json) {
-    List<TagData> list = [];
+  factory sweetDbUserInfos.fromJson(Map<String, dynamic> json) {
+    var list = [];
     if (json["personality"] != null && json["personality"] != '')
-      list.add(TagData(title: 'personality', data: json["personality"]));
-    if (json["size"] != null && json["size"] != '')
-      list.add(TagData(title: 'size', data: json["size"]));
+      list.add(json["personality"]);
+    if (json["size"] != null && json["size"] != '') list.add(json["size"]);
     if (json["profession"] != null && json["profession"] != '')
-      list.add(TagData(title: 'profession', data: json["profession"]));
-
+      list.add(json["profession"]);
     // if (json["area"] != null && json["area"] != '') list.add(json["area"]);
-    if (json["money"] != null && json["money"] != '')
-      list.add(TagData(title: 'money', data: json["money"]));
+    if (json["money"] != null && json["money"] != '') list.add(json["money"]);
     if (json["education"] != null && json["education"] != '')
-      list.add(TagData(title: 'education', data: json["education"]));
-    if (json["height"] != null && json["height"] != '')
-      list.add(TagData(title: 'height', data: json["height"].toString()));
+      list.add(json["education"]);
+
     if (json["language"] != null && json["language"] != '')
-      list.add(TagData(title: 'language', data: json["language"]));
-    if (json["smoke"] != null && json["smoke"] != '')
-      list.add(TagData(title: 'smoke', data: json["smoke"]));
-    if (json["drink"] != null && json["drink"] != '')
-      list.add(TagData(title: 'drink', data: json["drink"]));
-    return DbUserinfoModel(
+      list.add(json["language"]);
+
+    if (json["smoke"] != null && json["smoke"] != '') list.add(json["smoke"]);
+    if (json["drink"] != null && json["drink"] != '') list.add(json["drink"]);
+    return sweetDbUserInfos(
         memberid: json["_id"],
         nickname: json["nickname"] == null ? null : json["nickname"],
         default_chat_text: json["default_chat"],
@@ -130,8 +123,8 @@ class DbUserinfoModel {
         birthday: json["birthday"],
         cover: json['cover'],
         role: json['role'],
-        icoin: json['i_coin'] != null ? json['i_coin'] : 0,
         vip: json['vip'],
+        get_donate_count: json['get_donate_count'],
         height: json['height'] != null ? json['height'] : null,
         age: json['age'] != null ? json['age'] : null,
         sex: json['sex'] != null ? json['sex'] : null,
@@ -187,7 +180,6 @@ class DbUserinfoModel {
         "height": height,
         "birthday": birthday,
         "age": age,
-        "i_coin": icoin,
         "sex": sex,
         "money": money,
         "constellation": constellation,
@@ -208,12 +200,6 @@ class DbUserinfoModel {
         "smoke": smoke,
         "drink": drink,
         "voice_introduction": voice_introduction,
+        "get_donate_count": get_donate_count
       };
-}
-
-class TagData {
-  String title;
-  String data;
-
-  TagData({required this.title, required this.data});
 }

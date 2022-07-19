@@ -13,10 +13,8 @@ class FollowActionModel {
 
   var action;
 
-  factory FollowActionModel.fromJson(Map<String, dynamic> json) {
-    return FollowActionModel(
-        action: ActionModel.fromJson(json["actionlist"]));
-  }
+  factory FollowActionModel.fromJson(Map<String, dynamic> json) =>
+      FollowActionModel(action: ActionModel.fromJson(json["actionlist"]));
 
   Map<String, dynamic> toJson() => {
         "actionlist": action,

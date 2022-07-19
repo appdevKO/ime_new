@@ -1,6 +1,8 @@
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:ime_new/business_logic/provider/chat_provider.dart';
+import 'package:ime_new/ui/date/one2one_chat/o2ochatroom.dart';
+import 'package:ime_new/ui/live/spylive/mission/missiondetailpage.dart';
 import 'package:ime_new/utils/viewconfig.dart';
 import 'package:provider/provider.dart';
 
@@ -27,6 +29,7 @@ class _MyMissionState extends State<MyMission> {
   }
 
   Future initData() async {
+    //我接的
     await Provider.of<ChatProvider>(context, listen: false)
         .get_spy_mymission_icatch_startyetlist();
     await Provider.of<ChatProvider>(context, listen: false)
@@ -35,6 +38,15 @@ class _MyMissionState extends State<MyMission> {
         .get_spy_mymission_icatch_successlist();
     await Provider.of<ChatProvider>(context, listen: false)
         .get_spy_mymission_icatch_faillist();
+    // 我發的
+    await Provider.of<ChatProvider>(context, listen: false)
+        .get_spy_mymission_ilaunch_startyetlist();
+    await Provider.of<ChatProvider>(context, listen: false)
+        .get_spy_mymission_ilaunch_streaminglist();
+    await Provider.of<ChatProvider>(context, listen: false)
+        .get_spy_mymission_ilaunch_notcatchedlist();
+    await Provider.of<ChatProvider>(context, listen: false)
+        .get_spy_mymission_ilaunch_finishlist();
   }
 
   @override
@@ -50,6 +62,16 @@ class _MyMissionState extends State<MyMission> {
             appBar: AppBar(
               title: Text('我的任務'),
               backgroundColor: Color(0xff1A1A1A),
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back),
+                onPressed: () async {
+                  Navigator.pop(context);
+                  await Provider.of<ChatProvider>(context, listen: false)
+                      .get_spy_mission_streaminglist();
+                  await Provider.of<ChatProvider>(context, listen: false)
+                      .get_spy_mission_accessible_list();
+                },
+              ),
             ),
             body: GestureDetector(
               onTap: () => FocusScope.of(context).unfocus(),
@@ -152,135 +174,343 @@ class _MyMissionState extends State<MyMission> {
                             child: TabBarView(
                               controller: _tabController,
                               children: [
+                                //進行中
                                 Consumer<ChatProvider>(
                                     builder: (context, value, child) {
-                                  return value.mymission_icatch_startyet_list !=
+                                  return value.mymission_ilaunch_streaming_list !=
                                           null
-                                      ? value.mymission_icatch_startyet_list
+                                      ? value.mymission_ilaunch_streaming_list
                                               .isNotEmpty
                                           ? ListView.separated(
                                               itemBuilder: (context, index) {
                                                 return Padding(
                                                   padding: EdgeInsetsDirectional
                                                       .fromSTEB(16, 8, 16, 0),
-                                                  child: Container(
-                                                    width: double.infinity,
-                                                    height: 150,
-                                                    decoration: BoxDecoration(
-                                                        color:
-                                                            spy_card_background,
-                                                        boxShadow: [
-                                                          BoxShadow(
-                                                            blurRadius: 2,
-                                                            color: index % 2 ==
-                                                                    0
-                                                                ? Color(
-                                                                    0xff00CCFF)
-                                                                : Color(
-                                                                    0xff9900CC),
-                                                            offset: Offset(
-                                                                index % 2 == 0
-                                                                    ? 2
-                                                                    : -2,
-                                                                0),
-                                                          )
-                                                        ],
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(12),
-                                                        border: Border.all(
-                                                            width: 1,
-                                                            color:
-                                                                spy_card_border_background)),
-                                                    child: Padding(
-                                                      padding:
-                                                          EdgeInsetsDirectional
-                                                              .fromSTEB(
-                                                                  0, 8, 0, 0),
-                                                      child: Row(
-                                                        mainAxisSize:
-                                                            MainAxisSize.max,
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Column(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .max,
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceBetween,
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              Padding(
-                                                                padding:
-                                                                    EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            16,
-                                                                            0,
-                                                                            0,
-                                                                            0),
-                                                                child: Image
-                                                                    .network(
-                                                                  'https://picsum.photos/seed/556/600',
-                                                                  width: 100,
-                                                                  height: 100,
-                                                                  fit: BoxFit
-                                                                      .cover,
-                                                                ),
-                                                              ),
-                                                              Container(
-                                                                width: 100,
-                                                                height: 30,
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                        borderRadius:
-                                                                            BorderRadius
-                                                                                .only(
-                                                                          bottomLeft:
-                                                                              Radius.circular(12),
-                                                                          bottomRight:
-                                                                              Radius.circular(0),
-                                                                          topLeft:
-                                                                              Radius.circular(0),
-                                                                          topRight:
-                                                                              Radius.circular(12),
-                                                                        ),
-                                                                        gradient:
-                                                                            LinearGradient(colors: [
-                                                                          spy_gradient_light_blue,
-                                                                          spy_gradient_light_purple,
-                                                                        ])),
-                                                                child: Padding(
-                                                                  padding: EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          0,
-                                                                          5,
-                                                                          0,
-                                                                          0),
-                                                                  child: Text(
-                                                                    '觀看人數',
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .center,
-                                                                    style: TextStyle(
-                                                                        color: Colors
-                                                                            .white,
-                                                                        fontWeight:
-                                                                            FontWeight.w700),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          Expanded(
-                                                            child: Column(
+                                                  child: GestureDetector(
+                                                    child: Container(
+                                                      width: double.infinity,
+                                                      height: 150,
+                                                      decoration: BoxDecoration(
+                                                          color:
+                                                              spy_card_background,
+                                                          boxShadow: [
+                                                            BoxShadow(
+                                                              blurRadius: 2,
+                                                              color: index %
+                                                                          2 ==
+                                                                      0
+                                                                  ? Color(
+                                                                      0xff00CCFF)
+                                                                  : Color(
+                                                                      0xff9900CC),
+                                                              offset: Offset(
+                                                                  index % 2 == 0
+                                                                      ? 2
+                                                                      : -2,
+                                                                  0),
+                                                            )
+                                                          ],
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(12),
+                                                          border: Border.all(
+                                                              width: 1,
+                                                              color:
+                                                                  spy_card_border_background)),
+                                                      child: Padding(
+                                                        padding:
+                                                            EdgeInsetsDirectional
+                                                                .fromSTEB(
+                                                                    0, 8, 0, 0),
+                                                        child: Row(
+                                                          mainAxisSize:
+                                                              MainAxisSize.max,
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Column(
                                                               mainAxisSize:
                                                                   MainAxisSize
                                                                       .max,
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Padding(
+                                                                  padding: EdgeInsetsDirectional
+                                                                      .fromSTEB(
+                                                                          16,
+                                                                          0,
+                                                                          0,
+                                                                          0),
+                                                                  child: Image
+                                                                      .network(
+                                                                    'https://picsum.photos/seed/556/600',
+                                                                    width: 100,
+                                                                    height: 100,
+                                                                    fit: BoxFit
+                                                                        .cover,
+                                                                  ),
+                                                                ),
+                                                                Container(
+                                                                  width: 100,
+                                                                  height: 30,
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                          borderRadius: BorderRadius
+                                                                              .only(
+                                                                            bottomLeft:
+                                                                                Radius.circular(12),
+                                                                            bottomRight:
+                                                                                Radius.circular(0),
+                                                                            topLeft:
+                                                                                Radius.circular(0),
+                                                                            topRight:
+                                                                                Radius.circular(12),
+                                                                          ),
+                                                                          gradient:
+                                                                              LinearGradient(colors: [
+                                                                            spy_gradient_light_blue,
+                                                                            spy_gradient_light_purple,
+                                                                          ])),
+                                                                  child:
+                                                                      Padding(
+                                                                    padding: EdgeInsetsDirectional
+                                                                        .fromSTEB(
+                                                                            0,
+                                                                            5,
+                                                                            0,
+                                                                            0),
+                                                                    child: Text(
+                                                                      '觀看人數',
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .center,
+                                                                      style: TextStyle(
+                                                                          color: Colors
+                                                                              .white,
+                                                                          fontWeight:
+                                                                              FontWeight.w700),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            Expanded(
+                                                              child: Column(
+                                                                mainAxisSize:
+                                                                    MainAxisSize
+                                                                        .max,
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceBetween,
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .center,
+                                                                children: [
+                                                                  Padding(
+                                                                    padding: EdgeInsetsDirectional
+                                                                        .fromSTEB(
+                                                                            10,
+                                                                            10,
+                                                                            0,
+                                                                            0),
+                                                                    child: Text(
+                                                                      '${value.mymission_ilaunch_streaming_list[index].title}',
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .start,
+                                                                      style: TextStyle(
+                                                                          color: Colors
+                                                                              .white,
+                                                                          fontSize:
+                                                                              20,
+                                                                          fontWeight:
+                                                                              FontWeight.w700),
+                                                                    ),
+                                                                  ),
+                                                                  Padding(
+                                                                    padding: EdgeInsetsDirectional
+                                                                        .fromSTEB(
+                                                                            10,
+                                                                            0,
+                                                                            0,
+                                                                            0),
+                                                                    child: Text(
+                                                                      '${value.mymission_ilaunch_streaming_list[index].content}',
+                                                                      style: TextStyle(
+                                                                          color: Colors
+                                                                              .grey,
+                                                                          fontSize:
+                                                                              14,
+                                                                          fontWeight:
+                                                                              FontWeight.w700),
+                                                                    ),
+                                                                  ),
+                                                                  Padding(
+                                                                    padding: EdgeInsetsDirectional
+                                                                        .fromSTEB(
+                                                                            0,
+                                                                            0,
+                                                                            10,
+                                                                            0),
+                                                                    child: Text(
+                                                                      '懸賞獎金\$${value.mymission_ilaunch_streaming_list[index].price}',
+                                                                      style: TextStyle(
+                                                                          color:
+                                                                              spy_mission_money,
+                                                                          fontSize:
+                                                                              16,
+                                                                          fontWeight:
+                                                                              FontWeight.w700),
+                                                                    ),
+                                                                  ),
+                                                                  Row(
+                                                                    mainAxisSize:
+                                                                        MainAxisSize
+                                                                            .max,
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .end,
+                                                                    children: [
+                                                                      Container(
+                                                                        width:
+                                                                            100,
+                                                                        height:
+                                                                            30,
+                                                                        decoration: BoxDecoration(
+                                                                            borderRadius: BorderRadius.only(
+                                                                              bottomLeft: Radius.circular(0),
+                                                                              bottomRight: Radius.circular(12),
+                                                                              topLeft: Radius.circular(12),
+                                                                              topRight: Radius.circular(0),
+                                                                            ),
+                                                                            gradient: LinearGradient(colors: [
+                                                                              spy_gradient_light_blue,
+                                                                              spy_gradient_light_purple,
+                                                                            ])),
+                                                                        child:
+                                                                            Padding(
+                                                                          padding: EdgeInsetsDirectional.fromSTEB(
+                                                                              0,
+                                                                              5,
+                                                                              0,
+                                                                              0),
+                                                                          child:
+                                                                              Text(
+                                                                            '立即觀看',
+                                                                            textAlign:
+                                                                                TextAlign.center,
+                                                                            style:
+                                                                                TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  MissionDetailPage(
+                                                                      ThisMission:
+                                                                          value.mymission_ilaunch_streaming_list[
+                                                                              index])));
+                                                    },
+                                                  ),
+                                                );
+                                              },
+                                              separatorBuilder:
+                                                  (context, index) {
+                                                return Container(
+                                                  height: 5,
+                                                );
+                                              },
+                                              itemCount: value
+                                                  .mymission_ilaunch_startyet_list
+                                                  .length,
+                                            )
+                                          : Center(
+                                              child: Text(
+                                                '目前沒有在直播中的任務',
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              ),
+                                            )
+                                      : Center(
+                                          child: Text(
+                                            '任務加載中',
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ),
+                                        );
+                                }),
+                                // 未進行
+                                Consumer<ChatProvider>(
+                                    builder: (context, value, child) {
+                                  return value.mymission_ilaunch_startyet_list !=
+                                          null
+                                      ? value.mymission_ilaunch_startyet_list
+                                              .isNotEmpty
+                                          ? ListView.separated(
+                                              itemBuilder: (context, index) {
+                                                return Padding(
+                                                  padding: EdgeInsetsDirectional
+                                                      .fromSTEB(16, 8, 16, 0),
+                                                  child: GestureDetector(
+                                                    child: Container(
+                                                      width: double.infinity,
+                                                      height: 150,
+                                                      decoration: BoxDecoration(
+                                                          color:
+                                                              spy_card_background,
+                                                          boxShadow: [
+                                                            BoxShadow(
+                                                              blurRadius: 2,
+                                                              color: index %
+                                                                          2 ==
+                                                                      0
+                                                                  ? Color(
+                                                                      0xff00CCFF)
+                                                                  : Color(
+                                                                      0xff9900CC),
+                                                              offset: Offset(
+                                                                  index % 2 == 0
+                                                                      ? 2
+                                                                      : -2,
+                                                                  0),
+                                                            )
+                                                          ],
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(12),
+                                                          border: Border.all(
+                                                              width: 1,
+                                                              color:
+                                                                  spy_card_border_background)),
+                                                      child: Padding(
+                                                        padding:
+                                                            EdgeInsetsDirectional
+                                                                .fromSTEB(15, 8,
+                                                                    15, 0),
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Row(
                                                               mainAxisAlignment:
                                                                   MainAxisAlignment
                                                                       .spaceBetween,
@@ -292,11 +522,11 @@ class _MyMissionState extends State<MyMission> {
                                                                   padding: EdgeInsetsDirectional
                                                                       .fromSTEB(
                                                                           10,
-                                                                          10,
+                                                                          0,
                                                                           0,
                                                                           0),
                                                                   child: Text(
-                                                                    'title',
+                                                                    '${value.mymission_ilaunch_startyet_list[index].title}',
                                                                     textAlign:
                                                                         TextAlign
                                                                             .start,
@@ -304,101 +534,79 @@ class _MyMissionState extends State<MyMission> {
                                                                         color: Colors
                                                                             .white,
                                                                         fontSize:
-                                                                            20,
+                                                                            18,
                                                                         fontWeight:
                                                                             FontWeight.w700),
                                                                   ),
                                                                 ),
-                                                                Padding(
-                                                                  padding: EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          10,
-                                                                          0,
-                                                                          0,
-                                                                          0),
-                                                                  child: Text(
-                                                                    '任務內容',
-                                                                    style: TextStyle(
-                                                                        color: Colors
-                                                                            .grey,
-                                                                        fontSize:
-                                                                            14,
-                                                                        fontWeight:
-                                                                            FontWeight.w700),
-                                                                  ),
-                                                                ),
-                                                                Padding(
-                                                                  padding: EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          0,
-                                                                          0,
-                                                                          10,
-                                                                          0),
-                                                                  child: Text(
-                                                                    '懸賞獎金\$6666666',
-                                                                    style: TextStyle(
-                                                                        color:
-                                                                            spy_mission_money,
-                                                                        fontSize:
-                                                                            16,
-                                                                        fontWeight:
-                                                                            FontWeight.w700),
-                                                                  ),
-                                                                ),
-                                                                Row(
-                                                                  mainAxisSize:
-                                                                      MainAxisSize
-                                                                          .max,
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .end,
-                                                                  children: [
-                                                                    Container(
-                                                                      width:
-                                                                          100,
-                                                                      height:
-                                                                          30,
-                                                                      decoration: BoxDecoration(
-                                                                          borderRadius: BorderRadius.only(
-                                                                            bottomLeft:
-                                                                                Radius.circular(0),
-                                                                            bottomRight:
-                                                                                Radius.circular(12),
-                                                                            topLeft:
-                                                                                Radius.circular(12),
-                                                                            topRight:
-                                                                                Radius.circular(0),
-                                                                          ),
-                                                                          gradient: LinearGradient(colors: [
+                                                                Container(
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                          borderRadius: BorderRadius.circular(
+                                                                              20),
+                                                                          gradient:
+                                                                              LinearGradient(colors: [
                                                                             spy_gradient_light_blue,
                                                                             spy_gradient_light_purple,
                                                                           ])),
-                                                                      child:
-                                                                          Padding(
-                                                                        padding: EdgeInsetsDirectional.fromSTEB(
-                                                                            0,
-                                                                            5,
-                                                                            0,
-                                                                            0),
-                                                                        child:
-                                                                            Text(
-                                                                          '立即觀看',
-                                                                          textAlign:
-                                                                              TextAlign.center,
-                                                                          style: TextStyle(
-                                                                              color: Colors.white,
-                                                                              fontWeight: FontWeight.w700),
-                                                                        ),
-                                                                      ),
+                                                                  child:
+                                                                      Padding(
+                                                                    padding: EdgeInsets.symmetric(
+                                                                        vertical:
+                                                                            7,
+                                                                        horizontal:
+                                                                            30),
+                                                                    child: Text(
+                                                                      '跟TA聊聊',
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .center,
+                                                                      style: TextStyle(
+                                                                          fontSize:
+                                                                              16,
+                                                                          color: Colors
+                                                                              .white,
+                                                                          fontWeight:
+                                                                              FontWeight.w700),
                                                                     ),
-                                                                  ],
+                                                                  ),
                                                                 ),
                                                               ],
                                                             ),
-                                                          ),
-                                                        ],
+                                                            Padding(
+                                                              padding:
+                                                                  EdgeInsetsDirectional
+                                                                      .fromSTEB(
+                                                                          10,
+                                                                          20,
+                                                                          0,
+                                                                          0),
+                                                              child: Text(
+                                                                '${value.mymission_ilaunch_startyet_list[index].content}',
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .white,
+                                                                    fontSize:
+                                                                        14,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w700),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
                                                       ),
                                                     ),
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  MissionDetailPage(
+                                                                      ThisMission:
+                                                                          value.mymission_ilaunch_startyet_list[
+                                                                              index])));
+                                                    },
                                                   ),
                                                 );
                                               },
@@ -409,7 +617,7 @@ class _MyMissionState extends State<MyMission> {
                                                 );
                                               },
                                               itemCount: value
-                                                  .mymission_icatch_startyet_list
+                                                  .mymission_ilaunch_startyet_list
                                                   .length,
                                             )
                                           : Center(
@@ -427,144 +635,156 @@ class _MyMissionState extends State<MyMission> {
                                           ),
                                         );
                                 }),
+                                // 未接取
                                 Consumer<ChatProvider>(
                                     builder: (context, value, child) {
-                                  return value.mymission_icatch_applied_list !=
+                                  return value.mymission_ilaunch_notcatched_list !=
                                           null
-                                      ? value.mymission_icatch_applied_list
+                                      ? value.mymission_ilaunch_notcatched_list
                                               .isNotEmpty
                                           ? ListView.separated(
                                               itemBuilder: (context, index) {
                                                 return Padding(
                                                   padding: EdgeInsetsDirectional
                                                       .fromSTEB(16, 8, 16, 0),
-                                                  child: Container(
-                                                    width: double.infinity,
-                                                    height: 150,
-                                                    decoration: BoxDecoration(
-                                                        color:
-                                                            spy_card_background,
-                                                        boxShadow: [
-                                                          BoxShadow(
-                                                            blurRadius: 2,
-                                                            color: index % 2 ==
-                                                                    0
-                                                                ? Color(
-                                                                    0xff00CCFF)
-                                                                : Color(
-                                                                    0xff9900CC),
-                                                            offset: Offset(
-                                                                index % 2 == 0
-                                                                    ? 2
-                                                                    : -2,
-                                                                0),
-                                                          )
-                                                        ],
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(12),
-                                                        border: Border.all(
-                                                            width: 1,
-                                                            color:
-                                                                spy_card_border_background)),
-                                                    child: Padding(
-                                                      padding:
-                                                          EdgeInsetsDirectional
-                                                              .fromSTEB(
-                                                                  15, 8, 15, 0),
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceBetween,
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              Padding(
-                                                                padding:
-                                                                    EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            10,
-                                                                            0,
-                                                                            0,
-                                                                            0),
-                                                                child: Text(
-                                                                  '任務標題',
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .start,
-                                                                  style: TextStyle(
-                                                                      color: Colors
-                                                                          .white,
-                                                                      fontSize:
-                                                                          18,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w700),
-                                                                ),
-                                                              ),
-                                                              Container(
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(
-                                                                                20),
-                                                                        gradient:
-                                                                            LinearGradient(colors: [
-                                                                          spy_gradient_light_blue,
-                                                                          spy_gradient_light_purple,
-                                                                        ])),
-                                                                child: Padding(
-                                                                  padding: EdgeInsets
-                                                                      .symmetric(
-                                                                          vertical:
-                                                                              7,
-                                                                          horizontal:
-                                                                              30),
+                                                  child: GestureDetector(
+                                                    child: Container(
+                                                      width: double.infinity,
+                                                      height: 150,
+                                                      decoration: BoxDecoration(
+                                                          color:
+                                                              spy_card_background,
+                                                          boxShadow: [
+                                                            BoxShadow(
+                                                              blurRadius: 2,
+                                                              color: index %
+                                                                          2 ==
+                                                                      0
+                                                                  ? Color(
+                                                                      0xff00CCFF)
+                                                                  : Color(
+                                                                      0xff9900CC),
+                                                              offset: Offset(
+                                                                  index % 2 == 0
+                                                                      ? 2
+                                                                      : -2,
+                                                                  0),
+                                                            )
+                                                          ],
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(12),
+                                                          border: Border.all(
+                                                              width: 1,
+                                                              color:
+                                                                  spy_card_border_background)),
+                                                      child: Padding(
+                                                        padding:
+                                                            EdgeInsetsDirectional
+                                                                .fromSTEB(15, 8,
+                                                                    15, 0),
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                Padding(
+                                                                  padding: EdgeInsetsDirectional
+                                                                      .fromSTEB(
+                                                                          10,
+                                                                          0,
+                                                                          0,
+                                                                          0),
                                                                   child: Text(
-                                                                    '跟TA聊聊',
+                                                                    '${value.mymission_ilaunch_notcatched_list[index].title}',
                                                                     textAlign:
                                                                         TextAlign
-                                                                            .center,
+                                                                            .start,
                                                                     style: TextStyle(
-                                                                        fontSize:
-                                                                            16,
                                                                         color: Colors
                                                                             .white,
+                                                                        fontSize:
+                                                                            18,
                                                                         fontWeight:
                                                                             FontWeight.w700),
                                                                   ),
                                                                 ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          Padding(
-                                                            padding:
-                                                                EdgeInsetsDirectional
-                                                                    .fromSTEB(
-                                                                        10,
-                                                                        20,
-                                                                        0,
-                                                                        0),
-                                                            child: Text(
-                                                              '任務內容',
-                                                              style: TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  fontSize: 14,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w700),
+                                                                Container(
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                          borderRadius: BorderRadius.circular(
+                                                                              20),
+                                                                          gradient:
+                                                                              LinearGradient(colors: [
+                                                                            spy_gradient_light_blue,
+                                                                            spy_gradient_light_purple,
+                                                                          ])),
+                                                                  child:
+                                                                      Padding(
+                                                                    padding: EdgeInsets.symmetric(
+                                                                        vertical:
+                                                                            7,
+                                                                        horizontal:
+                                                                            30),
+                                                                    child: Text(
+                                                                      '申請列表',
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .center,
+                                                                      style: TextStyle(
+                                                                          fontSize:
+                                                                              16,
+                                                                          color: Colors
+                                                                              .white,
+                                                                          fontWeight:
+                                                                              FontWeight.w700),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ],
                                                             ),
-                                                          ),
-                                                        ],
+                                                            Padding(
+                                                              padding:
+                                                                  EdgeInsetsDirectional
+                                                                      .fromSTEB(
+                                                                          10,
+                                                                          20,
+                                                                          0,
+                                                                          0),
+                                                              child: Text(
+                                                                '${value.mymission_ilaunch_notcatched_list[index].content}',
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .white,
+                                                                    fontSize:
+                                                                        14,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w700),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
                                                       ),
                                                     ),
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  MissionDetailPage(
+                                                                      ThisMission:
+                                                                          value.mymission_ilaunch_notcatched_list[
+                                                                              index])));
+                                                    },
                                                   ),
                                                 );
                                               },
@@ -575,7 +795,7 @@ class _MyMissionState extends State<MyMission> {
                                                 );
                                               },
                                               itemCount: value
-                                                  .mymission_icatch_applied_list
+                                                  .mymission_ilaunch_notcatched_list
                                                   .length,
                                             )
                                           : Center(
@@ -593,144 +813,156 @@ class _MyMissionState extends State<MyMission> {
                                           ),
                                         );
                                 }),
+                                // 已結束
                                 Consumer<ChatProvider>(
                                     builder: (context, value, child) {
-                                  return value.mymission_icatch_success_list !=
+                                  return value.mymission_ilaunch_finish_list !=
                                           null
-                                      ? value.mymission_icatch_success_list
+                                      ? value.mymission_ilaunch_finish_list
                                               .isNotEmpty
                                           ? ListView.separated(
                                               itemBuilder: (context, index) {
                                                 return Padding(
                                                   padding: EdgeInsetsDirectional
                                                       .fromSTEB(16, 8, 16, 0),
-                                                  child: Container(
-                                                    width: double.infinity,
-                                                    height: 150,
-                                                    decoration: BoxDecoration(
-                                                        color:
-                                                            spy_card_background,
-                                                        boxShadow: [
-                                                          BoxShadow(
-                                                            blurRadius: 2,
-                                                            color: index % 2 ==
-                                                                    0
-                                                                ? Color(
-                                                                    0xff00CCFF)
-                                                                : Color(
-                                                                    0xff9900CC),
-                                                            offset: Offset(
-                                                                index % 2 == 0
-                                                                    ? 2
-                                                                    : -2,
-                                                                0),
-                                                          )
-                                                        ],
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(12),
-                                                        border: Border.all(
-                                                            width: 1,
-                                                            color:
-                                                                spy_card_border_background)),
-                                                    child: Padding(
-                                                      padding:
-                                                          EdgeInsetsDirectional
-                                                              .fromSTEB(
-                                                                  15, 8, 15, 0),
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceBetween,
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              Padding(
-                                                                padding:
-                                                                    EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            10,
-                                                                            0,
-                                                                            0,
-                                                                            0),
-                                                                child: Text(
-                                                                  '任務標題',
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .start,
-                                                                  style: TextStyle(
-                                                                      color: Colors
-                                                                          .white,
-                                                                      fontSize:
-                                                                          18,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w700),
-                                                                ),
-                                                              ),
-                                                              Container(
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(
-                                                                                20),
-                                                                        gradient:
-                                                                            LinearGradient(colors: [
-                                                                          spy_gradient_light_blue,
-                                                                          spy_gradient_light_purple,
-                                                                        ])),
-                                                                child: Padding(
-                                                                  padding: EdgeInsets
-                                                                      .symmetric(
-                                                                          vertical:
-                                                                              7,
-                                                                          horizontal:
-                                                                              30),
+                                                  child: GestureDetector(
+                                                    child: Container(
+                                                      width: double.infinity,
+                                                      height: 150,
+                                                      decoration: BoxDecoration(
+                                                          color:
+                                                              spy_card_background,
+                                                          boxShadow: [
+                                                            BoxShadow(
+                                                              blurRadius: 2,
+                                                              color: index %
+                                                                          2 ==
+                                                                      0
+                                                                  ? Color(
+                                                                      0xff00CCFF)
+                                                                  : Color(
+                                                                      0xff9900CC),
+                                                              offset: Offset(
+                                                                  index % 2 == 0
+                                                                      ? 2
+                                                                      : -2,
+                                                                  0),
+                                                            )
+                                                          ],
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(12),
+                                                          border: Border.all(
+                                                              width: 1,
+                                                              color:
+                                                                  spy_card_border_background)),
+                                                      child: Padding(
+                                                        padding:
+                                                            EdgeInsetsDirectional
+                                                                .fromSTEB(15, 8,
+                                                                    15, 0),
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                Padding(
+                                                                  padding: EdgeInsetsDirectional
+                                                                      .fromSTEB(
+                                                                          10,
+                                                                          0,
+                                                                          0,
+                                                                          0),
                                                                   child: Text(
-                                                                    '申請列表',
+                                                                    '${value.mymission_ilaunch_finish_list[index].title}',
                                                                     textAlign:
                                                                         TextAlign
-                                                                            .center,
+                                                                            .start,
                                                                     style: TextStyle(
-                                                                        fontSize:
-                                                                            16,
                                                                         color: Colors
                                                                             .white,
+                                                                        fontSize:
+                                                                            18,
                                                                         fontWeight:
                                                                             FontWeight.w700),
                                                                   ),
                                                                 ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          Padding(
-                                                            padding:
-                                                                EdgeInsetsDirectional
-                                                                    .fromSTEB(
-                                                                        10,
-                                                                        20,
-                                                                        0,
-                                                                        0),
-                                                            child: Text(
-                                                              '任務內容',
-                                                              style: TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  fontSize: 14,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w700),
+                                                                Container(
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                          borderRadius: BorderRadius.circular(
+                                                                              20),
+                                                                          gradient:
+                                                                              LinearGradient(colors: [
+                                                                            spy_gradient_light_blue,
+                                                                            spy_gradient_light_purple,
+                                                                          ])),
+                                                                  child:
+                                                                      Padding(
+                                                                    padding: EdgeInsets.symmetric(
+                                                                        vertical:
+                                                                            7,
+                                                                        horizontal:
+                                                                            30),
+                                                                    child: Text(
+                                                                      '詳細內容',
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .center,
+                                                                      style: TextStyle(
+                                                                          fontSize:
+                                                                              16,
+                                                                          color: Colors
+                                                                              .white,
+                                                                          fontWeight:
+                                                                              FontWeight.w700),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ],
                                                             ),
-                                                          ),
-                                                        ],
+                                                            Padding(
+                                                              padding:
+                                                                  EdgeInsetsDirectional
+                                                                      .fromSTEB(
+                                                                          10,
+                                                                          20,
+                                                                          0,
+                                                                          0),
+                                                              child: Text(
+                                                                '${value.mymission_ilaunch_finish_list[index].content}',
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .white,
+                                                                    fontSize:
+                                                                        14,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w700),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
                                                       ),
                                                     ),
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  MissionDetailPage(
+                                                                      ThisMission:
+                                                                          value.mymission_ilaunch_finish_list[
+                                                                              index])));
+                                                    },
                                                   ),
                                                 );
                                               },
@@ -741,173 +973,7 @@ class _MyMissionState extends State<MyMission> {
                                                 );
                                               },
                                               itemCount: value
-                                                  .mymission_icatch_success_list
-                                                  .length,
-                                            )
-                                          : Center(
-                                              child: Text(
-                                                '目前沒有在直播中的任務',
-                                                style: TextStyle(
-                                                    color: Colors.white),
-                                              ),
-                                            )
-                                      : Center(
-                                          child: Text(
-                                            '任務加載中',
-                                            style:
-                                                TextStyle(color: Colors.white),
-                                          ),
-                                        );
-                                }),
-                                Consumer<ChatProvider>(
-                                    builder: (context, value, child) {
-                                  return value.mymission_icatch_fail_list !=
-                                          null
-                                      ? value.mymission_icatch_fail_list
-                                              .isNotEmpty
-                                          ? ListView.separated(
-                                              itemBuilder: (context, index) {
-                                                return Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(16, 8, 16, 0),
-                                                  child: Container(
-                                                    width: double.infinity,
-                                                    height: 150,
-                                                    decoration: BoxDecoration(
-                                                        color:
-                                                            spy_card_background,
-                                                        boxShadow: [
-                                                          BoxShadow(
-                                                            blurRadius: 2,
-                                                            color: index % 2 ==
-                                                                    0
-                                                                ? Color(
-                                                                    0xff00CCFF)
-                                                                : Color(
-                                                                    0xff9900CC),
-                                                            offset: Offset(
-                                                                index % 2 == 0
-                                                                    ? 2
-                                                                    : -2,
-                                                                0),
-                                                          )
-                                                        ],
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(12),
-                                                        border: Border.all(
-                                                            width: 1,
-                                                            color:
-                                                                spy_card_border_background)),
-                                                    child: Padding(
-                                                      padding:
-                                                          EdgeInsetsDirectional
-                                                              .fromSTEB(
-                                                                  15, 8, 15, 0),
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceBetween,
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              Padding(
-                                                                padding:
-                                                                    EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            10,
-                                                                            0,
-                                                                            0,
-                                                                            0),
-                                                                child: Text(
-                                                                  '任務標題',
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .start,
-                                                                  style: TextStyle(
-                                                                      color: Colors
-                                                                          .white,
-                                                                      fontSize:
-                                                                          18,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w700),
-                                                                ),
-                                                              ),
-                                                              Container(
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(
-                                                                                20),
-                                                                        gradient:
-                                                                            LinearGradient(colors: [
-                                                                          spy_gradient_light_blue,
-                                                                          spy_gradient_light_purple,
-                                                                        ])),
-                                                                child: Padding(
-                                                                  padding: EdgeInsets
-                                                                      .symmetric(
-                                                                          vertical:
-                                                                              7,
-                                                                          horizontal:
-                                                                              30),
-                                                                  child: Text(
-                                                                    '詳細內容',
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .center,
-                                                                    style: TextStyle(
-                                                                        fontSize:
-                                                                            16,
-                                                                        color: Colors
-                                                                            .white,
-                                                                        fontWeight:
-                                                                            FontWeight.w700),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          Padding(
-                                                            padding:
-                                                                EdgeInsetsDirectional
-                                                                    .fromSTEB(
-                                                                        10,
-                                                                        20,
-                                                                        0,
-                                                                        0),
-                                                            child: Text(
-                                                              '任務內容',
-                                                              style: TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  fontSize: 14,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w700),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                              separatorBuilder:
-                                                  (context, index) {
-                                                return Container(
-                                                  height: 5,
-                                                );
-                                              },
-                                              itemCount: value
-                                                  .mymission_icatch_fail_list
+                                                  .mymission_ilaunch_finish_list
                                                   .length,
                                             )
                                           : Center(
@@ -933,6 +999,7 @@ class _MyMissionState extends State<MyMission> {
                             child: TabBarView(
                               controller: _tabController,
                               children: [
+                                //未進行
                                 Consumer<ChatProvider>(
                                     builder: (context, value, child) {
                                   return value.mymission_icatch_startyet_list !=
@@ -944,124 +1011,307 @@ class _MyMissionState extends State<MyMission> {
                                                 return Padding(
                                                   padding: EdgeInsetsDirectional
                                                       .fromSTEB(16, 8, 16, 0),
-                                                  child: Container(
-                                                    width: double.infinity,
-                                                    height: 150,
-                                                    decoration: BoxDecoration(
-                                                        color:
-                                                            spy_card_background,
-                                                        boxShadow: [
-                                                          BoxShadow(
-                                                            blurRadius: 2,
-                                                            color: index % 2 ==
-                                                                    0
-                                                                ? Color(
-                                                                    0xff00CCFF)
-                                                                : Color(
-                                                                    0xff9900CC),
-                                                            offset: Offset(
-                                                                index % 2 == 0
-                                                                    ? 2
-                                                                    : -2,
-                                                                0),
-                                                          )
-                                                        ],
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(12),
-                                                        border: Border.all(
-                                                            width: 1,
-                                                            color:
-                                                                spy_card_border_background)),
-                                                    child: Padding(
-                                                      padding:
-                                                          EdgeInsetsDirectional
-                                                              .fromSTEB(
-                                                                  0, 8, 0, 0),
-                                                      child: Row(
-                                                        mainAxisSize:
-                                                            MainAxisSize.max,
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Column(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .max,
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceBetween,
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              Padding(
-                                                                padding:
-                                                                    EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            16,
-                                                                            0,
-                                                                            0,
-                                                                            0),
-                                                                child: Image
-                                                                    .network(
-                                                                  'https://picsum.photos/seed/556/600',
-                                                                  width: 100,
-                                                                  height: 100,
-                                                                  fit: BoxFit
-                                                                      .cover,
-                                                                ),
-                                                              ),
-                                                              Container(
-                                                                width: 100,
-                                                                height: 30,
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                        borderRadius:
-                                                                            BorderRadius
-                                                                                .only(
-                                                                          bottomLeft:
-                                                                              Radius.circular(12),
-                                                                          bottomRight:
-                                                                              Radius.circular(0),
-                                                                          topLeft:
-                                                                              Radius.circular(0),
-                                                                          topRight:
-                                                                              Radius.circular(12),
-                                                                        ),
-                                                                        gradient:
-                                                                            LinearGradient(colors: [
-                                                                          spy_gradient_light_blue,
-                                                                          spy_gradient_light_purple,
-                                                                        ])),
-                                                                child: Padding(
-                                                                  padding: EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          0,
-                                                                          5,
-                                                                          0,
-                                                                          0),
-                                                                  child: Text(
-                                                                    '觀看人數',
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .center,
-                                                                    style: TextStyle(
-                                                                        color: Colors
-                                                                            .white,
-                                                                        fontWeight:
-                                                                            FontWeight.w700),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          Expanded(
-                                                            child: Column(
-                                                              mainAxisSize:
-                                                                  MainAxisSize
-                                                                      .max,
+                                                  child:
+
+                                                      // GestureDetector(
+                                                      //   child: Container(
+                                                      //     width: double.infinity,
+                                                      //     height: 150,
+                                                      //     decoration: BoxDecoration(
+                                                      //         color:
+                                                      //             spy_card_background,
+                                                      //         boxShadow: [
+                                                      //           BoxShadow(
+                                                      //             blurRadius: 2,
+                                                      //             color: index %
+                                                      //                         2 ==
+                                                      //                     0
+                                                      //                 ? Color(
+                                                      //                     0xff00CCFF)
+                                                      //                 : Color(
+                                                      //                     0xff9900CC),
+                                                      //             offset: Offset(
+                                                      //                 index % 2 == 0
+                                                      //                     ? 2
+                                                      //                     : -2,
+                                                      //                 0),
+                                                      //           )
+                                                      //         ],
+                                                      //         borderRadius:
+                                                      //             BorderRadius
+                                                      //                 .circular(12),
+                                                      //         border: Border.all(
+                                                      //             width: 1,
+                                                      //             color:
+                                                      //                 spy_card_border_background)),
+                                                      //     child: Padding(
+                                                      //       padding:
+                                                      //           EdgeInsetsDirectional
+                                                      //               .fromSTEB(
+                                                      //                   0, 8, 0, 0),
+                                                      //       child: Row(
+                                                      //         mainAxisSize:
+                                                      //             MainAxisSize.max,
+                                                      //         crossAxisAlignment:
+                                                      //             CrossAxisAlignment
+                                                      //                 .start,
+                                                      //         children: [
+                                                      //           Column(
+                                                      //             mainAxisSize:
+                                                      //                 MainAxisSize
+                                                      //                     .max,
+                                                      //             mainAxisAlignment:
+                                                      //                 MainAxisAlignment
+                                                      //                     .spaceBetween,
+                                                      //             crossAxisAlignment:
+                                                      //                 CrossAxisAlignment
+                                                      //                     .start,
+                                                      //             children: [
+                                                      //               Padding(
+                                                      //                 padding: EdgeInsetsDirectional
+                                                      //                     .fromSTEB(
+                                                      //                         16,
+                                                      //                         0,
+                                                      //                         0,
+                                                      //                         0),
+                                                      //                 child: Image
+                                                      //                     .network(
+                                                      //                   'https://picsum.photos/seed/556/600',
+                                                      //                   width: 100,
+                                                      //                   height: 100,
+                                                      //                   fit: BoxFit
+                                                      //                       .cover,
+                                                      //                 ),
+                                                      //               ),
+                                                      //               Container(
+                                                      //                 width: 100,
+                                                      //                 height: 30,
+                                                      //                 decoration:
+                                                      //                     BoxDecoration(
+                                                      //                         borderRadius: BorderRadius
+                                                      //                             .only(
+                                                      //                           bottomLeft:
+                                                      //                               Radius.circular(12),
+                                                      //                           bottomRight:
+                                                      //                               Radius.circular(0),
+                                                      //                           topLeft:
+                                                      //                               Radius.circular(0),
+                                                      //                           topRight:
+                                                      //                               Radius.circular(12),
+                                                      //                         ),
+                                                      //                         gradient:
+                                                      //                             LinearGradient(colors: [
+                                                      //                           spy_gradient_light_blue,
+                                                      //                           spy_gradient_light_purple,
+                                                      //                         ])),
+                                                      //                 child:
+                                                      //                     Padding(
+                                                      //                   padding: EdgeInsetsDirectional
+                                                      //                       .fromSTEB(
+                                                      //                           0,
+                                                      //                           5,
+                                                      //                           0,
+                                                      //                           0),
+                                                      //                   child: Text(
+                                                      //                     '觀看人數',
+                                                      //                     textAlign:
+                                                      //                         TextAlign
+                                                      //                             .center,
+                                                      //                     style: TextStyle(
+                                                      //                         color: Colors
+                                                      //                             .white,
+                                                      //                         fontWeight:
+                                                      //                             FontWeight.w700),
+                                                      //                   ),
+                                                      //                 ),
+                                                      //               ),
+                                                      //             ],
+                                                      //           ),
+                                                      //           Expanded(
+                                                      //             child: Column(
+                                                      //               mainAxisSize:
+                                                      //                   MainAxisSize
+                                                      //                       .max,
+                                                      //               mainAxisAlignment:
+                                                      //                   MainAxisAlignment
+                                                      //                       .spaceBetween,
+                                                      //               crossAxisAlignment:
+                                                      //                   CrossAxisAlignment
+                                                      //                       .center,
+                                                      //               children: [
+                                                      //                 Padding(
+                                                      //                   padding: EdgeInsetsDirectional
+                                                      //                       .fromSTEB(
+                                                      //                           10,
+                                                      //                           10,
+                                                      //                           0,
+                                                      //                           0),
+                                                      //                   child: Text(
+                                                      //                     '${value.mymission_icatch_startyet_list[index].title}',
+                                                      //                     textAlign:
+                                                      //                         TextAlign
+                                                      //                             .start,
+                                                      //                     style: TextStyle(
+                                                      //                         color: Colors
+                                                      //                             .white,
+                                                      //                         fontSize:
+                                                      //                             20,
+                                                      //                         fontWeight:
+                                                      //                             FontWeight.w700),
+                                                      //                   ),
+                                                      //                 ),
+                                                      //                 Padding(
+                                                      //                   padding: EdgeInsetsDirectional
+                                                      //                       .fromSTEB(
+                                                      //                           10,
+                                                      //                           0,
+                                                      //                           0,
+                                                      //                           0),
+                                                      //                   child:
+                                                      //                       Container(
+                                                      //                     height:
+                                                      //                         40,
+                                                      //                     width:
+                                                      //                         180,
+                                                      //                     child:
+                                                      //                         RichText(
+                                                      //                       overflow:
+                                                      //                           TextOverflow.ellipsis,
+                                                      //                       strutStyle:
+                                                      //                           StrutStyle(fontSize: 12.0),
+                                                      //                       text:
+                                                      //                           TextSpan(
+                                                      //                         style: TextStyle(
+                                                      //                             color: Colors.grey,
+                                                      //                             fontSize: 14,
+                                                      //                             fontWeight: FontWeight.w700),
+                                                      //                         text:
+                                                      //                             '${value.mymission_icatch_startyet_list[index].content}',
+                                                      //                       ),
+                                                      //                     ),
+                                                      //                   ),
+                                                      //                 ),
+                                                      //                 Padding(
+                                                      //                   padding: EdgeInsetsDirectional
+                                                      //                       .fromSTEB(
+                                                      //                           0,
+                                                      //                           0,
+                                                      //                           10,
+                                                      //                           0),
+                                                      //                   child: Text(
+                                                      //                     '懸賞獎金\$${value.mymission_icatch_startyet_list[index].price}',
+                                                      //                     style: TextStyle(
+                                                      //                         color:
+                                                      //                             spy_mission_money,
+                                                      //                         fontSize:
+                                                      //                             16,
+                                                      //                         fontWeight:
+                                                      //                             FontWeight.w700),
+                                                      //                   ),
+                                                      //                 ),
+                                                      //                 Row(
+                                                      //                   mainAxisSize:
+                                                      //                       MainAxisSize
+                                                      //                           .max,
+                                                      //                   mainAxisAlignment:
+                                                      //                       MainAxisAlignment
+                                                      //                           .end,
+                                                      //                   children: [
+                                                      //                     Container(
+                                                      //                       width:
+                                                      //                           100,
+                                                      //                       height:
+                                                      //                           30,
+                                                      //                       decoration: BoxDecoration(
+                                                      //                           borderRadius: BorderRadius.only(
+                                                      //                             bottomLeft: Radius.circular(0),
+                                                      //                             bottomRight: Radius.circular(12),
+                                                      //                             topLeft: Radius.circular(12),
+                                                      //                             topRight: Radius.circular(0),
+                                                      //                           ),
+                                                      //                           gradient: LinearGradient(colors: [
+                                                      //                             spy_gradient_light_blue,
+                                                      //                             spy_gradient_light_purple,
+                                                      //                           ])),
+                                                      //                       child:
+                                                      //                           Padding(
+                                                      //                         padding: EdgeInsetsDirectional.fromSTEB(
+                                                      //                             0,
+                                                      //                             5,
+                                                      //                             0,
+                                                      //                             0),
+                                                      //                         child:
+                                                      //                             Text(
+                                                      //                           '立即觀看',
+                                                      //                           textAlign:
+                                                      //                               TextAlign.center,
+                                                      //                           style:
+                                                      //                               TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                                                      //                         ),
+                                                      //                       ),
+                                                      //                     ),
+                                                      //                   ],
+                                                      //                 ),
+                                                      //               ],
+                                                      //             ),
+                                                      //           ),
+                                                      //         ],
+                                                      //       ),
+                                                      //     ),
+                                                      //   ),
+                                                      //   onTap: () {
+                                                      //     Navigator.push(
+                                                      //         context,
+                                                      //         MaterialPageRoute(
+                                                      //             builder: (context) =>
+                                                      //                 MissionDetailPage(
+                                                      //                     ThisMission:
+                                                      //                         value.mymission_icatch_startyet_list[
+                                                      //                             index])));
+                                                      //   },
+                                                      // ),
+                                                      GestureDetector(
+                                                    child: Container(
+                                                      width: double.infinity,
+                                                      height: 150,
+                                                      decoration: BoxDecoration(
+                                                          color:
+                                                              spy_card_background,
+                                                          boxShadow: [
+                                                            BoxShadow(
+                                                              blurRadius: 2,
+                                                              color: index %
+                                                                          2 ==
+                                                                      0
+                                                                  ? Color(
+                                                                      0xff00CCFF)
+                                                                  : Color(
+                                                                      0xff9900CC),
+                                                              offset: Offset(
+                                                                  index % 2 == 0
+                                                                      ? 2
+                                                                      : -2,
+                                                                  0),
+                                                            )
+                                                          ],
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(12),
+                                                          border: Border.all(
+                                                              width: 1,
+                                                              color:
+                                                                  spy_card_border_background)),
+                                                      child: Padding(
+                                                        padding:
+                                                            EdgeInsetsDirectional
+                                                                .fromSTEB(15, 8,
+                                                                    15, 0),
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Row(
                                                               mainAxisAlignment:
                                                                   MainAxisAlignment
                                                                       .spaceBetween,
@@ -1073,7 +1323,7 @@ class _MyMissionState extends State<MyMission> {
                                                                   padding: EdgeInsetsDirectional
                                                                       .fromSTEB(
                                                                           10,
-                                                                          10,
+                                                                          0,
                                                                           0,
                                                                           0),
                                                                   child: Text(
@@ -1085,117 +1335,93 @@ class _MyMissionState extends State<MyMission> {
                                                                         color: Colors
                                                                             .white,
                                                                         fontSize:
-                                                                            20,
+                                                                            18,
                                                                         fontWeight:
                                                                             FontWeight.w700),
                                                                   ),
                                                                 ),
-                                                                Padding(
-                                                                  padding: EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          10,
-                                                                          0,
-                                                                          0,
-                                                                          0),
-                                                                  child:
-                                                                      Container(
-                                                                    height: 40,
-                                                                    width: 180,
-                                                                    child:
-                                                                        RichText(
-                                                                      overflow:
-                                                                          TextOverflow
-                                                                              .ellipsis,
-                                                                      strutStyle:
-                                                                          StrutStyle(
-                                                                              fontSize: 12.0),
-                                                                      text:
-                                                                          TextSpan(
-                                                                        style: TextStyle(
-                                                                            color: Colors
-                                                                                .grey,
-                                                                            fontSize:
-                                                                                14,
-                                                                            fontWeight:
-                                                                                FontWeight.w700),
-                                                                        text:
-                                                                            '${value.mymission_icatch_startyet_list[index].content}',
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                                Padding(
-                                                                  padding: EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          0,
-                                                                          0,
-                                                                          10,
-                                                                          0),
-                                                                  child: Text(
-                                                                    '懸賞獎金\$${value.mymission_icatch_startyet_list[index].price}',
-                                                                    style: TextStyle(
-                                                                        color:
-                                                                            spy_mission_money,
-                                                                        fontSize:
-                                                                            16,
-                                                                        fontWeight:
-                                                                            FontWeight.w700),
-                                                                  ),
-                                                                ),
-                                                                Row(
-                                                                  mainAxisSize:
-                                                                      MainAxisSize
-                                                                          .max,
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .end,
-                                                                  children: [
-                                                                    Container(
-                                                                      width:
-                                                                          100,
-                                                                      height:
-                                                                          30,
-                                                                      decoration: BoxDecoration(
-                                                                          borderRadius: BorderRadius.only(
-                                                                            bottomLeft:
-                                                                                Radius.circular(0),
-                                                                            bottomRight:
-                                                                                Radius.circular(12),
-                                                                            topLeft:
-                                                                                Radius.circular(12),
-                                                                            topRight:
-                                                                                Radius.circular(0),
-                                                                          ),
-                                                                          gradient: LinearGradient(colors: [
+                                                                Container(
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                          borderRadius: BorderRadius.circular(
+                                                                              20),
+                                                                          gradient:
+                                                                              LinearGradient(colors: [
                                                                             spy_gradient_light_blue,
                                                                             spy_gradient_light_purple,
                                                                           ])),
-                                                                      child:
-                                                                          Padding(
-                                                                        padding: EdgeInsetsDirectional.fromSTEB(
-                                                                            0,
-                                                                            5,
-                                                                            0,
-                                                                            0),
-                                                                        child:
-                                                                            Text(
-                                                                          '立即觀看',
-                                                                          textAlign:
-                                                                              TextAlign.center,
-                                                                          style: TextStyle(
-                                                                              color: Colors.white,
-                                                                              fontWeight: FontWeight.w700),
-                                                                        ),
-                                                                      ),
+                                                                  child:
+                                                                      Padding(
+                                                                    padding: EdgeInsets.symmetric(
+                                                                        vertical:
+                                                                            7,
+                                                                        horizontal:
+                                                                            30),
+                                                                    child: Text(
+                                                                      '立即開播',
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .center,
+                                                                      style: TextStyle(
+                                                                          fontSize:
+                                                                              16,
+                                                                          color: Colors
+                                                                              .white,
+                                                                          fontWeight:
+                                                                              FontWeight.w700),
                                                                     ),
-                                                                  ],
+                                                                  ),
                                                                 ),
                                                               ],
                                                             ),
-                                                          ),
-                                                        ],
+                                                            Padding(
+                                                              padding:
+                                                                  EdgeInsetsDirectional
+                                                                      .fromSTEB(
+                                                                          10,
+                                                                          20,
+                                                                          0,
+                                                                          0),
+                                                              child: Container(
+                                                                height: 40,
+                                                                width: 300,
+                                                                child: RichText(
+                                                                  overflow:
+                                                                      TextOverflow
+                                                                          .ellipsis,
+                                                                  strutStyle:
+                                                                      StrutStyle(
+                                                                          fontSize:
+                                                                              12.0),
+                                                                  text:
+                                                                      TextSpan(
+                                                                    style: TextStyle(
+                                                                        color: Colors
+                                                                            .white,
+                                                                        fontSize:
+                                                                            14,
+                                                                        fontWeight:
+                                                                            FontWeight.w700),
+                                                                    text:
+                                                                        '${value.mymission_icatch_startyet_list[index].content}',
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
                                                       ),
                                                     ),
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  MissionDetailPage(
+                                                                      ThisMission:
+                                                                          value.mymission_icatch_startyet_list[
+                                                                              index])));
+                                                    },
                                                   ),
                                                 );
                                               },
@@ -1224,6 +1450,7 @@ class _MyMissionState extends State<MyMission> {
                                           ),
                                         );
                                 }),
+                                // 已申請
                                 Consumer<ChatProvider>(
                                     builder: (context, value, child) {
                                   return value.mymission_icatch_applied_list !=
@@ -1235,148 +1462,176 @@ class _MyMissionState extends State<MyMission> {
                                                 return Padding(
                                                   padding: EdgeInsetsDirectional
                                                       .fromSTEB(16, 8, 16, 0),
-                                                  child: Container(
-                                                    width: double.infinity,
-                                                    height: 150,
-                                                    decoration: BoxDecoration(
-                                                        color:
-                                                            spy_card_background,
-                                                        boxShadow: [
-                                                          BoxShadow(
-                                                            blurRadius: 2,
-                                                            color: index % 2 ==
-                                                                    0
-                                                                ? Color(
-                                                                    0xff00CCFF)
-                                                                : Color(
-                                                                    0xff9900CC),
-                                                            offset: Offset(
-                                                                index % 2 == 0
-                                                                    ? 2
-                                                                    : -2,
-                                                                0),
-                                                          )
-                                                        ],
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(12),
-                                                        border: Border.all(
-                                                            width: 1,
-                                                            color:
-                                                                spy_card_border_background)),
-                                                    child: Padding(
-                                                      padding:
-                                                          EdgeInsetsDirectional
-                                                              .fromSTEB(
-                                                                  15, 8, 15, 0),
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceBetween,
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              Padding(
-                                                                padding:
-                                                                    EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            10,
-                                                                            0,
-                                                                            0,
-                                                                            0),
-                                                                child: Text(
-                                                                  '${value.mymission_icatch_applied_list[index].title}',
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .start,
-                                                                  style: TextStyle(
-                                                                      color: Colors
-                                                                          .white,
-                                                                      fontSize:
-                                                                          18,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w700),
-                                                                ),
-                                                              ),
-                                                              Container(
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(
-                                                                                20),
-                                                                        gradient:
-                                                                            LinearGradient(colors: [
-                                                                          spy_gradient_light_blue,
-                                                                          spy_gradient_light_purple,
-                                                                        ])),
-                                                                child: Padding(
-                                                                  padding: EdgeInsets
-                                                                      .symmetric(
-                                                                          vertical:
-                                                                              7,
-                                                                          horizontal:
-                                                                              30),
+                                                  child: GestureDetector(
+                                                    child: Container(
+                                                      width: double.infinity,
+                                                      height: 150,
+                                                      decoration: BoxDecoration(
+                                                          color:
+                                                              spy_card_background,
+                                                          boxShadow: [
+                                                            BoxShadow(
+                                                              blurRadius: 2,
+                                                              color: index %
+                                                                          2 ==
+                                                                      0
+                                                                  ? Color(
+                                                                      0xff00CCFF)
+                                                                  : Color(
+                                                                      0xff9900CC),
+                                                              offset: Offset(
+                                                                  index % 2 == 0
+                                                                      ? 2
+                                                                      : -2,
+                                                                  0),
+                                                            )
+                                                          ],
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(12),
+                                                          border: Border.all(
+                                                              width: 1,
+                                                              color:
+                                                                  spy_card_border_background)),
+                                                      child: Padding(
+                                                        padding:
+                                                            EdgeInsetsDirectional
+                                                                .fromSTEB(15, 8,
+                                                                    15, 0),
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                Padding(
+                                                                  padding: EdgeInsetsDirectional
+                                                                      .fromSTEB(
+                                                                          10,
+                                                                          0,
+                                                                          0,
+                                                                          0),
                                                                   child: Text(
-                                                                    '跟TA聊聊',
+                                                                    '${value.mymission_icatch_applied_list[index].title}',
                                                                     textAlign:
                                                                         TextAlign
-                                                                            .center,
+                                                                            .start,
                                                                     style: TextStyle(
-                                                                        fontSize:
-                                                                            16,
                                                                         color: Colors
                                                                             .white,
+                                                                        fontSize:
+                                                                            18,
                                                                         fontWeight:
                                                                             FontWeight.w700),
                                                                   ),
                                                                 ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          Padding(
-                                                            padding:
-                                                                EdgeInsetsDirectional
-                                                                    .fromSTEB(
-                                                                        10,
-                                                                        20,
-                                                                        0,
-                                                                        0),
-                                                            child: Container(
-                                                              height: 40,
-                                                              width: 300,
-                                                              child: RichText(
-                                                                overflow:
-                                                                    TextOverflow
-                                                                        .ellipsis,
-                                                                strutStyle:
-                                                                    StrutStyle(
-                                                                        fontSize:
-                                                                            12.0),
-                                                                text: TextSpan(
-                                                                  style: TextStyle(
-                                                                      color: Colors
-                                                                          .white,
-                                                                      fontSize:
-                                                                          14,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w700),
+                                                                GestureDetector(
+                                                                  child: Container(
+                                                                    decoration:
+                                                                        BoxDecoration(
+                                                                            borderRadius: BorderRadius.circular(
+                                                                                20),
+                                                                            gradient:
+                                                                                LinearGradient(colors: [
+                                                                              spy_gradient_light_blue,
+                                                                              spy_gradient_light_purple,
+                                                                            ])),
+                                                                    child:
+                                                                        Padding(
+                                                                      padding: EdgeInsets.symmetric(
+                                                                          vertical:
+                                                                              7,
+                                                                          horizontal:
+                                                                              30),
+                                                                      child: Text(
+                                                                        '跟TA聊聊',
+                                                                        textAlign:
+                                                                            TextAlign
+                                                                                .center,
+                                                                        style: TextStyle(
+                                                                            fontSize:
+                                                                                16,
+                                                                            color: Colors
+                                                                                .white,
+                                                                            fontWeight:
+                                                                                FontWeight.w700),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  onTap: (){
+                                                                    Navigator.push(
+                                                                        context,
+                                                                        MaterialPageRoute(
+                                                                            builder: (context) => O2OChatroom(
+                                                                              memberid: value
+                                                                                  .remoteUserInfo[0]
+                                                                                  .memberid,
+                                                                              chatroomid: value.mymission_icatch_applied_list[index].memberid
+                                                                                  .toHexString(),
+                                                                              nickname: value.mymission_icatch_applied_list[index]
+                                                                                  .nickname,
+                                                                              avatar: value.mymission_icatch_applied_list[index].avatar_sub,
+                                                                              fcmtoken: value.mymission_icatch_applied_list[index].fcmtoken,
+                                                                            )));
+                                                                  },
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            Padding(
+                                                              padding:
+                                                                  EdgeInsetsDirectional
+                                                                      .fromSTEB(
+                                                                          10,
+                                                                          20,
+                                                                          0,
+                                                                          0),
+                                                              child: Container(
+                                                                height: 40,
+                                                                width: 300,
+                                                                child: RichText(
+                                                                  overflow:
+                                                                      TextOverflow
+                                                                          .ellipsis,
+                                                                  strutStyle:
+                                                                      StrutStyle(
+                                                                          fontSize:
+                                                                              12.0),
                                                                   text:
-                                                                      '${value.mymission_icatch_applied_list[index].content}',
+                                                                      TextSpan(
+                                                                    style: TextStyle(
+                                                                        color: Colors
+                                                                            .white,
+                                                                        fontSize:
+                                                                            14,
+                                                                        fontWeight:
+                                                                            FontWeight.w700),
+                                                                    text:
+                                                                        '${value.mymission_icatch_applied_list[index].content}',
+                                                                  ),
                                                                 ),
                                                               ),
                                                             ),
-                                                          ),
-                                                        ],
+                                                          ],
+                                                        ),
                                                       ),
                                                     ),
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  MissionDetailPage(
+                                                                      ThisMission:
+                                                                          value.mymission_icatch_applied_list[
+                                                                              index])));
+                                                    },
                                                   ),
                                                 );
                                               },
@@ -1405,6 +1660,7 @@ class _MyMissionState extends State<MyMission> {
                                           ),
                                         );
                                 }),
+                                // 任務成功
                                 Consumer<ChatProvider>(
                                     builder: (context, value, child) {
                                   return value.mymission_icatch_success_list !=
@@ -1416,148 +1672,158 @@ class _MyMissionState extends State<MyMission> {
                                                 return Padding(
                                                   padding: EdgeInsetsDirectional
                                                       .fromSTEB(16, 8, 16, 0),
-                                                  child: Container(
-                                                    width: double.infinity,
-                                                    height: 150,
-                                                    decoration: BoxDecoration(
-                                                        color:
-                                                            spy_card_background,
-                                                        boxShadow: [
-                                                          BoxShadow(
-                                                            blurRadius: 2,
-                                                            color: index % 2 ==
-                                                                    0
-                                                                ? Color(
-                                                                    0xff00CCFF)
-                                                                : Color(
-                                                                    0xff9900CC),
-                                                            offset: Offset(
-                                                                index % 2 == 0
-                                                                    ? 2
-                                                                    : -2,
-                                                                0),
-                                                          )
-                                                        ],
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(12),
-                                                        border: Border.all(
-                                                            width: 1,
-                                                            color:
-                                                                spy_card_border_background)),
-                                                    child: Padding(
-                                                      padding:
-                                                          EdgeInsetsDirectional
-                                                              .fromSTEB(
-                                                                  15, 8, 15, 0),
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceBetween,
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              Padding(
-                                                                padding:
-                                                                    EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            10,
-                                                                            0,
-                                                                            0,
-                                                                            0),
-                                                                child: Text(
-                                                                  '${value.mymission_icatch_success_list[index].title}',
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .start,
-                                                                  style: TextStyle(
-                                                                      color: Colors
-                                                                          .white,
-                                                                      fontSize:
-                                                                          18,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w700),
-                                                                ),
-                                                              ),
-                                                              Container(
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(
-                                                                                20),
-                                                                        gradient:
-                                                                            LinearGradient(colors: [
-                                                                          spy_gradient_light_blue,
-                                                                          spy_gradient_light_purple,
-                                                                        ])),
-                                                                child: Padding(
-                                                                  padding: EdgeInsets
-                                                                      .symmetric(
-                                                                          vertical:
-                                                                              7,
-                                                                          horizontal:
-                                                                              30),
+                                                  child: GestureDetector(
+                                                    child: Container(
+                                                      width: double.infinity,
+                                                      height: 150,
+                                                      decoration: BoxDecoration(
+                                                          color:
+                                                              spy_card_background,
+                                                          boxShadow: [
+                                                            BoxShadow(
+                                                              blurRadius: 2,
+                                                              color: index %
+                                                                          2 ==
+                                                                      0
+                                                                  ? Color(
+                                                                      0xff00CCFF)
+                                                                  : Color(
+                                                                      0xff9900CC),
+                                                              offset: Offset(
+                                                                  index % 2 == 0
+                                                                      ? 2
+                                                                      : -2,
+                                                                  0),
+                                                            )
+                                                          ],
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(12),
+                                                          border: Border.all(
+                                                              width: 1,
+                                                              color:
+                                                                  spy_card_border_background)),
+                                                      child: Padding(
+                                                        padding:
+                                                            EdgeInsetsDirectional
+                                                                .fromSTEB(15, 8,
+                                                                    15, 0),
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                Padding(
+                                                                  padding: EdgeInsetsDirectional
+                                                                      .fromSTEB(
+                                                                          10,
+                                                                          0,
+                                                                          0,
+                                                                          0),
                                                                   child: Text(
-                                                                    '申請列表',
+                                                                    '${value.mymission_icatch_success_list[index].title}',
                                                                     textAlign:
                                                                         TextAlign
-                                                                            .center,
+                                                                            .start,
                                                                     style: TextStyle(
-                                                                        fontSize:
-                                                                            16,
                                                                         color: Colors
                                                                             .white,
+                                                                        fontSize:
+                                                                            18,
                                                                         fontWeight:
                                                                             FontWeight.w700),
                                                                   ),
                                                                 ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          Padding(
-                                                            padding:
-                                                                EdgeInsetsDirectional
-                                                                    .fromSTEB(
-                                                                        10,
-                                                                        20,
-                                                                        0,
-                                                                        0),
-                                                            child: Container(
-                                                              height: 40,
-                                                              width: 300,
-                                                              child: RichText(
-                                                                overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
-                                                                strutStyle:
-                                                                StrutStyle(
-                                                                    fontSize:
-                                                                    12.0),
-                                                                text: TextSpan(
-                                                                  style: TextStyle(
-                                                                      color: Colors
-                                                                          .white,
-                                                                      fontSize:
-                                                                      14,
-                                                                      fontWeight:
-                                                                      FontWeight
-                                                                          .w700),
+                                                                Container(
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                          borderRadius: BorderRadius.circular(
+                                                                              20),
+                                                                          gradient:
+                                                                              LinearGradient(colors: [
+                                                                            spy_gradient_light_blue,
+                                                                            spy_gradient_light_purple,
+                                                                          ])),
+                                                                  child:
+                                                                      Padding(
+                                                                    padding: EdgeInsets.symmetric(
+                                                                        vertical:
+                                                                            7,
+                                                                        horizontal:
+                                                                            30),
+                                                                    child: Text(
+                                                                      '申請列表',
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .center,
+                                                                      style: TextStyle(
+                                                                          fontSize:
+                                                                              16,
+                                                                          color: Colors
+                                                                              .white,
+                                                                          fontWeight:
+                                                                              FontWeight.w700),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            Padding(
+                                                              padding:
+                                                                  EdgeInsetsDirectional
+                                                                      .fromSTEB(
+                                                                          10,
+                                                                          20,
+                                                                          0,
+                                                                          0),
+                                                              child: Container(
+                                                                height: 40,
+                                                                width: 300,
+                                                                child: RichText(
+                                                                  overflow:
+                                                                      TextOverflow
+                                                                          .ellipsis,
+                                                                  strutStyle:
+                                                                      StrutStyle(
+                                                                          fontSize:
+                                                                              12.0),
                                                                   text:
-                                                                  '${value.mymission_icatch_success_list[index].content}',
+                                                                      TextSpan(
+                                                                    style: TextStyle(
+                                                                        color: Colors
+                                                                            .white,
+                                                                        fontSize:
+                                                                            14,
+                                                                        fontWeight:
+                                                                            FontWeight.w700),
+                                                                    text:
+                                                                        '${value.mymission_icatch_success_list[index].content}',
+                                                                  ),
                                                                 ),
                                                               ),
                                                             ),
-                                                          ),
-                                                        ],
+                                                          ],
+                                                        ),
                                                       ),
                                                     ),
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  MissionDetailPage(
+                                                                      ThisMission:
+                                                                          value.mymission_icatch_success_list[
+                                                                              index])));
+                                                    },
                                                   ),
                                                 );
                                               },
@@ -1586,6 +1852,7 @@ class _MyMissionState extends State<MyMission> {
                                           ),
                                         );
                                 }),
+                                // 任務失敗
                                 Consumer<ChatProvider>(
                                     builder: (context, value, child) {
                                   return value.mymission_icatch_fail_list !=
@@ -1597,148 +1864,158 @@ class _MyMissionState extends State<MyMission> {
                                                 return Padding(
                                                   padding: EdgeInsetsDirectional
                                                       .fromSTEB(16, 8, 16, 0),
-                                                  child: Container(
-                                                    width: double.infinity,
-                                                    height: 150,
-                                                    decoration: BoxDecoration(
-                                                        color:
-                                                            spy_card_background,
-                                                        boxShadow: [
-                                                          BoxShadow(
-                                                            blurRadius: 2,
-                                                            color: index % 2 ==
-                                                                    0
-                                                                ? Color(
-                                                                    0xff00CCFF)
-                                                                : Color(
-                                                                    0xff9900CC),
-                                                            offset: Offset(
-                                                                index % 2 == 0
-                                                                    ? 2
-                                                                    : -2,
-                                                                0),
-                                                          )
-                                                        ],
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(12),
-                                                        border: Border.all(
-                                                            width: 1,
-                                                            color:
-                                                                spy_card_border_background)),
-                                                    child: Padding(
-                                                      padding:
-                                                          EdgeInsetsDirectional
-                                                              .fromSTEB(
-                                                                  15, 8, 15, 0),
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceBetween,
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              Padding(
-                                                                padding:
-                                                                    EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            10,
-                                                                            0,
-                                                                            0,
-                                                                            0),
-                                                                child: Text(
-                                                                  '${value.mymission_icatch_fail_list[index].title}',
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .start,
-                                                                  style: TextStyle(
-                                                                      color: Colors
-                                                                          .white,
-                                                                      fontSize:
-                                                                          18,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w700),
-                                                                ),
-                                                              ),
-                                                              Container(
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(
-                                                                                20),
-                                                                        gradient:
-                                                                            LinearGradient(colors: [
-                                                                          spy_gradient_light_blue,
-                                                                          spy_gradient_light_purple,
-                                                                        ])),
-                                                                child: Padding(
-                                                                  padding: EdgeInsets
-                                                                      .symmetric(
-                                                                          vertical:
-                                                                              7,
-                                                                          horizontal:
-                                                                              30),
+                                                  child: GestureDetector(
+                                                    child: Container(
+                                                      width: double.infinity,
+                                                      height: 150,
+                                                      decoration: BoxDecoration(
+                                                          color:
+                                                              spy_card_background,
+                                                          boxShadow: [
+                                                            BoxShadow(
+                                                              blurRadius: 2,
+                                                              color: index %
+                                                                          2 ==
+                                                                      0
+                                                                  ? Color(
+                                                                      0xff00CCFF)
+                                                                  : Color(
+                                                                      0xff9900CC),
+                                                              offset: Offset(
+                                                                  index % 2 == 0
+                                                                      ? 2
+                                                                      : -2,
+                                                                  0),
+                                                            )
+                                                          ],
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(12),
+                                                          border: Border.all(
+                                                              width: 1,
+                                                              color:
+                                                                  spy_card_border_background)),
+                                                      child: Padding(
+                                                        padding:
+                                                            EdgeInsetsDirectional
+                                                                .fromSTEB(15, 8,
+                                                                    15, 0),
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                Padding(
+                                                                  padding: EdgeInsetsDirectional
+                                                                      .fromSTEB(
+                                                                          10,
+                                                                          0,
+                                                                          0,
+                                                                          0),
                                                                   child: Text(
-                                                                    '詳細內容',
+                                                                    '${value.mymission_icatch_fail_list[index].title}',
                                                                     textAlign:
                                                                         TextAlign
-                                                                            .center,
+                                                                            .start,
                                                                     style: TextStyle(
-                                                                        fontSize:
-                                                                            16,
                                                                         color: Colors
                                                                             .white,
+                                                                        fontSize:
+                                                                            18,
                                                                         fontWeight:
                                                                             FontWeight.w700),
                                                                   ),
                                                                 ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          Padding(
-                                                            padding:
-                                                                EdgeInsetsDirectional
-                                                                    .fromSTEB(
-                                                                        10,
-                                                                        20,
-                                                                        0,
-                                                                        0),
-                                                            child: Container(
-                                                              height: 40,
-                                                              width: 300,
-                                                              child: RichText(
-                                                                overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
-                                                                strutStyle:
-                                                                StrutStyle(
-                                                                    fontSize:
-                                                                    12.0),
-                                                                text: TextSpan(
-                                                                  style: TextStyle(
-                                                                      color: Colors
-                                                                          .white,
-                                                                      fontSize:
-                                                                      14,
-                                                                      fontWeight:
-                                                                      FontWeight
-                                                                          .w700),
-                                                                  text:
-                                                                  '${value.mymission_icatch_fail_list[index].content}',
+                                                                Container(
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                          borderRadius: BorderRadius.circular(
+                                                                              20),
+                                                                          gradient:
+                                                                              LinearGradient(colors: [
+                                                                            spy_gradient_light_blue,
+                                                                            spy_gradient_light_purple,
+                                                                          ])),
+                                                                  child:
+                                                                      Padding(
+                                                                    padding: EdgeInsets.symmetric(
+                                                                        vertical:
+                                                                            7,
+                                                                        horizontal:
+                                                                            30),
+                                                                    child: Text(
+                                                                      '詳細內容',
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .center,
+                                                                      style: TextStyle(
+                                                                          fontSize:
+                                                                              16,
+                                                                          color: Colors
+                                                                              .white,
+                                                                          fontWeight:
+                                                                              FontWeight.w700),
+                                                                    ),
+                                                                  ),
                                                                 ),
-                                                              ),
-                                                            )
-                                                          ),
-                                                        ],
+                                                              ],
+                                                            ),
+                                                            Padding(
+                                                                padding:
+                                                                    EdgeInsetsDirectional
+                                                                        .fromSTEB(
+                                                                            10,
+                                                                            20,
+                                                                            0,
+                                                                            0),
+                                                                child:
+                                                                    Container(
+                                                                  height: 40,
+                                                                  width: 300,
+                                                                  child:
+                                                                      RichText(
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                    strutStyle: StrutStyle(
+                                                                        fontSize:
+                                                                            12.0),
+                                                                    text:
+                                                                        TextSpan(
+                                                                      style: TextStyle(
+                                                                          color: Colors
+                                                                              .white,
+                                                                          fontSize:
+                                                                              14,
+                                                                          fontWeight:
+                                                                              FontWeight.w700),
+                                                                      text:
+                                                                          '${value.mymission_icatch_fail_list[index].content}',
+                                                                    ),
+                                                                  ),
+                                                                )),
+                                                          ],
+                                                        ),
                                                       ),
                                                     ),
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  MissionDetailPage(
+                                                                      ThisMission:
+                                                                          value.mymission_icatch_fail_list[
+                                                                              index])));
+                                                    },
                                                   ),
                                                 );
                                               },

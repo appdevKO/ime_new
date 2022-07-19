@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ime_new/business_logic/provider/chat_provider.dart';
+import 'package:ime_new/ui/live/spylive/contract/becomespy.dart';
 import 'package:ime_new/ui/live/spylive/showtime/fakestream.dart';
 import 'package:ime_new/utils/viewconfig.dart';
 
@@ -36,6 +37,14 @@ class _MissionPageState extends State<MissionPage> {
         appBar: AppBar(
           title: Text('Mission'),
           backgroundColor: Color(0xff1A1A1A),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () async {
+              Navigator.pop(context);
+              await Provider.of<ChatProvider>(context, listen: false)
+                  .get_spy_streaminglist();
+            },
+          ),
         ),
         body: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
@@ -333,7 +342,7 @@ class _MissionPageState extends State<MissionPage> {
                                                                             fontWeight:
                                                                                 FontWeight.w700),
                                                                         text:
-                                                                            '${value.spy_streaming_list[index].content}',
+                                                                            '${value.spy_streaming_mission_list[index].content}',
                                                                       ),
                                                                     ),
                                                                   ),
@@ -346,7 +355,7 @@ class _MissionPageState extends State<MissionPage> {
                                                                           10,
                                                                           0),
                                                                   child: Text(
-                                                                    '懸賞獎金\$${value.spy_streaming_list[index].price}',
+                                                                    '懸賞獎金\$${value.spy_streaming_mission_list[index].price}',
                                                                     style: TextStyle(
                                                                         color:
                                                                             spy_mission_money,
@@ -403,7 +412,10 @@ class _MissionPageState extends State<MissionPage> {
                                                                           () {
                                                                         Navigator.push(
                                                                             context,
-                                                                            MaterialPageRoute(builder: (context) => FakeStream()));
+                                                                            MaterialPageRoute(
+                                                                                builder: (context) => FakeStream(
+                                                                                      TheMission: value.spy_streaming_mission_list[index],
+                                                                                    )));
                                                                       },
                                                                     ),
                                                                   ],
@@ -420,8 +432,11 @@ class _MissionPageState extends State<MissionPage> {
                                                         context,
                                                         MaterialPageRoute(
                                                             builder: (context) =>
-                                                                MissionDetailPage(ThisMission: value
-                                                                    .spy_streaming_mission_list[index],)));
+                                                                MissionDetailPage(
+                                                                  ThisMission:
+                                                                      value.spy_streaming_mission_list[
+                                                                          index],
+                                                                )));
                                                   },
                                                 ),
                                               );
@@ -449,7 +464,7 @@ class _MissionPageState extends State<MissionPage> {
                                         ),
                                       );
                               }),
-                              // 接取任務
+                              // 我想接取任務
                               Consumer<ChatProvider>(
                                   builder: (context, value, child) {
                                 return value.spy_accessible_mission_list != null
@@ -654,7 +669,13 @@ class _MissionPageState extends State<MissionPage> {
                                                                   ),
                                                                 ),
                                                                 onTap: () {
-                                                                  // Navigator.push(context, MaterialPageRoute(builder: (context)=>MissionDetailPage()));
+                                                                  // if( value.remoteUserInfo[0].role==2){
+                                                                  //   //直播主
+                                                                  //
+                                                                  // }else{
+                                                                  //   //玩家
+                                                                  //
+                                                                  // }
                                                                 }),
                                                           ],
                                                         ),
@@ -666,8 +687,10 @@ class _MissionPageState extends State<MissionPage> {
                                                         context,
                                                         MaterialPageRoute(
                                                             builder: (context) =>
-                                                                MissionDetailPage(ThisMission: value
-                                                                    .spy_accessible_mission_list[index])));
+                                                                MissionDetailPage(
+                                                                    ThisMission:
+                                                                        value.spy_accessible_mission_list[
+                                                                            index])));
                                                   },
                                                 ),
                                               );
@@ -683,7 +706,7 @@ class _MissionPageState extends State<MissionPage> {
                                           )
                                         : Center(
                                             child: Text(
-                                              '目前沒有在直播中的任務',
+                                              '目前沒有可接的任務',
                                               style: TextStyle(
                                                   color: Colors.white),
                                             ),

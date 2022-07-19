@@ -298,16 +298,26 @@ class _CreateShowTimeState extends State<CreateShowTime> {
                                       _contentcontroller.text,
                                       int.parse(_pricecontroller.text),
                                     )
-                                    .whenComplete(() => Future.delayed(
-                                            Duration(seconds: 2), () async {
-                                          Navigator.pop(context);
-                                          Navigator.pop(context);
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      FakeStream()));
-                                        }));
+                                    .whenComplete(
+                                        () => Future.delayed(
+                                                Duration(seconds: 2), () async {
+                                              Navigator.pop(context);
+                                              Navigator.pop(context);
+                                              Provider.of<ChatProvider>(context,
+                                                      listen: false)
+                                                  .find_missiondetail(
+                                                      _titlecontroller.text)
+                                                  .whenComplete(() =>
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder:
+                                                                  (context) =>
+                                                                      FakeStream(
+                                                                        TheMission:
+                                                                            Provider.of<ChatProvider>(context, listen: false).mission_detail[0],
+                                                                      ))));
+                                            }));
                               }
                             },
                           ),

@@ -34,6 +34,14 @@ class _ShowTimePageState extends State<ShowTimePage> {
         appBar: AppBar(
           title: Text('ShowTime'),
           backgroundColor: Color(0xff1A1A1A),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () async {
+              Navigator.pop(context);
+              await Provider.of<ChatProvider>(context, listen: false)
+                  .get_spy_streaminglist();
+            },
+          ),
         ),
         body: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
@@ -360,7 +368,7 @@ class _ShowTimePageState extends State<ShowTimePage> {
                                                         onTap: (){
                                                           Navigator.push(
                                                               context,
-                                                              MaterialPageRoute(builder: (context) => FakeStream()));
+                                                              MaterialPageRoute(builder: (context) => FakeStream(TheMission: value.spy_streaming_showtime_list[index],)));
                                                         },
                                                       ),
                                                     ],

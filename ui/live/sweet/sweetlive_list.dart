@@ -8,9 +8,9 @@ import 'package:ime_new/business_logic/provider/sweetProvider.dart';
 import 'package:ime_new/ui/live/sweet/sweetView.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:provider/provider.dart';
-import 'package:ime_new/business_logic/model/sweetRoom.dart';
-import 'package:ime_new/business_logic/model/audience.dart';
-import 'package:ime_new/business_logic/model/anchor.dart';
+import 'package:ime_new/business_logic/model/sweetModel/sweetRoom.dart';
+import 'package:ime_new/business_logic/model/sweetModel/sweetAudience.dart';
+import 'package:ime_new/business_logic/model/sweetModel/sweetAnchor.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:ime_new/ui/live/livepage2.dart';
 
@@ -272,7 +272,7 @@ Future<Future<String?>> openRoom(
                 String enExplain = strToEncode(roomExplain);
                 String enAnchorName = strToEncode(nickName);
                 var audienceJson = {};
-                audienceJson['"selfAvatar"'] = ('"${avatalUrl}"');
+                audienceJson['"anchorAvatar"'] = ('"${avatalUrl}"');
                 audienceJson['"encodeRoomName"'] = ('"${enName}"');
                 audienceJson['"encodeRoomExplain"'] = ('"${enExplain}"');
                 audienceJson['"selfEncodeName"'] = ('"${enAnchorName}"');

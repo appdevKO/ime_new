@@ -444,12 +444,12 @@ class _SpyLivePageState extends State<SpyLivePage> {
                                             ),
                                           ),
                                         ),
-                                        onTap: () {
+                                        onTap: () {print('${value.spy_streaming_list[index]}');
                                           Navigator.push(
                                               context,
                                               MaterialPageRoute(
                                                   builder: (context) =>
-                                                      FakeStream()));
+                                                      FakeStream(TheMission: value.spy_streaming_list[index],)));
                                         },
                                       ),
                                     ),

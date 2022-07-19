@@ -7,16 +7,19 @@ import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:agora_rtc_engine/rtc_local_view.dart' as RtcLocalView;
 import 'package:agora_rtc_engine/rtc_remote_view.dart' as RtcRemoteView;
 import 'package:agora_rtc_rawdata/agora_rtc_rawdata.dart';
+import 'package:faceunity_plugin/faceunity_plugin.dart';
 import 'package:faceunity_ui/Faceunity_ui.dart';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:ime_new/business_logic/provider/chat_provider.dart';
 import 'package:ime_new/business_logic/provider/sweetProvider.dart';
 import 'package:ime_new/ui/live/sweet/sweetlive_list.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:get/get.dart';
+import 'package:petitparser/petitparser.dart';
 
 import 'package:provider/provider.dart';
 import 'package:mqtt_client/mqtt_client.dart';
@@ -37,20 +40,30 @@ class sweetView extends StatefulWidget {
 }
 
 class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
+  int previouClick = 0;
+  int clicking = 0;
+  int giftIndex = 0;
   String msg = "";
   String _selfAccount = "";
   String _selfencodeName = "";
   String? memberId;
   AnimationController? _controller;
   RtcEngine? engine;
+  bool faceunityInit = true;
   bool isJoined = false;
   bool moreView = false;
   bool isSelfMute = false;
   bool isSelfHide = false;
+  bool initFaceunity = false;
   bool _cantalk = false;
   bool gifPlaying = false;
   bool musicPlaying = false;
   bool screenClear = false;
+  bool giftFrist = true;
+  bool _chat = false;
+  bool _camera = false;
+  bool _gift = false;
+
   String giftMoney = '';
   String giftName = '';
   String giftChName = '';
@@ -79,10 +92,7 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    if (identity == true) {
-      isSelfMute = true;
-      isSelfHide = true;
-    }
+
     player = AudioPlayer();
     // myUid = getUid();
     // MqttListen().resetSeats();
@@ -104,17 +114,25 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
       });
     });
     if (identity == true) {
+      isSelfMute = true;
+      isSelfHide = true;
       Future(() async {
-        Timer.periodic(Duration(seconds: 2), (timer) {
-          if (gifPlaying == false &&
-              musicPlaying == false &&
-              gifQueue.isNotEmpty) {
+        Timer.periodic(Duration(milliseconds: 100), (timer) {
+          if (gifQueue.isNotEmpty &&
+              gifPlaying == false &&
+              musicPlaying == false) {
             pushMqtt("imeSweetRoom/" + sweetRoomId,
                 "gif/play," + gifQueue.first.toString());
+            gifQueue.removeFirst();
           }
         });
       });
     }
+    Timer(Duration(milliseconds: 1000), () {
+      setState(() {
+        faceunityInit = false;
+      });
+    });
 
     client.subscribe("imeSweetRoom/" + sweetRoomId, MqttQos.atLeastOnce);
 
@@ -162,17 +180,20 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
     engine!.disableVideo();
     engine!.setEventHandler(
         RtcEngineEventHandler(joinChannelSuccess: (channel, uid, elapsed) {
+      print('joinChannelSuccess $channel $uid $elapsed');
       //log('joinChannelSuccess $channel $uid $elapsed');
       setState(() {
         isJoined = true;
       });
     }, userJoined: (uid, elapsed) {
+      print('userJoined  $uid $elapsed');
       //log('userJoined  $uid $elapsed');
       setState(() {
         remoteUid.add(uid);
         engine!.muteAllRemoteVideoStreams(false);
       });
     }, userOffline: (uid, reason) {
+      print('userleave  $uid $reason');
       //log('userJoined  $uid $reason');
       setState(() {
         remoteUid.removeWhere((element) => element == uid);
@@ -189,8 +210,6 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
 
     await engine!
         .joinChannel(null, sweetRoomId, null, await int.parse(myAgoraUid));
-
-    //关闭本地声音
     await engine!.muteLocalAudioStream(false);
     //关闭远程声音
     await engine!.muteAllRemoteVideoStreams(false);
@@ -221,6 +240,9 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
       cantTalk(context);
     }
     _chatController.clear();
+    setState(() {
+      _chat = false;
+    });
   }
 
   Future<void> playMusic(String url) async {
@@ -248,7 +270,21 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
               }
             },
             onTap: () {
-              FocusManager.instance.primaryFocus?.unfocus();
+              if (_chat == true) {
+                setState(() {
+                  _chat = false;
+                  FocusManager.instance.primaryFocus?.unfocus();
+                });
+              } else if (_gift == true) {
+                setState(() {
+                  _gift = false;
+                });
+              } else if (_camera == true) {
+                setState(() {
+                  _camera = false;
+                });
+              }
+              //FocusManager.instance.primaryFocus?.unfocus();
             },
             child: Stack(
               children: <Widget>[
@@ -260,7 +296,7 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
                   gifPlaying = _sweetProvider.giftAnime;
                   if (gifPlaying == true) {
                     if (_sweetProvider.giftMusic == true) {
-                      Timer(const Duration(milliseconds: 1000), () {
+                      Timer(const Duration(milliseconds: 900), () {
                         playMusic(_sweetProvider.giftMusicUrl);
                         _sweetProvider.giftMusic = false;
                       });
@@ -278,14 +314,104 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
                     _sweetProvider.chatroomRefresh = false;
                   }
 
-                  return Consumer<ChatProvider>(
-                      builder: (context, _ChatProvider, child) {
-                    return Stack(children: <Widget>[
+                  return Stack(children: <Widget>[
+                    if (faceunityInit == true) ...[FaceunityUI()],
+                    if (_sweetProvider.offStreaming == true) ...[
+                      Container(
+                        height: MediaQuery.of(context).size.height,
+                        width: MediaQuery.of(context).size.width,
+                        child: ImageFiltered(
+                            imageFilter:
+                                ImageFilter.blur(sigmaY: 15, sigmaX: 15),
+                            child: Image.network(
+                              _sweetProvider.anchorAvatar,
+                              fit: BoxFit.cover,
+                              height: double.infinity,
+                              width: double.infinity,
+                              alignment: Alignment.center,
+                            )),
+                      ),
+                      Align(
+                        alignment: Alignment.center,
+                        child: Container(
+                          height: MediaQuery.of(context).size.height * 0.75,
+                          width: MediaQuery.of(context).size.width * 0.9,
+                          color: Colors.transparent,
+                          child: Align(
+                              alignment: Alignment.topCenter,
+                              child: Column(
+                                children: [
+                                  Text(
+                                    '直播結束',
+                                    style: TextStyle(
+                                        fontSize: 50, color: Colors.white),
+                                  ),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  CircleAvatar(
+                                    radius: 27.5,
+                                    backgroundColor: Colors.transparent,
+                                    backgroundImage: NetworkImage(
+                                        _sweetProvider.anchorAvatar),
+                                  ),
+                                  Text(
+                                    _sweetProvider.anchorName,
+                                    style: TextStyle(
+                                        fontSize: 20, color: Colors.white),
+                                  ),
+                                  SizedBox(
+                                    height: 15,
+                                  ),
+                                  Container(
+                                    // name
+                                    height: 30,
+                                    width: 125,
+                                    decoration: new BoxDecoration(
+                                        //背景半透明
+                                        color: Colors.white,
+                                        //设置四周圆角 角度
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(15)),
+                                        //设置四周边框
+                                        border: new Border.all(
+                                          width: 1,
+                                          color: Colors.transparent,
+                                        )),
+                                    child: Center(
+                                      child: (Text(
+                                        '追蹤',
+                                        style: TextStyle(fontSize: 15),
+                                      )),
+                                    ),
+                                  )
+                                ],
+                              )),
+                        ),
+                      ),
+                      Positioned(
+                        top: MediaQuery.of(context).padding.top,
+                        left: 0,
+                        right: 0,
+                        child: Align(
+                          alignment: Alignment.topRight,
+                          child: IconButton(
+                            color: Colors.black,
+                            icon: Icon(Icons.clear,
+                                color: Colors.black), //Icons.arrow_back
+                            onPressed: () {
+                              Get.back();
+                            },
+                          ),
+                        ),
+                      ),
+                    ] else ...[
                       Container(
                           height: MediaQuery.of(context).size.height,
+                          width: MediaQuery.of(context).size.width,
                           child: _sweetProvider.vdoStatus == false
                               ? Image.network(
-                                  _sweetProvider.inRoomAvatar,
+                                  _sweetProvider.anchorAvatar,
                                   fit: BoxFit.cover,
                                   height: double.infinity,
                                   width: double.infinity,
@@ -298,11 +424,40 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
                                           uid: _sweetProvider.anchorID,
                                           channelId: sweetRoomId,
                                         )
-                                  : Container(
-                                      width: 0,
-                                      height: 0,
+                                  : Image.network(
+                                      _sweetProvider.anchorAvatar,
+                                      fit: BoxFit.cover,
+                                      height: double.infinity,
+                                      width: double.infinity,
+                                      alignment: Alignment.center,
                                     )),
 
+                      _sweetProvider.giftAnime
+                          ? Align(
+                              alignment: Alignment.center,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Transform.scale(
+                                    scale: 1.0,
+                                    child: Container(
+                                      height:
+                                          MediaQuery.of(context).size.height,
+                                      width: MediaQuery.of(context).size.width,
+                                      decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                          image: NetworkImage(
+                                              _sweetProvider.gifUrl),
+                                          fit: BoxFit.cover,
+                                          repeat: ImageRepeat.noRepeat,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ))
+                          : Container(width: 0, height: 0),
                       //共同都有 appbar
                       if (screenClear == false) ...[
                         Positioned(
@@ -310,7 +465,7 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
                           left: 0,
                           right: 0,
                           child: Container(
-                            height: 70,
+                            height: 80,
                             child: Stack(
                               children: [
                                 Align(
@@ -321,12 +476,12 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
                                         children: [
                                           Container(
                                               // name
-                                              height: 40,
-                                              width: 200,
+                                              height: 50,
+                                              width: 180,
                                               decoration: new BoxDecoration(
-                                                  //背景
-                                                  color: Color.fromARGB(
-                                                      100, 22, 44, 33),
+                                                  //背景半透明
+                                                  // color: Color.fromARGB(
+                                                  //     100, 22, 44, 33),
                                                   //设置四周圆角 角度
                                                   borderRadius:
                                                       BorderRadius.all(
@@ -336,56 +491,123 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
                                                     width: 1,
                                                     color: Colors.transparent,
                                                   )),
-                                              child: Center(
-                                                  child: Text(
-                                                _sweetProvider.anchorName,
-                                                textAlign: TextAlign.center,
-                                                style: TextStyle(
-                                                    fontSize: 20,
-                                                    color: Colors.white),
-                                              ))),
-                                          Container(
-                                            //audience
-                                            height: 40,
-                                            width: 50,
-                                            decoration: new BoxDecoration(
-                                              //背景
-                                              color: Color.fromARGB(
-                                                  100, 22, 44, 33),
-                                              //设置四周圆角 角度
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(20)),
-                                              //设置四周边框
-                                              border: new Border.all(
-                                                width: 1,
-                                                color: Colors.transparent,
-                                              ),
-                                            ),
-                                            child: TextButton(
-                                              onPressed: () async {
-                                                (await _showUserList(
-                                                    context,
-                                                    _sweetProvider
-                                                        .audienceList));
-                                                ;
-                                              },
-                                              child: Text(
-                                                  _sweetProvider.audienceCount,
-                                                  style: TextStyle(
-                                                      fontSize: 15,
-                                                      color: Colors.black)),
-                                            ),
-                                          )
+                                              child: Stack(
+                                                children: [
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      _showAnchorInfo(
+                                                          context,
+                                                          _sweetProvider
+                                                              .anchorInfo);
+                                                    },
+                                                    child: Stack(
+                                                      children: [
+                                                        Align(
+                                                          alignment:
+                                                              Alignment.center,
+                                                          child: Container(
+                                                            height: 40,
+                                                            width: 160,
+                                                            decoration:
+                                                                new BoxDecoration(
+                                                                    //背景
+                                                                    color: Color
+                                                                        .fromARGB(
+                                                                            100,
+                                                                            22,
+                                                                            44,
+                                                                            33),
+                                                                    //设置四周圆角 角度
+                                                                    borderRadius:
+                                                                        BorderRadius.all(Radius.circular(
+                                                                            20)),
+                                                                    //设置四周边框
+                                                                    border:
+                                                                        new Border
+                                                                            .all(
+                                                                      width: 1,
+                                                                      color: Colors
+                                                                          .transparent,
+                                                                    )),
+                                                          ),
+                                                        ),
+                                                        Align(
+                                                            alignment: Alignment
+                                                                .center,
+                                                            child: Text(
+                                                              anchorNameConvert(
+                                                                  _sweetProvider
+                                                                      .anchorInfo
+                                                                      .nickname),
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                              style: TextStyle(
+                                                                  fontSize: 11,
+                                                                  color: Colors
+                                                                      .white),
+                                                            )),
+                                                        Align(
+                                                            alignment: Alignment
+                                                                .centerLeft,
+                                                            child: CircleAvatar(
+                                                              radius: 28.5,
+                                                              backgroundColor:
+                                                                  Colors
+                                                                      .transparent,
+                                                              backgroundImage:
+                                                                  NetworkImage(
+                                                                      'https://storage.googleapis.com/ime-gift/icon/border.png'),
+                                                              child:
+                                                                  CircleAvatar(
+                                                                radius: 16.0,
+                                                                backgroundColor:
+                                                                    Colors
+                                                                        .transparent,
+                                                                backgroundImage:
+                                                                    NetworkImage(
+                                                                        _sweetProvider
+                                                                            .anchorAvatar),
+                                                              ),
+                                                            )),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  Align(
+                                                    alignment:
+                                                        Alignment.centerRight,
+                                                    child: Transform.scale(
+                                                      scale: 1.25,
+                                                      child: IconButton(
+                                                        onPressed: () {
+                                                          pushMqtt(
+                                                              'imeSweetRoom/' +
+                                                                  sweetRoomId,
+                                                              'follow/anchor,' +
+                                                                  strToEncode(
+                                                                      _sweetProvider
+                                                                          .anchorName));
+                                                        },
+                                                        icon: Image.network(
+                                                            "https://storage.googleapis.com/ime-gift/icon/follow.png"),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              )),
                                         ],
                                       ),
                                       Row(
                                         children: [
+                                          SizedBox(
+                                            width: 10,
+                                          ),
                                           Stack(
                                             children: [
                                               Container(
                                                 //禮物count
                                                 height: 25,
-                                                width: 150,
+                                                width: 100,
                                                 decoration: new BoxDecoration(
                                                   //背景
                                                   color: Color.fromARGB(
@@ -409,102 +631,202 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
                                                     Image.network(
                                                         "https://storage.googleapis.com/ime-gift/icon/star.png"),
                                                     SizedBox(
-                                                      width: 15,
+                                                      width: 5,
                                                     ),
                                                     Text(
-                                                        _sweetProvider
-                                                            .donateCount
-                                                            .toString(),
+                                                        donateNumConvert(
+                                                            _sweetProvider
+                                                                .donateCount),
                                                         style: TextStyle(
                                                           fontSize: 12.5,
-                                                          color: Colors.black,
+                                                          color: Colors.white,
                                                         ))
                                                   ],
                                                 ),
                                               ),
                                             ],
                                           ),
-                                          Container(
-                                              //donate top
-                                              height: 25,
-                                              width: 100,
-                                              color: Colors.transparent,
-                                              child: Row(
-                                                children: <Widget>[
-                                                  for (int i = 0;
-                                                      i < 3;
-                                                      i++) ...[
-                                                    Container(
-                                                      height: 20,
-                                                      width: 20,
-                                                      decoration:
-                                                          new BoxDecoration(
-                                                        //背景
-                                                        color: Color.fromARGB(
-                                                            100, 22, 44, 33),
-                                                        //设置四周圆角 角度
-                                                        borderRadius:
-                                                            BorderRadius.all(
-                                                                Radius.circular(
-                                                                    20)),
-                                                        //设置四周边框
-                                                        border: new Border.all(
-                                                          width: 1,
-                                                          color: Colors
-                                                              .transparent,
-                                                        ),
-                                                      ),
-                                                      // child: IconButton(
-                                                      //   icon: Image.network(
-                                                      //       'https://lh3.googleusercontent.com/a/AATXAJyUuWNvBW1tAKoDxDWs0s49XT35qOFpd0PRCMmX=s96-c'),
-                                                      //   iconSize: 100,
-                                                      //   onPressed: () {},
-                                                      // ),
-                                                    ),
-                                                    SizedBox(
-                                                      width: 10,
-                                                    )
-                                                  ]
-                                                ],
-                                              )),
                                         ],
                                       ),
                                     ],
                                   ),
                                 ),
                                 Align(
-                                  alignment: Alignment.topRight,
-                                  child: IconButton(
-                                    color: Colors.black,
-                                    icon: Icon(Icons.clear,
-                                        color: Colors.black), //Icons.arrow_back
-                                    onPressed: () {
-                                      //final builder = MqttClientPayloadBuilder();
-                                      // builder.addString("leaveRoom," +
-                                      //     identity.toString() +
-                                      //     ',' +
-                                      //     selfAccount);
-                                      // client.publishMessage(
-                                      //     "imeSweetRoom/" + sweetRoomId,
-                                      //     MqttQos.atLeastOnce,
-                                      //     builder.payload!);
-                                      // client.unsubscribe(
-                                      //     "imeSweetRoom/" + sweetRoomId);
-                                      // client.unsubscribe("imeSweetUser/" + myUid);
-                                      // myUid = getUid();
-                                      // client.subscribe("imeSweetUser/" + myUid,
-                                      //     MqttQos.atLeastOnce);
-                                      // print('訂閱新Uid $myUid');
-                                      Get.back();
-                                    },
-                                  ),
-                                )
+                                    alignment: Alignment.topRight,
+                                    child: Row(
+                                      children: [
+                                        Expanded(child: SizedBox()),
+                                        Container(
+                                          height: 40,
+                                          width: 190,
+                                          //color: Colors.red,
+                                          child: (Row(
+                                            children: [
+                                              Expanded(child: SizedBox()),
+                                              GestureDetector(
+                                                onTap: () async {
+                                                  (await _showAudienceList(
+                                                      context,
+                                                      _sweetProvider
+                                                          .audienceList));
+                                                  ;
+                                                },
+                                                child: (Container(
+                                                  //audience
+                                                  height: 40,
+                                                  width: 140,
+                                                  //color: Colors.green,
+                                                  child: Row(
+                                                    children: [
+                                                      Expanded(
+                                                          child: SizedBox()),
+                                                      if (_sweetProvider
+                                                              .accountList
+                                                              .length <
+                                                          4) ...[
+                                                        for (int i = 0;
+                                                            i <
+                                                                _sweetProvider
+                                                                    .audienceCount;
+                                                            i++) ...[
+                                                          Stack(
+                                                            children: [
+                                                              CircleAvatar(
+                                                                radius: 21,
+                                                                backgroundColor:
+                                                                    Colors
+                                                                        .transparent,
+                                                                backgroundImage:
+                                                                    NetworkImage(
+                                                                        'https://storage.googleapis.com/ime-gift/icon/border.png'),
+                                                                child:
+                                                                    CircleAvatar(
+                                                                  radius: 13,
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .transparent,
+                                                                  backgroundImage:
+                                                                      NetworkImage(
+                                                                          _sweetProvider.audienceList[i]
+                                                                              [
+                                                                              "avatar_sub"]),
+                                                                ),
+                                                              )
+                                                            ],
+                                                          )
+                                                        ]
+                                                      ] else ...[
+                                                        for (int i = 0;
+                                                            i < 4;
+                                                            i++) ...[
+                                                          if (i != 3) ...[
+                                                            Stack(
+                                                              children: [
+                                                                CircleAvatar(
+                                                                  radius: 21,
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .transparent,
+                                                                  backgroundImage:
+                                                                      NetworkImage(
+                                                                          'https://storage.googleapis.com/ime-gift/icon/border.png'),
+                                                                  child:
+                                                                      CircleAvatar(
+                                                                    radius: 13,
+                                                                    backgroundColor:
+                                                                        Colors
+                                                                            .transparent,
+                                                                    backgroundImage:
+                                                                        NetworkImage(_sweetProvider.audienceList[i]
+                                                                            [
+                                                                            "avatar_sub"]),
+                                                                  ),
+                                                                )
+                                                              ],
+                                                            )
+                                                          ] else ...[
+                                                            Container(
+                                                                height: 25,
+                                                                width: 40,
+                                                                decoration:
+                                                                    new BoxDecoration(
+                                                                  //背景
+                                                                  color: Color
+                                                                      .fromARGB(
+                                                                          100,
+                                                                          22,
+                                                                          44,
+                                                                          33),
+                                                                  //设置四周圆角 角度
+                                                                  borderRadius:
+                                                                      BorderRadius.all(
+                                                                          Radius.circular(
+                                                                              15)),
+                                                                  //设置四周边框
+                                                                  border:
+                                                                      new Border
+                                                                          .all(
+                                                                    width: 1,
+                                                                    color: Colors
+                                                                        .transparent,
+                                                                  ),
+                                                                ),
+                                                                child: Center(
+                                                                  child: Text(
+                                                                      _sweetProvider
+                                                                          .audienceCount
+                                                                          .toString(),
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontSize:
+                                                                            12.5,
+                                                                        color: Colors
+                                                                            .white,
+                                                                      )),
+                                                                )),
+                                                          ]
+                                                        ]
+                                                      ],
+                                                    ],
+                                                  ),
+                                                )),
+                                              ),
+                                              IconButton(
+                                                color: Colors.black,
+                                                icon: Icon(Icons.clear,
+                                                    color: Colors
+                                                        .black), //Icons.arrow_back
+                                                onPressed: () {
+                                                  //final builder = MqttClientPayloadBuilder();
+                                                  // builder.addString("leaveRoom," +
+                                                  //     identity.toString() +
+                                                  //     ',' +
+                                                  //     selfAccount);
+                                                  // client.publishMessage(
+                                                  //     "imeSweetRoom/" + sweetRoomId,
+                                                  //     MqttQos.atLeastOnce,
+                                                  //     builder.payload!);
+                                                  // client.unsubscribe(
+                                                  //     "imeSweetRoom/" + sweetRoomId);
+                                                  // client.unsubscribe("imeSweetUser/" + myUid);
+                                                  // myUid = getUid();
+                                                  // client.subscribe("imeSweetUser/" + myUid,
+                                                  //     MqttQos.atLeastOnce);
+                                                  // print('訂閱新Uid $myUid');
+                                                  Get.back();
+                                                },
+                                              ),
+                                            ],
+                                          )),
+                                        ),
+                                      ],
+                                    ))
                               ],
                             ),
                           ),
                         ),
 
-                        //共同都有 聊天室 主播更多：美顏 觀眾更多：送禮物
+                        //共同都有 聊天室 主播：美顏 送禮物
                         Positioned(
                           bottom: MediaQuery.of(context).viewInsets.bottom,
                           left: 0,
@@ -550,592 +872,125 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
                                                     alignment:
                                                         Alignment.topLeft,
                                                     child: Container(
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(20),
-                                                        color: Colors.blue[200],
-                                                      ),
-                                                      padding:
-                                                          EdgeInsets.all(5),
-                                                      child: Text(
-                                                        _sweetProvider
-                                                                .messages[index]
-                                                                .account +
-                                                            " " +
-                                                            _sweetProvider
-                                                                .messages[index]
-                                                                .messageContent,
-                                                        style: TextStyle(
-                                                            fontSize: 15),
-                                                      ),
-                                                    ),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(20),
+                                                          color: Color.fromARGB(
+                                                              100, 22, 44, 33),
+                                                        ),
+                                                        padding:
+                                                            EdgeInsets.all(5),
+                                                        child: Text(
+                                                          _sweetProvider
+                                                                  .messages[
+                                                                      index]
+                                                                  .account +
+                                                              " " +
+                                                              _sweetProvider
+                                                                  .messages[
+                                                                      index]
+                                                                  .messageContent,
+                                                          style: TextStyle(
+                                                              fontSize: 15,
+                                                              color:
+                                                                  Colors.white),
+                                                        )),
                                                   ),
                                                 ));
                                           },
                                         ),
                                       ),
-                                      if (moreView == true) ...[
-                                        if (identity == true) ...[
-                                          Container(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.4,
-                                            alignment: Alignment.bottomCenter,
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.end,
-                                              children: [
-                                                Container(
-                                                  width: MediaQuery.of(context)
-                                                      .size
-                                                      .width,
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      Align(
-                                                        alignment: Alignment
-                                                            .bottomLeft,
-                                                        child: IconButton(
-                                                          icon: Image.asset(
-                                                              'assets/images/camera.png'),
-                                                          iconSize: 3,
-                                                          onPressed: () {
-                                                            engine!
-                                                                .switchCamera();
-                                                          },
-                                                        ),
-                                                      ),
-                                                      if (isSelfMute ==
-                                                          true) ...[
-                                                        Align(
-                                                          alignment: Alignment
-                                                              .bottomRight,
-                                                          child: IconButton(
-                                                            icon: Image.asset(
-                                                                'assets/images/mic-on.png'),
-                                                            iconSize: 3,
-                                                            onPressed: () {
-                                                              setState(() {
-                                                                isSelfMute =
-                                                                    !isSelfMute;
-                                                              });
-                                                              engine!
-                                                                  .enableLocalAudio(
-                                                                      isSelfMute);
-                                                            },
-                                                          ),
-                                                        ),
-                                                      ] else if (isSelfMute ==
-                                                          false) ...[
-                                                        Align(
-                                                          alignment: Alignment
-                                                              .bottomRight,
-                                                          child: IconButton(
-                                                            icon: Image.asset(
-                                                                'assets/images/mic-off.png'),
-                                                            iconSize: 3,
-                                                            onPressed: () {
-                                                              setState(() {
-                                                                isSelfMute =
-                                                                    !isSelfMute;
-                                                              });
-                                                              engine!
-                                                                  .enableLocalAudio(
-                                                                      isSelfMute);
-                                                            },
-                                                          ),
-                                                        ),
-                                                      ],
-                                                      if (isSelfHide ==
-                                                          true) ...[
-                                                        Align(
-                                                          alignment: Alignment
-                                                              .bottomRight,
-                                                          child: IconButton(
-                                                            icon: Image.asset(
-                                                                'assets/images/vdo-on.png'),
-                                                            iconSize: 3,
-                                                            onPressed: () {
-                                                              setState(() {
-                                                                isSelfHide =
-                                                                    !isSelfHide;
-                                                                pushMqtt(
-                                                                    "imeSweetRoom/" +
-                                                                        sweetRoomId,
-                                                                    "vdoHide,$isSelfHide");
-                                                              });
-                                                              engine!
-                                                                  .enableLocalVideo(
-                                                                      isSelfHide);
-                                                            },
-                                                          ),
-                                                        ),
-                                                      ] else if (isSelfHide ==
-                                                          false) ...[
-                                                        Align(
-                                                          alignment: Alignment
-                                                              .bottomRight,
-                                                          child: IconButton(
-                                                            icon: Image.asset(
-                                                                'assets/images/vdo-off.png'),
-                                                            iconSize: 3,
-                                                            onPressed: () {
-                                                              setState(() {
-                                                                isSelfHide =
-                                                                    !isSelfHide;
-                                                                pushMqtt(
-                                                                    "imeSweetRoom/" +
-                                                                        sweetRoomId,
-                                                                    "vdoHide,$isSelfHide");
-                                                              });
-                                                              engine!
-                                                                  .enableLocalVideo(
-                                                                      isSelfHide);
-                                                            },
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ],
-                                                  ),
-                                                ),
-                                                FaceunityUI(
-                                                  cameraCallback: () =>
-                                                      engine!.switchCamera(),
-                                                ),
-                                              ],
-                                            ),
-                                          )
-                                        ] else if (identity == false) ...[
-                                          //送禮清單
-                                          Container(
-                                              height: (MediaQuery.of(context)
-                                                      .size
-                                                      .height) *
-                                                  0.4,
-                                              decoration: new BoxDecoration(
-                                                //背景
-                                                color: Colors.white,
-                                                //设置四周圆角 角度
-                                                borderRadius: BorderRadius.all(
-                                                    Radius.circular(20)),
-                                                //设置四周边框
-                                                border: new Border.all(
-                                                    width: 1,
-                                                    color: Colors.red),
-                                              ),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.stretch,
-                                                children: [
-                                                  Container(
-                                                    height:
-                                                        (MediaQuery.of(context)
-                                                                .size
-                                                                .height) *
-                                                            0.3,
-                                                    child: ListView(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              10.0),
-                                                      shrinkWrap: true,
-                                                      children: [
-                                                        Column(
-                                                          children: [
-                                                            for (int i = 0;
-                                                                i < 5;
-                                                                i++) ...[
-                                                              Row(
-                                                                children: [
-                                                                  for (int j =
-                                                                          1;
-                                                                      j < 5;
-                                                                      j++) ...[
-                                                                    if (i ==
-                                                                        0) ...[
-                                                                      GestureDetector(
-                                                                        onTap:
-                                                                            () {
-                                                                          ms = _sweetProvider
-                                                                              .giftList[i * 4 + j - 1]
-                                                                              .ms;
-                                                                          giftMusic = _sweetProvider
-                                                                              .giftList[j - 1]
-                                                                              .music;
-                                                                          giftMoney = _sweetProvider
-                                                                              .giftList[j - 1]
-                                                                              .money;
-                                                                          giftName = _sweetProvider
-                                                                              .giftList[j - 1]
-                                                                              .name;
-                                                                          giftChName = _sweetProvider
-                                                                              .giftList[j - 1]
-                                                                              .ch_name;
-                                                                          _sweetProvider.sendCount =
-                                                                              1;
-                                                                          for (int index = 0;
-                                                                              index < _sweetProvider.borderList.length;
-                                                                              index++) {
-                                                                            if (index ==
-                                                                                j - 1) {
-                                                                              _sweetProvider.borderList[index] = true;
-                                                                            } else {
-                                                                              _sweetProvider.borderList[index] = false;
-                                                                            }
-                                                                          }
-                                                                        },
-                                                                        child:
-                                                                            Container(
-                                                                          width:
-                                                                              (MediaQuery.of(context).size.width) * 0.23,
-                                                                          decoration:
-                                                                              BoxDecoration(
-                                                                            borderRadius:
-                                                                                BorderRadius.all(Radius.circular(10.0)),
-                                                                            border: (_sweetProvider.borderList[j - 1] == false)
-                                                                                ? Border.all(
-                                                                                    style: BorderStyle.none, //BorderSide
-                                                                                  )
-                                                                                : Border.all(
-                                                                                    width: 2.0,
-                                                                                    color: Colors.pinkAccent,
-                                                                                  ),
-                                                                          ),
-                                                                          child:
-                                                                              Column(
-                                                                            children: [
-                                                                              IconButton(
-                                                                                icon: Image.network(_sweetProvider.giftList[j - 1].icon_url),
-                                                                                iconSize: 60,
-                                                                                onPressed: () {},
-                                                                              ),
-                                                                              Text(
-                                                                                _sweetProvider.giftList[j - 1].ch_name,
-                                                                                style: TextStyle(fontSize: 12.5),
-                                                                              ),
-                                                                              Row(
-                                                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                                                children: [
-                                                                                  Image.asset(
-                                                                                    'assets/images/sweet/coin.png',
-                                                                                    height: 15,
-                                                                                    width: 15,
-                                                                                  ),
-                                                                                  Text(_sweetProvider.giftList[j - 1].money)
-                                                                                ],
-                                                                              )
-                                                                            ],
-                                                                          ),
-                                                                        ),
-                                                                      ),
-                                                                    ] else if (i *
-                                                                                4 +
-                                                                            j >
-                                                                        _sweetProvider
-                                                                            .giftList
-                                                                            .length
-                                                                            .toInt()) ...[
-                                                                      Container(
-                                                                        height:
-                                                                            0,
-                                                                        width:
-                                                                            0,
-                                                                      )
-                                                                    ] else if (i !=
-                                                                        0) ...[
-                                                                      GestureDetector(
-                                                                        onTap:
-                                                                            () {
-                                                                          ms = _sweetProvider
-                                                                              .giftList[i * 4 + j - 1]
-                                                                              .ms;
-                                                                          giftMusic = _sweetProvider
-                                                                              .giftList[i * 4 + j - 1]
-                                                                              .music;
-                                                                          giftMoney = _sweetProvider
-                                                                              .giftList[i * 4 + j - 1]
-                                                                              .money;
-                                                                          giftName = _sweetProvider
-                                                                              .giftList[i * 4 + j - 1]
-                                                                              .name;
-                                                                          giftChName = _sweetProvider
-                                                                              .giftList[i * 4 + j - 1]
-                                                                              .ch_name;
-                                                                          _sweetProvider.sendCount =
-                                                                              1;
-                                                                          for (int index = 0;
-                                                                              index < _sweetProvider.borderList.length;
-                                                                              index++) {
-                                                                            if (index ==
-                                                                                i * 4 + j - 1) {
-                                                                              _sweetProvider.borderList[index] = true;
-                                                                            } else {
-                                                                              _sweetProvider.borderList[index] = false;
-                                                                            }
-                                                                          }
-                                                                        },
-                                                                        child:
-                                                                            Container(
-                                                                          width:
-                                                                              (MediaQuery.of(context).size.width) * 0.23,
-                                                                          decoration:
-                                                                              BoxDecoration(
-                                                                            borderRadius:
-                                                                                BorderRadius.all(Radius.circular(10.0)),
-                                                                            border: (_sweetProvider.borderList[i * 4 + j - 1] == false)
-                                                                                ? Border.all(
-                                                                                    style: BorderStyle.none, //BorderSide
-                                                                                  )
-                                                                                : Border.all(
-                                                                                    width: 2.0,
-                                                                                    color: Colors.pinkAccent,
-                                                                                  ),
-                                                                          ),
-                                                                          child:
-                                                                              Column(
-                                                                            children: [
-                                                                              IconButton(
-                                                                                icon: Image.network(_sweetProvider.giftList[i * 4 + j - 1].icon_url),
-                                                                                iconSize: 60,
-                                                                                onPressed: () {},
-                                                                              ),
-                                                                              Text(
-                                                                                _sweetProvider.giftList[i * 4 + j - 1].ch_name,
-                                                                                style: TextStyle(fontSize: 12.5),
-                                                                              ),
-                                                                              Row(
-                                                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                                                children: [
-                                                                                  Image.asset(
-                                                                                    'assets/images/sweet/coin.png',
-                                                                                    height: 15,
-                                                                                    width: 15,
-                                                                                  ),
-                                                                                  Text(_sweetProvider.giftList[i * 4 + j - 1].money)
-                                                                                ],
-                                                                              )
-                                                                            ],
-                                                                          ),
-                                                                        ),
-                                                                      ),
-                                                                    ]
-                                                                  ]
-                                                                ],
-                                                              ),
-                                                            ]
-                                                          ],
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  Align(
-                                                    alignment:
-                                                        Alignment.bottomCenter,
-                                                    child: Container(
-                                                        height: (MediaQuery.of(
-                                                                    context)
-                                                                .size
-                                                                .height) *
-                                                            0.097,
-                                                        child: Stack(
-                                                          children: [
-                                                            Align(
-                                                              alignment:
-                                                                  Alignment
-                                                                      .center,
-                                                              child: (Container(
-                                                                height: (MediaQuery.of(
-                                                                            context)
-                                                                        .size
-                                                                        .height) *
-                                                                    0.07,
-                                                                width: 200,
-                                                                decoration:
-                                                                    new BoxDecoration(
-                                                                  //背景
-                                                                  color: Colors
-                                                                      .white,
-                                                                  //设置四周圆角 角度
-                                                                  borderRadius:
-                                                                      BorderRadius.all(
-                                                                          Radius.circular(
-                                                                              45)),
-                                                                  //设置四周边框
-                                                                  border: new Border
-                                                                          .all(
-                                                                      width: 1,
-                                                                      color: Colors
-                                                                          .pink),
-                                                                ),
-                                                                child: Row(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .spaceEvenly,
-                                                                  children: [
-                                                                    Row(
-                                                                      children: [
-                                                                        Text(
-                                                                          _sweetProvider
-                                                                              .sendCount
-                                                                              .toString(),
-                                                                          style:
-                                                                              TextStyle(fontSize: 20),
-                                                                        ),
-                                                                        IconButton(
-                                                                            onPressed:
-                                                                                () {
-                                                                              _sweetProvider.sendCount += 1;
-                                                                            },
-                                                                            icon:
-                                                                                const Icon(Icons.expand_less)),
-                                                                      ],
-                                                                    ),
-                                                                    ElevatedButton(
-                                                                      style: ElevatedButton
-                                                                          .styleFrom(
-                                                                        primary:
-                                                                            Color(0xffff7090),
-                                                                      ),
-                                                                      onPressed:
-                                                                          () {
-                                                                        SendGift(
-                                                                            _sweetProvider.selfEncodeName,
-                                                                            _sweetProvider.anchorName,
-                                                                            _sweetProvider.sendCount,
-                                                                            giftMoney,
-                                                                            giftName,
-                                                                            giftMusic,
-                                                                            giftChName,
-                                                                            ms);
-                                                                      },
-                                                                      child: Text(
-                                                                          '贈送'),
-                                                                    )
-                                                                  ],
-                                                                ),
-                                                              )),
-                                                            )
-                                                          ],
-                                                        )),
-                                                  )
-                                                ],
-                                              )),
-                                        ]
-                                      ] else ...[
-                                        Container(
-                                          //聊天列表
-                                          height: 0,
-                                          width: 0,
-                                        )
-                                      ],
                                     ],
                                   ),
-                                  //輸入欄
+                                  // under bar
                                   Container(
                                     padding: EdgeInsets.only(
                                         left: 10, bottom: 10, top: 10),
                                     height: 60,
                                     width: double.infinity,
-                                    color: Colors.white,
+                                    color: Colors.transparent,
                                     child: Row(
                                       children: <Widget>[
+                                        Container(
+                                            height: 40,
+                                            width: 40,
+                                            decoration: new BoxDecoration(
+                                              //背景
+                                              color: Color.fromARGB(
+                                                  100, 22, 44, 33),
+                                              //设置四周圆角 角度
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(40)),
+                                              //设置四周边框
+                                              border: new Border.all(
+                                                width: 1,
+                                                color: Colors.transparent,
+                                              ),
+                                            ),
+                                            child: Center(
+                                              child: IconButton(
+                                                icon: Icon(Icons.chat_rounded),
+                                                iconSize: 15,
+                                                onPressed: () {
+                                                  //聊天
+                                                  setState(() {
+                                                    _chat = true;
+                                                  });
+                                                  ;
+                                                },
+                                              ),
+                                            )),
+                                        SizedBox(
+                                          width: 15,
+                                        ),
                                         if (identity == true) ...[
-                                          GestureDetector(
-                                            onTap: () {
-                                              setState(() {
-                                                moreView = !moreView;
-                                              });
-                                            },
-                                            child: Container(
-                                              height: 30,
-                                              width: 30,
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(30),
-                                                image: DecorationImage(
-                                                  image: AssetImage(
-                                                      "assets/images/more.png"),
+                                          Container(
+                                              height: 40,
+                                              width: 40,
+                                              decoration: new BoxDecoration(
+                                                //背景
+                                                color: Color.fromARGB(
+                                                    100, 22, 44, 33),
+                                                //设置四周圆角 角度
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(40)),
+                                                //设置四周边框
+                                                border: new Border.all(
+                                                  width: 1,
+                                                  color: Colors.transparent,
                                                 ),
                                               ),
-                                            ),
-                                          ),
-                                        ] else if (identity == false) ...[
-                                          GestureDetector(
-                                            onTap: () {
-                                              setState(() {
-                                                moreView = !moreView;
-                                              });
-                                            },
-                                            child: Container(
-                                              height: 30,
-                                              width: 30,
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(30),
-                                                image: DecorationImage(
-                                                    image: NetworkImage(
-                                                        "https://i.ibb.co/mBhTmgL/image.png")),
-                                              ),
-                                            ),
-                                          ),
+                                              child: Center(
+                                                child: IconButton(
+                                                  icon: Image.asset(
+                                                      'assets/images/more.png'),
+                                                  iconSize: 15,
+                                                  onPressed: () {
+                                                    setState(() {
+                                                      _camera = true;
+                                                    });
+                                                    ;
+                                                  },
+                                                ),
+                                              )),
                                         ],
-                                        SizedBox(
-                                          width: 15,
-                                        ),
-                                        Expanded(
-                                          child: TextField(
-                                            textInputAction: TextInputAction.go,
-                                            decoration: InputDecoration(
-                                                hintText: "輸入訊息",
-                                                hintStyle: TextStyle(
-                                                    color: Colors.black54),
-                                                border: InputBorder.none),
-                                            controller: _chatController,
-                                            onSubmitted: _submitText,
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: 15,
-                                        ),
-                                        FloatingActionButton(
-                                          //回頭補 鍵盤return 送出mqtt
-                                          onPressed: () {
-                                            if (_sweetProvider.cantTalk ==
-                                                false) {
-                                              if ((_chatController.text.length)
-                                                      .toInt() >
-                                                  0) {
-                                                pushMqtt(
-                                                    'imeSweetRoom/' +
-                                                        sweetRoomId,
-                                                    'addChatMsg,' +
-                                                        _sweetProvider
-                                                            .selfEncodeName +
-                                                        ',' +
-                                                        strToEncode(
-                                                            _chatController
-                                                                .text));
-                                                _chatController.clear();
-                                              }
-                                              FocusScope.of(context)
-                                                  .requestFocus(FocusNode());
-                                            } else {
-                                              cantTalk(context);
-                                              FocusScope.of(context)
-                                                  .requestFocus(FocusNode());
-                                              _chatController.clear();
-                                            }
+                                        Expanded(child: SizedBox()),
+                                        GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              _gift = true;
+                                            });
                                           },
-                                          child: Icon(
-                                            Icons.send,
-                                            color: Colors.white,
-                                            size: 18,
-                                          ),
-                                          backgroundColor: Colors.blue,
-                                          elevation: 0,
+                                          child: (Image.network(
+                                            "https://storage.googleapis.com/ime-gift/icon/gift.png",
+                                            height: 40,
+                                            width: 40,
+                                          )),
+                                        ),
+                                        SizedBox(
+                                          width: 15,
                                         ),
                                       ],
                                     ),
@@ -1145,45 +1000,629 @@ class _theRoomState extends State<sweetView> with TickerProviderStateMixin {
                             ],
                           ),
                         ),
+
+                        if (_chat == true) ...[
+                          //輸入欄
+                          Positioned(
+                            bottom: MediaQuery.of(context).viewInsets.bottom,
+                            left: 0,
+                            right: 0,
+                            child: Container(
+                              padding: EdgeInsets.only(
+                                  left: 10, bottom: 10, top: 10),
+                              height: 60,
+                              width: double.infinity,
+                              color: Colors.white,
+                              child: Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: TextField(
+                                      autofocus: true,
+                                      textInputAction: TextInputAction.go,
+                                      decoration: InputDecoration(
+                                          hintText: "輸入訊息",
+                                          hintStyle:
+                                              TextStyle(color: Colors.black54),
+                                          border: InputBorder.none),
+                                      controller: _chatController,
+                                      onSubmitted: _submitText,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 15,
+                                  ),
+                                  FloatingActionButton(
+                                    //回頭補 鍵盤return 送出mqtt
+                                    onPressed: () {
+                                      if (_sweetProvider.cantTalk == false) {
+                                        if ((_chatController.text.length)
+                                                .toInt() >
+                                            0) {
+                                          pushMqtt(
+                                              'imeSweetRoom/' + sweetRoomId,
+                                              'addChatMsg,' +
+                                                  _sweetProvider
+                                                      .selfEncodeName +
+                                                  ',' +
+                                                  strToEncode(
+                                                      _chatController.text));
+                                          _chatController.clear();
+                                        }
+
+                                        ;
+                                      } else {
+                                        cantTalk(context);
+                                        _chatController.clear();
+                                      }
+                                      setState(() {
+                                        _chat = false;
+                                      });
+                                      FocusScope.of(context)
+                                          .requestFocus(FocusNode());
+                                    },
+                                    child: Icon(
+                                      Icons.send,
+                                      color: Colors.white,
+                                      size: 18,
+                                    ),
+                                    backgroundColor: Colors.blue,
+                                    elevation: 0,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                        ],
+
+                        if (_camera == true) ...[
+                          Positioned(
+                              bottom: MediaQuery.of(context).viewInsets.bottom,
+                              left: 0,
+                              right: 0,
+                              child: Container(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.4,
+                                alignment: Alignment.bottomCenter,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Container(
+                                      width: MediaQuery.of(context).size.width,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Align(
+                                            alignment: Alignment.bottomLeft,
+                                            child: IconButton(
+                                              icon: Image.asset(
+                                                  'assets/images/camera.png'),
+                                              iconSize: 3,
+                                              onPressed: () {
+                                                engine!.switchCamera();
+                                              },
+                                            ),
+                                          ),
+                                          if (isSelfMute == true) ...[
+                                            Align(
+                                              alignment: Alignment.bottomRight,
+                                              child: IconButton(
+                                                icon: Image.asset(
+                                                    'assets/images/mic-on.png'),
+                                                iconSize: 3,
+                                                onPressed: () {
+                                                  setState(() {
+                                                    isSelfMute = !isSelfMute;
+                                                  });
+                                                  engine!.enableLocalAudio(
+                                                      isSelfMute);
+                                                },
+                                              ),
+                                            ),
+                                          ] else if (isSelfMute == false) ...[
+                                            Align(
+                                              alignment: Alignment.bottomRight,
+                                              child: IconButton(
+                                                icon: Image.asset(
+                                                    'assets/images/mic-off.png'),
+                                                iconSize: 3,
+                                                onPressed: () {
+                                                  setState(() {
+                                                    isSelfMute = !isSelfMute;
+                                                  });
+                                                  engine!.enableLocalAudio(
+                                                      isSelfMute);
+                                                },
+                                              ),
+                                            ),
+                                          ],
+                                          if (isSelfHide == true) ...[
+                                            Align(
+                                              alignment: Alignment.bottomRight,
+                                              child: IconButton(
+                                                icon: Image.asset(
+                                                    'assets/images/vdo-on.png'),
+                                                iconSize: 3,
+                                                onPressed: () {
+                                                  setState(() {
+                                                    isSelfHide = !isSelfHide;
+                                                    pushMqtt(
+                                                        "imeSweetRoom/" +
+                                                            sweetRoomId,
+                                                        "vdoHide,$isSelfHide");
+                                                  });
+                                                  engine!.enableLocalVideo(
+                                                      isSelfHide);
+                                                },
+                                              ),
+                                            ),
+                                          ] else if (isSelfHide == false) ...[
+                                            Align(
+                                              alignment: Alignment.bottomRight,
+                                              child: IconButton(
+                                                icon: Image.asset(
+                                                    'assets/images/vdo-off.png'),
+                                                iconSize: 3,
+                                                onPressed: () {
+                                                  setState(() {
+                                                    isSelfHide = !isSelfHide;
+                                                    pushMqtt(
+                                                        "imeSweetRoom/" +
+                                                            sweetRoomId,
+                                                        "vdoHide,$isSelfHide");
+                                                  });
+                                                  engine!.enableLocalVideo(
+                                                      isSelfHide);
+                                                },
+                                              ),
+                                            ),
+                                          ],
+                                        ],
+                                      ),
+                                    ),
+                                    FaceunityUI()
+                                  ],
+                                ),
+                              ))
+                        ],
+
+                        if (_gift == true) ...[
+                          Positioned(
+                            bottom: MediaQuery.of(context).viewInsets.bottom,
+                            left: 0,
+                            right: 0,
+                            child: Container(
+                                height:
+                                    (MediaQuery.of(context).size.height) * 0.4,
+                                decoration: new BoxDecoration(
+                                  //背景
+                                  color: Colors.white,
+                                  //设置四周圆角 角度
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(20)),
+                                  //设置四周边框
+                                  border: new Border.all(
+                                      width: 1, color: Colors.red),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    Container(
+                                      height:
+                                          (MediaQuery.of(context).size.height) *
+                                              0.3,
+                                      child: ListView(
+                                        padding: const EdgeInsets.all(10.0),
+                                        shrinkWrap: true,
+                                        children: [
+                                          Column(
+                                            children: [
+                                              for (int i = 0; i < 5; i++) ...[
+                                                Row(
+                                                  children: [
+                                                    for (int j = 1;
+                                                        j < 5;
+                                                        j++) ...[
+                                                      if (i == 0) ...[
+                                                        GestureDetector(
+                                                          // behavior:
+                                                          //     HitTestBehavior.opaque,
+                                                          onTap: () {
+                                                            giftIndex = j - 1;
+                                                            if (giftFrist ==
+                                                                true) {
+                                                              previouClick =
+                                                                  giftIndex;
+                                                              clicking =
+                                                                  giftIndex;
+                                                              giftFrist = false;
+                                                              setState(() {
+                                                                borderList[
+                                                                        clicking] =
+                                                                    true;
+                                                              });
+                                                            } else {
+                                                              previouClick =
+                                                                  clicking;
+                                                              clicking =
+                                                                  giftIndex;
+                                                              borderList[
+                                                                      previouClick] =
+                                                                  false;
+                                                              setState(() {
+                                                                borderList[
+                                                                        previouClick] =
+                                                                    false;
+                                                                borderList[
+                                                                        clicking] =
+                                                                    true;
+                                                              });
+                                                              ;
+                                                            }
+                                                            ms = _sweetProvider
+                                                                .giftList[
+                                                                    giftIndex]
+                                                                .ms;
+                                                            giftMusic =
+                                                                _sweetProvider
+                                                                    .giftList[
+                                                                        giftIndex]
+                                                                    .music;
+                                                            giftMoney =
+                                                                _sweetProvider
+                                                                    .giftList[
+                                                                        giftIndex]
+                                                                    .money;
+                                                            giftName =
+                                                                _sweetProvider
+                                                                    .giftList[
+                                                                        giftIndex]
+                                                                    .name;
+                                                            giftChName =
+                                                                _sweetProvider
+                                                                    .giftList[
+                                                                        giftIndex]
+                                                                    .ch_name;
+                                                            _sweetProvider
+                                                                .sendCount = 1;
+                                                          },
+                                                          child: Container(
+                                                            width: (MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .width) *
+                                                                0.23,
+                                                            height: (MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .height) *
+                                                                0.125,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              borderRadius: BorderRadius
+                                                                  .all(Radius
+                                                                      .circular(
+                                                                          10.0)),
+                                                              border:
+                                                                  (borderList[j -
+                                                                              1] ==
+                                                                          false)
+                                                                      ? Border
+                                                                          .all(
+                                                                          style:
+                                                                              BorderStyle.none, //BorderSide
+                                                                        )
+                                                                      : Border
+                                                                          .all(
+                                                                          width:
+                                                                              1.0,
+                                                                          color:
+                                                                              Colors.pinkAccent,
+                                                                        ),
+                                                            ),
+                                                            child: Column(
+                                                              children: [
+                                                                Image.network(
+                                                                  _sweetProvider
+                                                                      .giftList[
+                                                                          j - 1]
+                                                                      .icon_url,
+                                                                  width: 60,
+                                                                  height: 60,
+                                                                ),
+                                                                Text(
+                                                                  _sweetProvider
+                                                                      .giftList[
+                                                                          j - 1]
+                                                                      .ch_name,
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          10.5),
+                                                                ),
+                                                                Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .center,
+                                                                  children: [
+                                                                    Image.asset(
+                                                                      'assets/images/sweet/coin.png',
+                                                                      height:
+                                                                          15,
+                                                                      width: 15,
+                                                                    ),
+                                                                    Text(_sweetProvider
+                                                                        .giftList[
+                                                                            j - 1]
+                                                                        .money,
+                                                                      style: TextStyle(
+                                                                          fontSize:
+                                                                          10.5),
+                                                                    )
+                                                                  ],
+                                                                )
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ] else if (i * 4 + j >
+                                                          _sweetProvider
+                                                              .giftList.length
+                                                              .toInt()) ...[
+                                                        Container(
+                                                          height: 0,
+                                                          width: 0,
+                                                        )
+                                                      ] else if (i != 0) ...[
+                                                        GestureDetector(
+                                                          onTap: () {
+                                                            giftIndex =
+                                                                i * 4 + j - 1;
+                                                            if (giftFrist ==
+                                                                true) {
+                                                              previouClick =
+                                                                  giftIndex;
+                                                              clicking =
+                                                                  giftIndex;
+                                                              giftFrist = false;
+                                                              setState(() {
+                                                                borderList[
+                                                                        clicking] =
+                                                                    true;
+                                                              });
+                                                            } else {
+                                                              previouClick =
+                                                                  clicking;
+                                                              clicking =
+                                                                  giftIndex;
+                                                              borderList[
+                                                                      previouClick] =
+                                                                  false;
+                                                              setState(() {
+                                                                borderList[
+                                                                        previouClick] =
+                                                                    false;
+                                                                borderList[
+                                                                        clicking] =
+                                                                    true;
+                                                              });
+                                                              ;
+                                                            }
+                                                            ms = _sweetProvider
+                                                                .giftList[
+                                                                    giftIndex]
+                                                                .ms;
+                                                            giftMusic =
+                                                                _sweetProvider
+                                                                    .giftList[
+                                                                        giftIndex]
+                                                                    .music;
+                                                            giftMoney =
+                                                                _sweetProvider
+                                                                    .giftList[
+                                                                        giftIndex]
+                                                                    .money;
+                                                            giftName =
+                                                                _sweetProvider
+                                                                    .giftList[
+                                                                        giftIndex]
+                                                                    .name;
+                                                            giftChName =
+                                                                _sweetProvider
+                                                                    .giftList[
+                                                                        giftIndex]
+                                                                    .ch_name;
+                                                            _sweetProvider
+                                                                .sendCount = 1;
+                                                          },
+                                                          child: Container(
+                                                            width: (MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .width) *
+                                                                0.23,
+                                                            height: (MediaQuery.of(
+                                                                context)
+                                                                .size
+                                                                .height) *
+                                                                0.125,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              borderRadius: BorderRadius
+                                                                  .all(Radius
+                                                                      .circular(
+                                                                          10.0)),
+                                                              border: (borderList[i *
+                                                                              4 +
+                                                                          j -
+                                                                          1] ==
+                                                                      false)
+                                                                  ? Border.all(
+                                                                      style: BorderStyle
+                                                                          .none, //BorderSide
+                                                                    )
+                                                                  : Border.all(
+                                                                      width:
+                                                                          1.0,
+                                                                      color: Colors
+                                                                          .pinkAccent,
+                                                                    ),
+                                                            ),
+                                                            child: Column(
+                                                              children: [
+                                                                Image.network(
+                                                                  _sweetProvider
+                                                                      .giftList[
+                                                                          i * 4 +
+                                                                              j -
+                                                                              1]
+                                                                      .icon_url,
+                                                                  width: 60,
+                                                                  height: 60,
+                                                                ),
+                                                                Text(
+                                                                  _sweetProvider
+                                                                      .giftList[
+                                                                          i * 4 +
+                                                                              j -
+                                                                              1]
+                                                                      .ch_name,
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          10.5),
+                                                                ),
+                                                                Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .center,
+                                                                  children: [
+                                                                    Image.asset(
+                                                                      'assets/images/sweet/coin.png',
+                                                                      height:
+                                                                          15,
+                                                                      width: 15,
+                                                                    ),
+                                                                    Text(_sweetProvider
+                                                                        .giftList[i *
+                                                                                4 +
+                                                                            j -
+                                                                            1]
+                                                                        .money,
+                                                                      style: TextStyle(
+                                                                          fontSize:
+                                                                          10.5),
+                                                                    )
+                                                                  ],
+                                                                )
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ]
+                                                    ]
+                                                  ],
+                                                ),
+                                              ]
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Align(
+                                      alignment: Alignment.bottomCenter,
+                                      child: Container(
+                                          height: (MediaQuery.of(context)
+                                                  .size
+                                                  .height) *
+                                              0.09,
+                                          child: Stack(
+                                            children: [
+                                              Align(
+                                                alignment: Alignment.center,
+                                                child: (Container(
+                                                  height:
+                                                      (MediaQuery.of(context)
+                                                              .size
+                                                              .height) *
+                                                          0.07,
+                                                  width: 200,
+                                                  decoration: new BoxDecoration(
+                                                    //背景
+                                                    color: Colors.white,
+                                                    //设置四周圆角 角度
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                            Radius.circular(
+                                                                45)),
+                                                    //设置四周边框
+                                                    border: new Border.all(
+                                                        width: 1,
+                                                        color: Colors.pink),
+                                                  ),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceEvenly,
+                                                    children: [
+                                                      Row(
+                                                        children: [
+                                                          Text(
+                                                            _sweetProvider
+                                                                .sendCount
+                                                                .toString(),
+                                                            style: TextStyle(
+                                                                fontSize: 20),
+                                                          ),
+                                                          IconButton(
+                                                              onPressed: () {
+                                                                _sweetProvider
+                                                                    .sendCount += 1;
+                                                              },
+                                                              icon: const Icon(Icons
+                                                                  .expand_less)),
+                                                        ],
+                                                      ),
+                                                      ElevatedButton(
+                                                        style: ElevatedButton
+                                                            .styleFrom(
+                                                          primary:
+                                                              Color(0xffff7090),
+                                                        ),
+                                                        onPressed: () {
+                                                          SendGift(
+                                                              _sweetProvider
+                                                                  .selfEncodeName,
+                                                              _sweetProvider
+                                                                  .anchorName,
+                                                              _sweetProvider
+                                                                  .sendCount,
+                                                              giftMoney,
+                                                              giftName,
+                                                              giftMusic,
+                                                              giftChName,
+                                                              ms);
+                                                        },
+                                                        child: Text('贈送'),
+                                                      )
+                                                    ],
+                                                  ),
+                                                )),
+                                              )
+                                            ],
+                                          )),
+                                    )
+                                  ],
+                                )),
+                          )
+                        ],
+                        //共同都有 聊天室 主播更多：美顏 觀眾更多：送禮物
                       ],
 
                       //gif
-                      _sweetProvider.vipAnime
-                          ? Align(
-                              alignment: Alignment.center,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Image.network(
-                                    'https://storage.googleapis.com/ime-gift/gif/sports_car.gif',
-                                    width: 100,
-                                    height: 100,
-                                  ),
-                                  Text('VIP : ' +
-                                      _sweetProvider.vipName +
-                                      ' 進入房間'),
-                                ],
-                              ))
-                          : Container(width: 0, height: 0),
-                      _sweetProvider.giftAnime
-                          ? Align(
-                              alignment: Alignment.center,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Image.network(
-                                    _sweetProvider.gifUrl,
-                                    width: 150,
-                                    height: 100,
-                                  ),
-                                  Text(_sweetProvider.senderName + " 送給主播 "),
-                                ],
-                              ))
-                          : Container(width: 0, height: 0),
-                    ]);
-                  });
+
+
+                    ]
+                  ]);
                 })
               ],
             ),
@@ -1241,12 +1680,12 @@ Future<Future<String?>> cantTalk(BuildContext context) async {
 SendGift(selfEncodeName, anchorName, count, money, giftName, giftMusic,
     giftCnName, ms) {
   var sendGiftJson = {};
-  sendGiftJson['"dbName"'] = ("ime");
-  sendGiftJson['"coll"'] = ("member");
-  sendGiftJson['"eqKey"'] = ('nickname');
+  sendGiftJson['"dbName"'] = ('"ime"');
+  sendGiftJson['"coll"'] = ('"member"');
+  sendGiftJson['"eqKey"'] = ('"nickname"');
   sendGiftJson['"eqValue"'] = //("5q2k5Lmf5piv");
       ('"${strToEncode(anchorName)}"');
-  sendGiftJson['"setKey"'] = ("get_donate_count");
+  sendGiftJson['"setKey"'] = ('"get_donate_count"');
   sendGiftJson['"setValue"'] = ('"${money}"');
   sendGiftJson['"senderName"'] = ('"${selfEncodeName}"');
   sendGiftJson['"sendCount"'] = ('"${count}"');
@@ -1254,8 +1693,14 @@ SendGift(selfEncodeName, anchorName, count, money, giftName, giftMusic,
   sendGiftJson['"musicUrl"'] = ('"${strToEncode(giftMusic)}"');
   sendGiftJson['"ms"'] = ('"${strToEncode(ms)}"');
   //print("sendGiftJson," + sendGiftJson.toString());
+  pushMqtt('imeSweetRoom/' + sweetRoomId,
+      "put/gift/count," + sendGiftJson.toString());
   pushMqtt(
-      'imeSweetRoom/' + sweetRoomId, "send/gift," + sendGiftJson.toString());
+      'imeSweetRoom/' + sweetRoomId,
+      "gif/enQue," +
+          selfEncodeName +
+          "," +
+          sendGiftJson.toString()           );
   pushMqtt(
       'imeSweetRoom/' + sweetRoomId,
       'addChatMsg,' +
@@ -1264,47 +1709,183 @@ SendGift(selfEncodeName, anchorName, count, money, giftName, giftMusic,
           strToEncode('送給了主播' + count.toString() + '個' + giftCnName));
 }
 
-_showUserList(BuildContext context, accountList) {
-  //print('dddd ${accountList[0]}');
+_showAnchorInfo(BuildContext context, anchorInfo) {
   showModalBottomSheet(
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
     context: context,
     builder: (context) => Container(
-      child: ListView(
-          children: List.generate(
-        (accountList.length).toInt(),
-        (index) => InkWell(
-            child: Container(
-                alignment: Alignment.center,
-                height: 60.0,
-                child: Stack(
-                  children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Container(
-                        width: 100,
-                        child: CircleAvatar(
-                          backgroundImage:
-                              NetworkImage(accountList[index]["avatar_sub"]),
-                        ),
+      height: MediaQuery.of(context).size.height * 0.55,
+      decoration: new BoxDecoration(
+        color: Colors.white,
+        borderRadius: new BorderRadius.only(
+          topLeft: const Radius.circular(25.0),
+          topRight: const Radius.circular(25.0),
+        ),
+      ),
+      child: (Column(
+        children: [
+          CircleAvatar(
+            radius: 37.5,
+            backgroundColor: Colors.transparent,
+            backgroundImage: NetworkImage(
+                'https://storage.googleapis.com/ime-gift/icon/border.png'),
+            child: CircleAvatar(
+              radius: 24.0,
+              backgroundColor: Colors.transparent,
+              backgroundImage: NetworkImage(anchorInfo.avatar_sub),
+            ),
+          ),
+          SizedBox(
+            height: 30,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                anchorNameConvert(anchorInfo.nickname),
+                style: TextStyle(fontSize: 20),
+              ),
+              SizedBox(
+                width: 15,
+              ),
+              Container(
+                  height: 20,
+                  width: 50,
+                  decoration: new BoxDecoration(
+                      //背景
+                      color: Colors.orange,
+                      //设置四周圆角 角度
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                      //设置四周边框
+                      border: new Border.all(
+                        width: 1,
+                        color: Colors.transparent,
+                      )),
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: (Text(anchorInfo.age.toString())),
+                  )),
+            ],
+          ),
+          SizedBox(
+            height: 35,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                  height: 100,
+                  width: 100,
+                  child: Column(
+                    children: [
+                      Text(
+                        "10",
+                        style: TextStyle(fontSize: 20),
                       ),
-                    ),
-                    Align(
-                      alignment: Alignment.center,
-                      child: Container(
-                        width: 210,
-                        child: Text(
-                          accountList[index]["nickname"],
-                          style: TextStyle(fontSize: 15),
-                        ),
+                      SizedBox(
+                        height: 10,
                       ),
-                    )
-                  ],
+                      Text(
+                        "追蹤者",
+                        style: TextStyle(fontSize: 20),
+                      )
+                    ],
+                  )),
+              SizedBox(
+                height: 15,
+              ),
+              Container(
+                  height: 100,
+                  width: 100,
+                  child: Column(
+                    children: [
+                      Text(
+                        donateNumConvert(anchorInfo.get_donate_count),
+                        style: TextStyle(fontSize: 20),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                        "禮物",
+                        style: TextStyle(fontSize: 20),
+                      )
+                    ],
+                  )),
+            ],
+          ),
+          Container(
+            // name
+            height: 50,
+            width: 125,
+            decoration: new BoxDecoration(
+                //背景半透明
+                color: Color.fromARGB(100, 22, 44, 33),
+                //设置四周圆角 角度
+                borderRadius: BorderRadius.all(Radius.circular(25)),
+                //设置四周边框
+                border: new Border.all(
+                  width: 1,
+                  color: Colors.transparent,
                 )),
-            onTap: () async {
-              await _showUserDetail(context, accountList[index]);
-            }),
+            child: Center(
+              child: (Text(
+                '追蹤',
+                style: TextStyle(fontSize: 15),
+              )),
+            ),
+          )
+        ],
       )),
-      //height: 500,
+    ),
+  );
+}
+
+_showAudienceList(BuildContext context, audienceList) {
+  showModalBottomSheet(
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    context: context,
+    builder: (context) => Container(
+      height: MediaQuery.of(context).size.height * 0.65,
+      decoration: new BoxDecoration(
+        color: Colors.white,
+        borderRadius: new BorderRadius.only(
+          topLeft: const Radius.circular(25.0),
+          topRight: const Radius.circular(25.0),
+        ),
+      ),
+      child: (Column(
+        children: [
+          SizedBox(
+            height: 20,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                '觀看人數',
+                style: TextStyle(fontSize: 20),
+              ),
+              SizedBox(
+                width: 20,
+              ),
+              Text(
+                'VIP',
+                style: TextStyle(fontSize: 20),
+              ),
+              SizedBox(
+                width: 20,
+              ),
+              Text(
+                '貢獻榜',
+                style: TextStyle(fontSize: 20),
+              ),
+            ],
+          )
+        ],
+      )),
     ),
   );
 }
@@ -1332,4 +1913,20 @@ _showUserDetail(BuildContext context, account) {
       ),
     ),
   );
+}
+
+donateNumConvert(num) {
+  if (num > 10000) {
+    return (num ~/ 1000).toString() + 'K';
+  } else {
+    return num.toString();
+  }
+}
+
+anchorNameConvert(name) {
+  if (name.length > 5) {
+    return (name.substring(0, 5) + '...');
+  } else {
+    return name;
+  }
 }

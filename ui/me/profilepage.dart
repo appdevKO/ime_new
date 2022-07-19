@@ -300,17 +300,25 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                                   width: value
                                                               .remoteUserInfo[0]
                                                               .tag[index]
+                                                              .data
                                                               .length *
                                                           16.0 +
                                                       45,
                                                   child: Row(
                                                     children: [
                                                       Icon(
-                                                        Icons.mail,
+                                                        value
+                                                                    .remoteUserInfo[
+                                                                        0]
+                                                                    .tag[index]
+                                                                    .title ==
+                                                                'height'
+                                                            ? Icons.mail
+                                                            : Icons.star_border,
                                                         color: Colors.grey,
                                                       ),
                                                       Text(
-                                                        '${value.remoteUserInfo[0].tag[index]}',
+                                                        '${value.remoteUserInfo[0].tag[index].data}',
                                                         style: TextStyle(
                                                             color:
                                                                 Colors.black),
