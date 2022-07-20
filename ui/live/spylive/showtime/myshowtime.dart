@@ -5,6 +5,8 @@ import 'package:ime_new/ui/live/spylive/mission/missiondetailpage.dart';
 import 'package:ime_new/utils/viewconfig.dart';
 import 'package:provider/provider.dart';
 
+import 'fakestream.dart';
+
 class MyShowTime extends StatefulWidget {
   const MyShowTime({Key? key}) : super(key: key);
 
@@ -100,6 +102,7 @@ class _MyShowTimeState extends State<MyShowTime> {
                       child: TabBarView(
                         controller: _tabController,
                         children: [
+                          // 進行中
                           Consumer<ChatProvider>(
                             builder: (context, value, child) {
                               return value.myshowtime_streaming_list != null
@@ -323,42 +326,53 @@ class _MyShowTimeState extends State<MyShowTime> {
                                                                         .end,
                                                                 children: [
                                                                   GestureDetector(
-                                                                    child: Container(
-                                                                      width: 100,
-                                                                      height: 30,
-                                                                      decoration:
-                                                                          BoxDecoration(
-                                                                              borderRadius:
-                                                                                  BorderRadius.only(
-                                                                                bottomLeft: Radius.circular(0),
-                                                                                bottomRight: Radius.circular(12),
-                                                                                topLeft: Radius.circular(12),
-                                                                                topRight: Radius.circular(0),
-                                                                              ),
-                                                                              gradient: LinearGradient(colors: [
-                                                                                spy_gradient_light_blue,
-                                                                                spy_gradient_light_purple,
-                                                                              ])),
+                                                                    child:
+                                                                        Container(
+                                                                      width:
+                                                                          100,
+                                                                      height:
+                                                                          30,
+                                                                      decoration: BoxDecoration(
+                                                                          borderRadius: BorderRadius.only(
+                                                                            bottomLeft:
+                                                                                Radius.circular(0),
+                                                                            bottomRight:
+                                                                                Radius.circular(12),
+                                                                            topLeft:
+                                                                                Radius.circular(12),
+                                                                            topRight:
+                                                                                Radius.circular(0),
+                                                                          ),
+                                                                          gradient: LinearGradient(colors: [
+                                                                            spy_gradient_light_blue,
+                                                                            spy_gradient_light_purple,
+                                                                          ])),
                                                                       child:
                                                                           Padding(
-                                                                        padding: EdgeInsetsDirectional
-                                                                            .fromSTEB(
-                                                                                0,
-                                                                                5,
-                                                                                0,
-                                                                                0),
+                                                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                                                            0,
+                                                                            5,
+                                                                            0,
+                                                                            0),
                                                                         child:
                                                                             Text(
                                                                           '立即觀看',
                                                                           textAlign:
                                                                               TextAlign.center,
                                                                           style: TextStyle(
-                                                                              color:
-                                                                                  Colors.white,
+                                                                              color: Colors.white,
                                                                               fontWeight: FontWeight.w700),
                                                                         ),
                                                                       ),
                                                                     ),
+                                                                    onTap: () {
+                                                                      Navigator.push(
+                                                                          context,
+                                                                          MaterialPageRoute(
+                                                                              builder: (context) => FakeStream(
+                                                                                    TheMission: value.myshowtime_streaming_list[index],
+                                                                                  )));
+                                                                    },
                                                                   ),
                                                                 ],
                                                               ),
@@ -405,6 +419,7 @@ class _MyShowTimeState extends State<MyShowTime> {
                                     );
                             },
                           ),
+                          //已結束
                           Consumer<ChatProvider>(
                             builder: (context, value, child) {
                               return value.myshowtime_ended_list != null
@@ -558,8 +573,9 @@ class _MyShowTimeState extends State<MyShowTime> {
                                                                 BoxDecoration(
                                                               gradient:
                                                                   LinearGradient(
-                                                                      colors: value.myshowtime_ended_list[index].status ==
-                                                                              6
+                                                                      colors: value.myshowtime_ended_list[index].status == 6 ||
+                                                                              value.myshowtime_ended_list[index].status ==
+                                                                                  8
                                                                           ? [
                                                                               spy_bar_purple,
                                                                               spy_bar_purple
@@ -587,11 +603,17 @@ class _MyShowTimeState extends State<MyShowTime> {
                                                               ),
                                                             ),
                                                             child: Icon(
-                                                              value.myshowtime_ended_list[index]
-                                                                          .status ==
-                                                                      6
+                                                              value.myshowtime_ended_list[index].status ==
+                                                                          6 ||
+                                                                      value.myshowtime_ended_list[index].status ==
+                                                                          8
                                                                   ? Icons.close
-                                                                  : Icons.check_circle_outline,
+                                                                  : value.myshowtime_ended_list[index].status ==
+                                                                          5
+                                                                      ? Icons
+                                                                          .error_outline
+                                                                      : Icons
+                                                                          .check_circle_outline,
                                                               color:
                                                                   Colors.white,
                                                               size: 22,
@@ -638,6 +660,7 @@ class _MyShowTimeState extends State<MyShowTime> {
                                     );
                             },
                           ),
+                          // 曾經發起
                           Consumer<ChatProvider>(
                               builder:
                                   (context, value, child) =>
@@ -761,7 +784,7 @@ class _MyShowTimeState extends State<MyShowTime> {
                                                                             CrossAxisAlignment.center,
                                                                         children: [
                                                                           Text(
-                                                                            '任務內容',
+                                                                            '${value.myshowtime_hadcreated_list[index].content}',
                                                                             style: TextStyle(
                                                                                 color: Colors.white,
                                                                                 fontSize: 14,
@@ -793,14 +816,21 @@ class _MyShowTimeState extends State<MyShowTime> {
                                                                                 topLeft: Radius.circular(12),
                                                                                 topRight: Radius.circular(0),
                                                                               ),
-                                                                              gradient: LinearGradient(colors: [
-                                                                                spy_gradient_light_blue,
-                                                                                spy_gradient_light_purple,
-                                                                              ])),
+                                                                              gradient: LinearGradient(
+                                                                                  colors: value.myshowtime_hadcreated_list[index].status == 6 || value.myshowtime_hadcreated_list[index].status == 8
+                                                                                      ? [spy_bar_purple, spy_bar_purple]
+                                                                                      : [
+                                                                                          spy_gradient_light_blue,
+                                                                                          spy_gradient_light_purple,
+                                                                                        ])),
                                                                           child: Padding(
                                                                               padding: EdgeInsetsDirectional.fromSTEB(0, 5, 0, 0),
                                                                               child: Icon(
-                                                                                Icons.close_outlined,
+                                                                                value.myshowtime_hadcreated_list[index].status == 6 || value.myshowtime_hadcreated_list[index].status == 8
+                                                                                    ? Icons.close
+                                                                                    : value.myshowtime_hadcreated_list[index].status == 5
+                                                                                        ? Icons.error_outline
+                                                                                        : Icons.check_circle_outline,
                                                                                 color: Colors.white,
                                                                               )),
                                                                         ),

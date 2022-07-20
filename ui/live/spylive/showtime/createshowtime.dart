@@ -154,7 +154,7 @@ class _CreateShowTimeState extends State<CreateShowTime> {
                               ),
                             ),
                             Text(
-                              '任務獎金',
+                              '目標獎金',
                               style: TextStyle(color: Colors.white),
                             ),
                             Padding(

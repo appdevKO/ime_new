@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ime_new/business_logic/provider/chat_provider.dart';
+import 'package:ime_new/ui/live/spylive/contract/becomespy.dart';
 import 'package:ime_new/ui/live/spylive/mission/missiondetailpage.dart';
 import 'package:ime_new/ui/live/spylive/showtime/myshowtime.dart';
 
@@ -115,10 +116,20 @@ class _ShowTimePageState extends State<ShowTimePage> {
                           ),
                         ),
                         onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => CreateShowTime()));
+                          if (Provider.of<ChatProvider>(context, listen: false)
+                              .remoteUserInfo[0]
+                              .role ==
+                              2)
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => CreateShowTime()));
+                          else
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => BecomeSpy()));
+
                         },
                       ),
                     ],

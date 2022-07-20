@@ -1665,7 +1665,10 @@ class ChatProvider with ChangeNotifier {
     print('獲得現在直播中任務列表');
     spy_streaming_list = await readremotemongodb(
         MissionModel.fromJson, 'spy_mission',
-        field: mongo.where.eq('status', 4).limit(pagesize));
+        field: mongo.where
+            .eq('status', 4)
+            .or(mongo.where.eq('status', 3))
+            .limit(pagesize));
     print('任務列表$spy_streaming_list');
 
     notifyListeners();
@@ -1707,14 +1710,14 @@ class ChatProvider with ChangeNotifier {
         MissionModel.fromJson, 'spy_mission',
         field: mongo.where
             .eq('type', 3)
-            .and(mongo.where.eq('status', 4))
+            .and(mongo.where.eq('status', 4).or(mongo.where.eq('status', 3)))
             .limit(pagesize));
     print('任務列表$spy_streaming_showtime_list');
 
     notifyListeners();
   }
 
-  //my showtime
+  //my showtime (我有付錢)
   var myshowtime_streaming_list;
   int myshowtime_streaming_list_value = 1;
 
@@ -1726,6 +1729,7 @@ class ChatProvider with ChangeNotifier {
         MissionModel.fromJson, 'spy_mission',
         field: mongo.where
             .eq('type', 3)
+            .and(mongo.where.eq('pay_list', remoteUserInfo[0].memberid))
             .and(mongo.where.lt('status', 5))
             .limit(pagesize));
     print('myshowtime現在直播中任務列表$myshowtime_streaming_list');
@@ -1743,6 +1747,7 @@ class ChatProvider with ChangeNotifier {
         MissionModel.fromJson, 'spy_mission',
         field: mongo.where
             .eq('type', 3)
+            .and(mongo.where.eq('pay_list', remoteUserInfo[0].memberid))
             .and(mongo.where.gte('status', 5))
             .limit(pagesize));
     print('myshowtime ended任務列表$myshowtime_ended_list');
@@ -1762,6 +1767,7 @@ class ChatProvider with ChangeNotifier {
         field: mongo.where
             .eq('type', 3)
             .and(mongo.where.eq('memberid', remoteUserInfo[0].memberid))
+            .and(mongo.where.gte('status', 5))
             .limit(pagesize));
     print('曾經發起showtime任務列表$myshowtime_hadcreated_list');
 
@@ -1807,38 +1813,38 @@ class ChatProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  var mymission_icatch_success_list;
-  int mymission_icatch_success_list_value = 1;
+  var mymission_icatch_approve_list;
+  int mymission_icatch_approve_list_value = 1;
 
-  Future get_spy_mymission_icatch_successlist() async {
-    mymission_icatch_success_list_value = 1;
-    print('獲得mymission 我接的 成功列表');
-    mymission_icatch_success_list = await readremotemongodb(
+  Future get_spy_mymission_icatch_approvelist() async {
+    mymission_icatch_approve_list_value = 1;
+    print('獲得mymission 我接的 待審核列表');
+    mymission_icatch_approve_list = await readremotemongodb(
         MissionModel.fromJson, 'spy_mission',
         field: mongo.where
             .ne('type', 3)
-            .and(mongo.where.eq('status', 7))
+            .and(mongo.where.eq('status', 5))
             .and(mongo.where.eq('executor', remoteUserInfo[0].memberid))
             .limit(pagesize));
-    print('mymission 我接的 成功任務列表$mymission_icatch_success_list');
+    print('mymission 我接的 待審核任務列表$mymission_icatch_approve_list');
 
     notifyListeners();
   }
 
-  var mymission_icatch_fail_list;
-  int mymission_icatch_fail_list_value = 1;
+  var mymission_icatch_finished_list;
+  int mymission_icatch_finished_list_value = 1;
 
-  Future get_spy_mymission_icatch_faillist() async {
-    mymission_icatch_fail_list_value = 1;
-    print('獲得mymission 我接的 fail任務列表');
-    mymission_icatch_fail_list = await readremotemongodb(
+  Future get_spy_mymission_icatch_finishedlist() async {
+    mymission_icatch_finished_list_value = 1;
+    print('獲得mymission 我接的 finish任務列表');
+    mymission_icatch_finished_list = await readremotemongodb(
         MissionModel.fromJson, 'spy_mission',
         field: mongo.where
             .ne('type', 3)
-            .and(mongo.where.eq('status', 6))
+            .and(mongo.where.gte('status', 6))
             .and(mongo.where.eq('executor', remoteUserInfo[0].memberid))
             .limit(pagesize));
-    print('mymission 我接的 fail任務列表$mymission_icatch_fail_list');
+    print('mymission 我接的 finish任務列表$mymission_icatch_finished_list');
 
     notifyListeners();
   }
@@ -1885,7 +1891,6 @@ class ChatProvider with ChangeNotifier {
   int mymission_ilaunch_notcatched_list_value = 1;
 
   Future get_spy_mymission_ilaunch_notcatchedlist() async {
-    // only 直播主
     mymission_ilaunch_notcatched_list_value = 1;
     print('獲得mymission 我發起 還沒有人接取列表');
     mymission_ilaunch_notcatched_list = await readremotemongodb(
@@ -1910,13 +1915,38 @@ class ChatProvider with ChangeNotifier {
         MissionModel.fromJson, 'spy_mission',
         field: mongo.where
             .ne('type', 3)
-            .and(mongo.where.gte('status', 5))
+            .and(mongo.where.gte('status', 7))
             .and(mongo.where.eq('memberid', remoteUserInfo[0].memberid))
             .limit(pagesize));
     print('mymission 我發起的 finish任務列表$mymission_ilaunch_finish_list');
 
     notifyListeners();
   }
+
+  //待審核
+  var mymission_ilaunch_approve_list;
+  int mymission_ilaunch_approve_list_value = 1;
+
+  Future get_spy_mymission_ilaunch_approvelist() async {
+    mymission_ilaunch_approve_list_value = 1;
+    print('獲得mymission 我發起的待審核任務列表');
+    var result = await readremotemongodb(MissionModel.fromJson, 'spy_mission',
+        field: mongo.where
+            .ne('type', 3)
+            .and(mongo.where.eq('status', 5))
+            .and(mongo.where.eq('memberid', remoteUserInfo[0].memberid)));
+    if (result is List) {
+      approvenum = result.length;
+      mymission_ilaunch_approve_list = result;
+    } else {
+      approvenum = 0;
+    }
+    print('mymission 我發起的 待審核任務列表$mymission_ilaunch_approve_list');
+
+    notifyListeners();
+  }
+
+  int approvenum = 0;
 
   Future submit_mission(id) async {
     print('申請這個任務 $id');
@@ -1933,7 +1963,7 @@ class ChatProvider with ChangeNotifier {
   Future choose_mission_executor(id, memberid) async {
     print('選擇 執行人 $id// $memberid //');
 
-    await await _mongoDB.updateData_single(
+    await _mongoDB.updateData_single(
       "spy_mission",
       "_id",
       id,
@@ -1946,14 +1976,12 @@ class ChatProvider with ChangeNotifier {
   Future get_mission_detail_apply(id) async {
     final pipeline = mongo.AggregationPipelineBuilder()
           ..addStage(mongo.Match(mongo.where.eq('_id', id).map['\$query']))
-          ..addStage(
-            mongo.Lookup(
-              from: 'member',
-              as: 'executor_info',
-              foreignField: '_id',
-              localField: 'executor',
-            ),
-          )
+          ..addStage(mongo.Lookup(
+            from: 'member',
+            as: 'applyedlist',
+            foreignField: '_id',
+            localField: 'apply_list',
+          ))
         // ..addStage(mongo.Lookup(
         //   from: 'member',
         //   as: 'applyedlist',
@@ -2024,35 +2052,36 @@ class ChatProvider with ChangeNotifier {
     mission_detail = result;
     notifyListeners();
   }
+
   Future find_missiondetail(title) async {
     final pipeline = mongo.AggregationPipelineBuilder()
-      ..addStage(mongo.Match(mongo.where.eq('title', title).map['\$query']))
-      ..addStage(
-        mongo.Lookup(
-          from: 'member',
-          as: 'executor_info',
-          foreignField: '_id',
-          localField: 'executor',
-        ),
-      )
-    // ..addStage(mongo.Lookup(
-    //   from: 'member',
-    //   as: 'applyedlist',
-    //   foreignField: '_id',
-    //   localField: 'apply_list',
-    // ))
-    // mongo.Lookup(
-    //   from: 'member',
-    //   as: 'executor_info',
-    //   foreignField: '_id',
-    //   localField: 'executor',
-    // ),
-    // mongo.Lookup(
-    // from: 'member',
-    // as: 'applyedlist',
-    // foreignField: '_id',
-    // localField: 'apply_list',
-    // )
+          ..addStage(mongo.Match(mongo.where.eq('title', title).map['\$query']))
+          ..addStage(
+            mongo.Lookup(
+              from: 'member',
+              as: 'executor_info',
+              foreignField: '_id',
+              localField: 'executor',
+            ),
+          )
+        // ..addStage(mongo.Lookup(
+        //   from: 'member',
+        //   as: 'applyedlist',
+        //   foreignField: '_id',
+        //   localField: 'apply_list',
+        // ))
+        // mongo.Lookup(
+        //   from: 'member',
+        //   as: 'executor_info',
+        //   foreignField: '_id',
+        //   localField: 'executor',
+        // ),
+        // mongo.Lookup(
+        // from: 'member',
+        // as: 'applyedlist',
+        // foreignField: '_id',
+        // localField: 'apply_list',
+        // )
         ;
 
     var result = await lookupmongodb(
@@ -2064,10 +2093,51 @@ class ChatProvider with ChangeNotifier {
     mission_detail = result;
     notifyListeners();
   }
+
   Future finish_mission(missionid) async {
     print('關閉直播 改變任務狀態  ');
 
     await change_mission_status(missionid, 5);
+  }
+
+  Future donate_showtime(missionid, num) async {
+    print('donate showtime ');
+    //mission 加上donate 價錢
+    await _mongoDB.plus_num(
+        'spy_mission', "_id", missionid, 'actual_price', num);
+    //mission 加上 donate名字
+    await _mongoDB.updateData_addSet(
+      "spy_mission",
+      "_id",
+      missionid,
+      'pay_list',
+      remoteUserInfo[0].memberid,
+    );
+    //donate log留下紀錄
+    _mongoDB.inserttomongo(
+      "showtime_donate_log",
+      {
+        "mission_id": missionid,
+        "type": 'showtime',
+        "time": DateTime.now().add(Duration(hours: 8)),
+        "from_memberid": remoteUserInfo[0].memberid,
+        'i_coin': num
+      },
+    );
+  }
+  Future showtime_fail(missionid) async {
+    print('關閉直播 改變任務狀態  ');
+    await change_mission_status(missionid, 6);
+  }
+
+  Future approve_mission_success(missionid) async {
+    print('關閉直播 改變任務狀態  ');
+    await change_mission_status(missionid, 7);
+  }
+
+  Future approve_mission_fail(missionid) async {
+    print('關閉直播 改變任務狀態  ');
+    await change_mission_status(missionid, 8);
   }
 
   Future start_mission(missionid) async {
@@ -2079,7 +2149,7 @@ class ChatProvider with ChangeNotifier {
   Future start_showtime(missionid) async {
     print('開啟直播 改變任務狀態  ');
     //3募資中
-    await change_mission_status(missionid, 3);
+    await change_mission_status(missionid, 4);
   }
 
   Future change_mission_status(id, status) async {
@@ -3273,39 +3343,6 @@ class ChatProvider with ChangeNotifier {
 
       // 每次登入都刷新
       print('每次登入都刷新');
-      // if (location != null && placemarks.isNotEmpty) {
-      //   // print('placemarks${placemarks}');
-      //
-      //   ///在改 測試
-      //   await _mongoDB.upsertData2(
-      //     "member",
-      //     'account',
-      //     account.uid,
-      //     {
-      //       'position': {
-      //         'coordinates': [
-      //           location.longitude,
-      //           location.latitude,
-      //         ],
-      //         'type': 'Point',
-      //       },
-      //       'lastlogin': DateTime.now().add(Duration(hours: 8)),
-      //       'area': placemarks[0].administrativeArea,
-      //       'introduction': '',
-      //     },
-      //   );
-      // } else {
-      //   await _mongoDB.upsertData2(
-      //     "member",
-      //     'account',
-      //     account,
-      //     {
-      //       'lastlogin': DateTime.now().add(Duration(hours: 8)),
-      //       // 'area': placemarks[0].administrativeArea,
-      //       'introduction': '',
-      //     },
-      //   );
-      // }
       var token = await FirebaseMessaging.instance.getToken();
       await _mongoDB.upsertData2(
         "member",

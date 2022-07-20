@@ -54,6 +54,41 @@ class _MissionDetailPageState extends State<MissionDetailPage> {
                 ],
               ),
               backgroundColor: Color(0xff1A1A1A),
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back),
+                onPressed: () async {
+                  //刷新mission
+                  await Provider.of<ChatProvider>(context, listen: false)
+                      .get_spy_mission_streaminglist();
+                  await Provider.of<ChatProvider>(context, listen: false)
+                      .get_spy_mission_accessible_list();
+                  //刷新my mission
+                  //我接的
+                  await Provider.of<ChatProvider>(context, listen: false)
+                      .get_spy_mymission_icatch_startyetlist();
+                  await Provider.of<ChatProvider>(context, listen: false)
+                      .get_spy_mymission_icatch_appliedlist();
+                  await Provider.of<ChatProvider>(context, listen: false)
+                      .get_spy_mymission_icatch_approvelist();
+                  await Provider.of<ChatProvider>(context, listen: false)
+                      .get_spy_mymission_icatch_finishedlist();
+                  // 我發的
+                  await Provider.of<ChatProvider>(context, listen: false)
+                      .get_spy_mymission_ilaunch_startyetlist();
+                  await Provider.of<ChatProvider>(context, listen: false)
+                      .get_spy_mymission_ilaunch_streaminglist();
+                  await Provider.of<ChatProvider>(context, listen: false)
+                      .get_spy_mymission_ilaunch_notcatchedlist();
+                  await Provider.of<ChatProvider>(context, listen: false)
+                      .get_spy_mymission_ilaunch_finishlist();
+
+                  // 審核
+                  await Provider.of<ChatProvider>(context, listen: false)
+                      .get_spy_mymission_ilaunch_approvelist();
+                  Future.delayed(
+                      Duration(seconds: 0), () => Navigator.pop(context));
+                },
+              ),
             ),
             body: GestureDetector(
               onTap: () => FocusScope.of(context).unfocus(),
@@ -115,149 +150,194 @@ class _MissionDetailPageState extends State<MissionDetailPage> {
                           ],
                         ),
                       ),
+                      // 申請名單
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 15),
                         child: Consumer<ChatProvider>(
                             builder: (context, value, child) {
                           return value.mission_detail != null
-                              ? value.mission_detail[0].status == 1 &&
-                                      value.mission_detail[0].memberid ==
-                                          Provider.of<ChatProvider>(context,
-                                                  listen: false)
-                                              .remoteUserInfo[0]
-                                              .memberid
-                                  ? value.mission_detail[0].applyedlist != null
-                                      ? Container(
-                                          decoration: BoxDecoration(
-                                              border: Border.all(
-                                                  width: 1,
-                                                  color: Colors.white)),
-                                          child: Column(
-                                            children: [
-                                              Text(
-                                                '申請列表',
-                                                style: TextStyle(
-                                                    color: Colors.white),
-                                              ),
-                                              Container(
-                                                height: 200,
-                                                child: ListView.separated(
-                                                  itemBuilder:
-                                                      (context, index) =>
-                                                          Padding(
-                                                    padding: const EdgeInsets
-                                                            .symmetric(
-                                                        horizontal: 15.0),
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        Row(
-                                                          children: [
-                                                            CircleAvatar(
-                                                              backgroundImage:
-                                                                  NetworkImage(
-                                                                      '${value.mission_detail[0].applyedlist[index].avatar_sub}'),
-                                                            ),
-                                                            Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                          .only(
-                                                                      left:
-                                                                          5.0),
-                                                              child: Text(
-                                                                '${value.mission_detail[0].applyedlist[index].nickname}',
-                                                                style: TextStyle(
-                                                                    color: Colors
-                                                                        .white),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        GestureDetector(
-                                                          child: Container(
-                                                            padding: EdgeInsets
-                                                                .symmetric(
-                                                                    horizontal:
-                                                                        8,
-                                                                    vertical:
-                                                                        2),
-                                                            child: Text('指定'),
-                                                            color:
-                                                                spy_button_blue,
-                                                          ),
-                                                          onTap: () async {
-                                                            await value.choose_mission_executor(
-                                                                widget
-                                                                    .ThisMission
-                                                                    .id,
-                                                                value
-                                                                    .mission_detail[
-                                                                        0]
-                                                                    .applyedlist[
-                                                                        index]
-                                                                    .memberid);
-                                                            //刷新狀態
-                                                            await value
-                                                                .get_mission_detail_choose(
-                                                                    widget
-                                                                        .ThisMission
-                                                                        .id);
-                                                          },
-                                                        )
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  itemCount: value
-                                                      .mission_detail[0]
-                                                      .applyedlist
-                                                      .length,
-                                                  separatorBuilder:
-                                                      (context, index) =>
-                                                          Container(
-                                                    height: 5,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ))
-                                      : Center(
-                                          child: Text(
-                                            '尚未有申請者',
-                                            style:
-                                                TextStyle(color: Colors.white),
-                                          ),
-                                        )
-                                  : value.mission_detail[0].status == 2
-                                      ? Column(
-                                          children: [
-                                            Text(
-                                              '選定特務人選:',
-                                              style: TextStyle(
-                                                  color: Colors.white),
-                                            ),
-                                            Row(
-                                              children: [
-                                                CircleAvatar(
-                                                  backgroundImage: NetworkImage(
-                                                      '${value.mission_detail[0].executor_info[0].avatar_sub}'),
-                                                ),
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          left: 5.0),
-                                                  child: Text(
-                                                    '${value.mission_detail[0].executor_info[0].nickname}',
+                              ? value.mission_detail[0].type == 3
+                                  ? Container()
+                                  : value.mission_detail[0].status == 1 &&
+                                          value.mission_detail[0].memberid ==
+                                              Provider.of<ChatProvider>(context,
+                                                      listen: false)
+                                                  .remoteUserInfo[0]
+                                                  .memberid
+                                      ? value.mission_detail[0].applyedlist
+                                              .isNotEmpty
+                                          ? Container(
+                                              decoration: BoxDecoration(
+                                                  border: Border.all(
+                                                      width: 1,
+                                                      color: Colors.white)),
+                                              child: Column(
+                                                children: [
+                                                  Text(
+                                                    '申請列表',
                                                     style: TextStyle(
                                                         color: Colors.white),
                                                   ),
+                                                  Container(
+                                                    height: 200,
+                                                    child: ListView.separated(
+                                                      itemBuilder:
+                                                          (context, index) =>
+                                                              Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .symmetric(
+                                                                horizontal:
+                                                                    15.0),
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          children: [
+                                                            Row(
+                                                              children: [
+                                                                CircleAvatar(
+                                                                  backgroundImage:
+                                                                      NetworkImage(
+                                                                          '${value.mission_detail[0].applyedlist[index].avatar_sub}'),
+                                                                ),
+                                                                Padding(
+                                                                  padding: const EdgeInsets
+                                                                          .only(
+                                                                      left:
+                                                                          5.0),
+                                                                  child: Text(
+                                                                    '${value.mission_detail[0].applyedlist[index].nickname}',
+                                                                    style: TextStyle(
+                                                                        color: Colors
+                                                                            .white),
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            GestureDetector(
+                                                              child: Container(
+                                                                padding: EdgeInsets
+                                                                    .symmetric(
+                                                                        horizontal:
+                                                                            8,
+                                                                        vertical:
+                                                                            2),
+                                                                child:
+                                                                    Text('指定'),
+                                                                color:
+                                                                    spy_button_blue,
+                                                              ),
+                                                              onTap: () async {
+                                                                await value.choose_mission_executor(
+                                                                    widget
+                                                                        .ThisMission
+                                                                        .id,
+                                                                    value
+                                                                        .mission_detail[
+                                                                            0]
+                                                                        .applyedlist[
+                                                                            index]
+                                                                        .memberid);
+                                                                //刷新狀態
+                                                                await value
+                                                                    .get_mission_detail_choose(
+                                                                        widget
+                                                                            .ThisMission
+                                                                            .id);
+                                                              },
+                                                            )
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      itemCount: value
+                                                          .mission_detail[0]
+                                                          .applyedlist
+                                                          .length,
+                                                      separatorBuilder:
+                                                          (context, index) =>
+                                                              Container(
+                                                        height: 5,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ))
+                                          : Center(
+                                              child: Text(
+                                                '尚未有申請者',
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              ),
+                                            )
+                                      : value.mission_detail[0].status == 2
+                                          ? Column(
+                                              children: [
+                                                Text(
+                                                  '選定特務人選:',
+                                                  style: TextStyle(
+                                                      color: Colors.white),
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    CircleAvatar(
+                                                      backgroundImage: NetworkImage(
+                                                          '${value.mission_detail[0].executor_info[0].avatar_sub}'),
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 5.0),
+                                                      child: Text(
+                                                        '${value.mission_detail[0].executor_info[0].nickname}',
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
                                               ],
-                                            ),
-                                          ],
-                                        )
-                                      : Container()
+                                            )
+                                          : value.mission_detail[0].status ==
+                                                      5 ||
+                                                  value.mission_detail[0]
+                                                          .status ==
+                                                      6 ||
+                                                  value.mission_detail[0]
+                                                          .status ==
+                                                      7
+                                              ? Column(
+                                                  children: [
+                                                    Text(
+                                                      '執行特務:',
+                                                      style: TextStyle(
+                                                          color: Colors.white),
+                                                    ),
+                                                    Row(
+                                                      children: [
+                                                        CircleAvatar(
+                                                          backgroundImage:
+                                                              NetworkImage(
+                                                                  '${value.mission_detail[0].executor_info[0].avatar_sub}'),
+                                                        ),
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .only(
+                                                                  left: 5.0),
+                                                          child: Text(
+                                                            '${value.mission_detail[0].executor_info[0].nickname}',
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .white),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                )
+                                              : Container()
                               : Center(
                                   child: Text(
                                     '加載中',
@@ -266,6 +346,7 @@ class _MissionDetailPageState extends State<MissionDetailPage> {
                                 );
                         }),
                       ),
+                      //按鈕
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -273,143 +354,549 @@ class _MissionDetailPageState extends State<MissionDetailPage> {
                             builder: (context, value, child) {
                               return value.mission_detail == null
                                   ? Container()
-                                  : value.mission_detail[0].memberid ==
-                                              value
-                                                  .remoteUserInfo[0].memberid ||
-                                          (value.mission_detail[0].status ==
-                                                  2 &&
-                                              value.mission_detail[0]
-                                                      .executor !=
+                                  : value.mission_detail[0].status == 1
+                                      ? value.mission_detail[0].memberid ==
+                                              value.remoteUserInfo[0].memberid
+                                          ? Container()
+                                          : GestureDetector(
+                                              child: Container(
+                                                width: 300,
+                                                padding: EdgeInsets.symmetric(
+                                                    vertical: 20),
+                                                decoration: BoxDecoration(
+                                                    gradient:
+                                                        LinearGradient(colors: [
+                                                      spy_gradient_light_purple,
+                                                      spy_gradient_light_blue,
+                                                    ]),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            15)),
+                                                child: Center(
+                                                  child: Text(
+                                                    value.mission_detail[0]
+                                                                .apply_list
+                                                                .indexWhere((element) =>
+                                                                    element ==
+                                                                    value
+                                                                        .remoteUserInfo[
+                                                                            0]
+                                                                        .memberid) !=
+                                                            -1
+                                                        ? '已經申請'
+                                                        : '我想做任務',
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
+                                              ),
+                                              onTap: () async {
+                                                if (value.mission_detail[0]
+                                                        .status ==
+                                                    1) {
+                                                  //未選擇
+                                                  if (value.mission_detail[0]
+                                                          .memberid ==
+                                                      Provider.of<ChatProvider>(
+                                                              context,
+                                                              listen: false)
+                                                          .remoteUserInfo[0]
+                                                          .memberid) {
+                                                    // '去指定特務' 是我發起的
+                                                  } else {
+                                                    if (value.mission_detail[0]
+                                                            .apply_list
+                                                            .indexWhere((element) =>
+                                                                element ==
+                                                                value
+                                                                    .remoteUserInfo[
+                                                                        0]
+                                                                    .memberid) ==
+                                                        -1) {
+                                                      // '我想做任務' 不是我發起的
+                                                      Provider.of<ChatProvider>(
+                                                              context,
+                                                              listen: false)
+                                                          .submit_mission(widget
+                                                              .ThisMission.id);
+                                                    }
+                                                  }
+                                                  //刷新狀態
+                                                  await value
+                                                      .get_mission_detail_apply(
+                                                          widget
+                                                              .ThisMission.id);
+                                                } else if (value
+                                                        .mission_detail[0]
+                                                        .status ==
+                                                    2) {
+                                                  // 開播
+                                                  Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              FakeStream(
+                                                                TheMission: widget
+                                                                    .ThisMission,
+                                                              )));
+                                                } else if (value
+                                                            .mission_detail[0]
+                                                            .status ==
+                                                        3 ||
+                                                    value.mission_detail[0]
+                                                            .status ==
+                                                        4) {
+                                                  //看播
+                                                  Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              FakeStream(
+                                                                TheMission: widget
+                                                                    .ThisMission,
+                                                              )));
+                                                }
+                                              })
+                                      : value.mission_detail[0].status == 2 &&
+                                              value.mission_detail[0].executor ==
                                                   value.remoteUserInfo[0]
-                                                      .memberid)
-                                      ? Container()
-                                      : GestureDetector(
-                                          child: Container(
-                                            width: 300,
-                                            padding: EdgeInsets.symmetric(
-                                                vertical: 20),
-                                            decoration: BoxDecoration(
-                                                gradient:
-                                                    LinearGradient(colors: [
-                                                  spy_gradient_light_purple,
-                                                  spy_gradient_light_blue,
-                                                ]),
-                                                borderRadius:
-                                                    BorderRadius.circular(15)),
-                                            child: Center(
-                                              child: Text(
-                                                value.mission_detail == null
-                                                    ? '獲取資料中'
-                                                    : value.mission_detail[0]
+                                                      .memberid
+                                          ? GestureDetector(
+                                              child: Container(
+                                                width: 300,
+                                                padding: EdgeInsets.symmetric(
+                                                    vertical: 20),
+                                                decoration: BoxDecoration(
+                                                    gradient:
+                                                        LinearGradient(colors: [
+                                                      spy_gradient_light_purple,
+                                                      spy_gradient_light_blue,
+                                                    ]),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            15)),
+                                                child: Center(
+                                                  child: Text(
+                                                    value.mission_detail == null
+                                                        ? '獲取資料中'
+                                                        : value
+                                                                    .mission_detail[
+                                                                        0]
+                                                                    .status ==
+                                                                1
+                                                            ? value.mission_detail[0].apply_list.indexWhere((element) =>
+                                                                        element ==
+                                                                        value
+                                                                            .remoteUserInfo[
+                                                                                0]
+                                                                            .memberid) !=
+                                                                    -1
+                                                                ? '已經申請'
+                                                                : '我想做任務'
+                                                            : value.mission_detail[0].status ==
+                                                                        2 &&
+                                                                    value
+                                                                            .mission_detail[
+                                                                                0]
+                                                                            .executor ==
+                                                                        value
+                                                                            .remoteUserInfo[
+                                                                                0]
+                                                                            .memberid
+                                                                ? '被選為此任務特務，立即開播'
+                                                                : value.mission_detail[0]
+                                                                            .status ==
+                                                                        3
+                                                                    ? '去觀看募資'
+                                                                    : value.mission_detail[0].status == 4
+                                                                        ? '去觀看任務'
+                                                                        : '任務已結束',
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
+                                              ),
+                                              onTap: () async {
+                                                if (value.mission_detail[0]
+                                                        .status ==
+                                                    1) {
+                                                  //未選擇
+                                                  if (value.mission_detail[0]
+                                                          .memberid ==
+                                                      Provider.of<ChatProvider>(
+                                                              context,
+                                                              listen: false)
+                                                          .remoteUserInfo[0]
+                                                          .memberid) {
+                                                    // '去指定特務' 是我發起的
+                                                  } else {
+                                                    if (value.mission_detail[0]
+                                                            .apply_list
+                                                            .indexWhere((element) =>
+                                                                element ==
+                                                                value
+                                                                    .remoteUserInfo[
+                                                                        0]
+                                                                    .memberid) ==
+                                                        -1) {
+                                                      // '我想做任務' 不是我發起的
+                                                      Provider.of<ChatProvider>(
+                                                              context,
+                                                              listen: false)
+                                                          .submit_mission(widget
+                                                              .ThisMission.id);
+                                                    }
+                                                  }
+                                                  //刷新狀態
+                                                  await value
+                                                      .get_mission_detail_apply(
+                                                          widget
+                                                              .ThisMission.id);
+                                                } else if (value
+                                                        .mission_detail[0]
+                                                        .status ==
+                                                    2) {
+                                                  // 開播
+                                                  Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              FakeStream(
+                                                                TheMission: widget
+                                                                    .ThisMission,
+                                                              )));
+                                                } else if (value
+                                                            .mission_detail[0]
+                                                            .status ==
+                                                        3 ||
+                                                    value.mission_detail[0]
+                                                            .status ==
+                                                        4) {
+                                                  //看播
+                                                  Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              FakeStream(
+                                                                TheMission: widget
+                                                                    .ThisMission,
+                                                              )));
+                                                }
+                                              })
+                                          : value.mission_detail[0].status == 3
+                                              ? GestureDetector(
+                                                  child: Container(
+                                                    width: 300,
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            vertical: 20),
+                                                    decoration: BoxDecoration(
+                                                        gradient:
+                                                            LinearGradient(
+                                                                colors: [
+                                                              spy_gradient_light_purple,
+                                                              spy_gradient_light_blue,
+                                                            ]),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(15)),
+                                                    child: Center(
+                                                      child: Text(
+                                                        '去看播(showtime)',
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  onTap: () async {
+                                                    //看播
+                                                    Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                            builder:
+                                                                (context) =>
+                                                                    FakeStream(
+                                                                      TheMission:
+                                                                          widget
+                                                                              .ThisMission,
+                                                                    )));
+                                                  })
+                                              : value.mission_detail[0]
+                                                          .status ==
+                                                      4
+                                                  ? GestureDetector(
+                                                      child: Container(
+                                                        width: 300,
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                                vertical: 20),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                                gradient:
+                                                                    LinearGradient(
+                                                                        colors: [
+                                                                      spy_gradient_light_purple,
+                                                                      spy_gradient_light_blue,
+                                                                    ]),
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            15)),
+                                                        child: Center(
+                                                          child: Text(
+                                                            '去看播',
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .white),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      onTap: () async {
+                                                        if (value
+                                                                .mission_detail[
+                                                                    0]
                                                                 .status ==
-                                                            1
-                                                        ? value
+                                                            1) {
+                                                          //未選擇
+                                                          if (value
+                                                                  .mission_detail[
+                                                                      0]
+                                                                  .memberid ==
+                                                              Provider.of<ChatProvider>(
+                                                                      context,
+                                                                      listen:
+                                                                          false)
+                                                                  .remoteUserInfo[
+                                                                      0]
+                                                                  .memberid) {
+                                                            // '去指定特務' 是我發起的
+                                                          } else {
+                                                            if (value
                                                                     .mission_detail[
                                                                         0]
                                                                     .apply_list
                                                                     .indexWhere((element) =>
                                                                         element ==
                                                                         value
-                                                                            .remoteUserInfo[
-                                                                                0]
-                                                                            .memberid) !=
-                                                                -1
-                                                            ? '已經申請'
-                                                            : '我想做任務'
-                                                        : value
-                                                                        .mission_detail[
-                                                                            0]
-                                                                        .status ==
-                                                                    2 &&
-                                                                value
-                                                                        .mission_detail[
-                                                                            0]
-                                                                        .executor ==
-                                                                    value
-                                                                        .remoteUserInfo[
-                                                                            0]
-                                                                        .memberid
-                                                            ? '被選為此任務特務，立即開播'
-                                                            : value
-                                                                        .mission_detail[
-                                                                            0]
-                                                                        .status ==
-                                                                    3
-                                                                ? '去觀看募資'
-                                                                : value.mission_detail[0]
-                                                                            .status ==
-                                                                        4
-                                                                    ? '去觀看任務'
-                                                                    : '任務已結束',
-                                                style: TextStyle(
-                                                    color: Colors.white),
-                                              ),
-                                            ),
-                                          ),
-                                          onTap: () async {
-                                            if (value
-                                                    .mission_detail[0].status ==
-                                                1) {
-                                              //未選擇
-                                              if (value.mission_detail[0]
-                                                      .memberid ==
-                                                  Provider.of<ChatProvider>(
-                                                          context,
-                                                          listen: false)
-                                                      .remoteUserInfo[0]
-                                                      .memberid) {
-                                                // '去指定特務' 是我發起的
-                                              } else {
-                                                if (value.mission_detail[0]
-                                                        .apply_list
-                                                        .indexWhere((element) =>
-                                                            element ==
-                                                            value
-                                                                .remoteUserInfo[
+                                                                            .remoteUserInfo[0]
+                                                                            .memberid) ==
+                                                                -1) {
+                                                              // '我想做任務' 不是我發起的
+                                                              Provider.of<ChatProvider>(
+                                                                      context,
+                                                                      listen:
+                                                                          false)
+                                                                  .submit_mission(
+                                                                      widget
+                                                                          .ThisMission
+                                                                          .id);
+                                                            }
+                                                          }
+                                                          //刷新狀態
+                                                          await value
+                                                              .get_mission_detail_apply(
+                                                                  widget
+                                                                      .ThisMission
+                                                                      .id);
+                                                        } else if (value
+                                                                .mission_detail[
                                                                     0]
-                                                                .memberid) ==
-                                                    -1) {
-                                                  // '我想做任務' 不是我發起的
-                                                  Provider.of<ChatProvider>(
-                                                          context,
-                                                          listen: false)
-                                                      .submit_mission(widget
-                                                          .ThisMission.id);
-                                                }
-                                              }
-                                              //刷新狀態
-                                              await value
-                                                  .get_mission_detail_apply(
-                                                      widget.ThisMission.id);
-                                            } else if (value
-                                                    .mission_detail[0].status ==
-                                                2) {
-                                              // 開播
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          FakeStream(
-                                                            TheMission: widget
-                                                                .ThisMission,
-                                                          )));
-                                            } else if (value.mission_detail[0]
-                                                        .status ==
-                                                    3 ||
-                                                value.mission_detail[0]
-                                                        .status ==
-                                                    4) {
-                                              //看播
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          FakeStream(
-                                                            TheMission: widget
-                                                                .ThisMission,
-                                                          )));
-                                            }
-                                          });
+                                                                .status ==
+                                                            2) {
+                                                          // 開播
+                                                          Navigator.push(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                  builder:
+                                                                      (context) =>
+                                                                          FakeStream(
+                                                                            TheMission:
+                                                                                widget.ThisMission,
+                                                                          )));
+                                                        } else if (value
+                                                                    .mission_detail[
+                                                                        0]
+                                                                    .status ==
+                                                                3 ||
+                                                            value.mission_detail[0]
+                                                                    .status ==
+                                                                4) {
+                                                          //看播
+                                                          Navigator.push(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                  builder:
+                                                                      (context) =>
+                                                                          FakeStream(
+                                                                            TheMission:
+                                                                                widget.ThisMission,
+                                                                          )));
+                                                        }
+                                                      })
+                                                  : value.mission_detail[0]
+                                                              .status ==
+                                                          5
+                                                      ? value.mission_detail[0]
+                                                                  .memberid ==
+                                                              value
+                                                                  .remoteUserInfo[
+                                                                      0]
+                                                                  .memberid
+                                                          ?
+                                                          //結束 發起人審核
+                                                          Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceEvenly,
+                                                              children: [
+                                                                GestureDetector(
+                                                                    child:
+                                                                        Container(
+                                                                      width:
+                                                                          150,
+                                                                      padding: EdgeInsets.symmetric(
+                                                                          vertical:
+                                                                              20),
+                                                                      decoration: BoxDecoration(
+                                                                          gradient: LinearGradient(colors: [
+                                                                            spy_gradient_light_purple,
+                                                                            spy_gradient_light_blue,
+                                                                          ]),
+                                                                          borderRadius: BorderRadius.circular(15)),
+                                                                      child:
+                                                                          Center(
+                                                                        child:
+                                                                            Text(
+                                                                          '任務成功',
+                                                                          style:
+                                                                              TextStyle(color: Colors.white),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    onTap:
+                                                                        () async {
+                                                                      await value.approve_mission_success(widget
+                                                                          .ThisMission
+                                                                          .id);
+                                                                      await value.get_mission_detail_choose(widget
+                                                                          .ThisMission
+                                                                          .id);
+                                                                    }),
+                                                                GestureDetector(
+                                                                    child:
+                                                                        Container(
+                                                                      width:
+                                                                          150,
+                                                                      padding: EdgeInsets.symmetric(
+                                                                          vertical:
+                                                                              20),
+                                                                      decoration: BoxDecoration(
+                                                                          gradient: LinearGradient(colors: [
+                                                                            spy_gradient_light_purple,
+                                                                            spy_gradient_light_blue,
+                                                                          ]),
+                                                                          borderRadius: BorderRadius.circular(15)),
+                                                                      child:
+                                                                          Center(
+                                                                        child:
+                                                                            Text(
+                                                                          '任務失敗',
+                                                                          style:
+                                                                              TextStyle(color: Colors.white),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    onTap:
+                                                                        () async {
+                                                                      await value.approve_mission_fail(widget
+                                                                          .ThisMission
+                                                                          .id);
+
+                                                                      await value.get_mission_detail_choose(widget
+                                                                          .ThisMission
+                                                                          .id);
+                                                                    }),
+                                                              ],
+                                                            )
+                                                          : Container(
+                                                              width: 300,
+                                                              padding: EdgeInsets
+                                                                  .symmetric(
+                                                                      vertical:
+                                                                          20),
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                      gradient:
+                                                                          LinearGradient(
+                                                                              colors: [
+                                                                            spy_gradient_light_purple,
+                                                                            spy_gradient_light_blue,
+                                                                          ]),
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              15)),
+                                                              child: Center(
+                                                                child: Text(
+                                                                  '任務結束等待審核',
+                                                                  style: TextStyle(
+                                                                      color: Colors
+                                                                          .white),
+                                                                ),
+                                                              ),
+                                                            )
+                                                      : value.mission_detail[0]
+                                                                  .status ==
+                                                              7
+                                                          ? value.mission_detail[0].memberid ==
+                                                                  value
+                                                                      .remoteUserInfo[
+                                                                          0]
+                                                                      .memberid
+                                                              ? Container(
+                                                                  child: Text(
+                                                                    '任務成功',
+                                                                    style: TextStyle(
+                                                                        color: Colors
+                                                                            .white),
+                                                                  ),
+                                                                )
+                                                              : Container(
+                                                                  child: Text(
+                                                                    '任務審核為成功',
+                                                                    style: TextStyle(
+                                                                        color: Colors
+                                                                            .white),
+                                                                  ),
+                                                                )
+                                                          : value
+                                                                      .mission_detail[
+                                                                          0]
+                                                                      .status ==
+                                                                  8
+                                                              ? value.mission_detail[0].memberid ==
+                                                                      value
+                                                                          .remoteUserInfo[0]
+                                                                          .memberid
+                                                                  ? Container(
+                                                                      child:
+                                                                          Text(
+                                                                        '任務失敗',
+                                                                        style: TextStyle(
+                                                                            color:
+                                                                                Colors.white),
+                                                                      ),
+                                                                    )
+                                                                  : Container(
+                                                                      child:
+                                                                          Text(
+                                                                        '任務審核為失敗',
+                                                                        style: TextStyle(
+                                                                            color:
+                                                                                Colors.white),
+                                                                      ),
+                                                                    )
+                                                              : Container();
                             },
                           ),
                         ],

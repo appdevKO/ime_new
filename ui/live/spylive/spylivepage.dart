@@ -5,6 +5,7 @@ import 'package:ime_new/ui/live/spylive/showtime/showtimepage.dart';
 
 import 'package:ime_new/utils/viewconfig.dart';
 import 'package:provider/provider.dart';
+import 'contract/becomespy.dart';
 import 'mission/missionpage.dart';
 
 class SpyLivePage extends StatefulWidget {
@@ -120,10 +121,12 @@ class _SpyLivePageState extends State<SpyLivePage> {
                             )),
                       ),
                       onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ShowTimePage()));
+
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ShowTimePage()));
+
                       },
                     ),
                   ],
@@ -444,12 +447,18 @@ class _SpyLivePageState extends State<SpyLivePage> {
                                             ),
                                           ),
                                         ),
-                                        onTap: () {print('${value.spy_streaming_list[index]}');
+                                        onTap: () {
+                                          print(
+                                              '${value.spy_streaming_list[index]}');
                                           Navigator.push(
                                               context,
                                               MaterialPageRoute(
                                                   builder: (context) =>
-                                                      FakeStream(TheMission: value.spy_streaming_list[index],)));
+                                                      FakeStream(
+                                                        TheMission: value
+                                                                .spy_streaming_list[
+                                                            index],
+                                                      )));
                                         },
                                       ),
                                     ),

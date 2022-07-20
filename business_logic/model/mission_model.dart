@@ -9,25 +9,25 @@ MissionModel missionModelFromJson(String str) =>
 String missionModelToJson(MissionModel data) => json.encode(data.toJson());
 
 class MissionModel {
-  MissionModel({
-    this.id,
-    this.title,
-    this.content,
-    this.price,
-    this.actual_price,
-    this.starttime,
-    this.endtime,
-    this.type,
-    this.memberid,
-    this.nickname,
-    this.avatar,
-    this.status,
-    this.apply_list,
-    this.applyedlist,
-    this.executor,
-    this.executor_info,
-    this.fcmtoken,
-  });
+  MissionModel(
+      {this.id,
+      this.title,
+      this.content,
+      this.price,
+      this.actual_price,
+      this.starttime,
+      this.endtime,
+      this.type,
+      this.memberid,
+      this.nickname,
+      this.avatar,
+      this.status,
+      this.apply_list,
+      this.applyedlist,
+      this.executor,
+      this.executor_info,
+      this.fcmtoken,
+      this.pay_list});
 
   ObjectId? id;
   String? title;
@@ -45,6 +45,7 @@ class MissionModel {
   List? applyedlist;
   List? executor_info;
   List? apply_list;
+  List? pay_list;
   String? fcmtoken;
 
   factory MissionModel.fromJson(Map<String, dynamic> json) => MissionModel(
@@ -63,6 +64,7 @@ class MissionModel {
         fcmtoken: json["fcmtoken"],
         avatar: json["avatar"],
         apply_list: json["apply_list"] ?? [],
+        pay_list: json["pay_list"] ?? [],
 
         ///重要
         //收到list json 用 list generate  依次建造
@@ -91,6 +93,7 @@ class MissionModel {
         "nickname": nickname,
         "avatar": avatar,
         "apply_list": apply_list,
+        "pay_list": pay_list,
         "applyedlist": applyedlist,
         "executor_info": executor_info,
         "fcmtoken": fcmtoken,

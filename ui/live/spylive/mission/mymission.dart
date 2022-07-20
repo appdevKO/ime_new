@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:ime_new/business_logic/provider/chat_provider.dart';
 import 'package:ime_new/ui/date/one2one_chat/o2ochatroom.dart';
 import 'package:ime_new/ui/live/spylive/mission/missiondetailpage.dart';
+import 'package:ime_new/ui/live/spylive/showtime/fakestream.dart';
 import 'package:ime_new/utils/viewconfig.dart';
 import 'package:provider/provider.dart';
+
+import 'approvepage.dart';
 
 class MyMission extends StatefulWidget {
   const MyMission({Key? key}) : super(key: key);
@@ -35,9 +38,9 @@ class _MyMissionState extends State<MyMission> {
     await Provider.of<ChatProvider>(context, listen: false)
         .get_spy_mymission_icatch_appliedlist();
     await Provider.of<ChatProvider>(context, listen: false)
-        .get_spy_mymission_icatch_successlist();
+        .get_spy_mymission_icatch_approvelist();
     await Provider.of<ChatProvider>(context, listen: false)
-        .get_spy_mymission_icatch_faillist();
+        .get_spy_mymission_icatch_finishedlist();
     // 我發的
     await Provider.of<ChatProvider>(context, listen: false)
         .get_spy_mymission_ilaunch_startyetlist();
@@ -47,6 +50,9 @@ class _MyMissionState extends State<MyMission> {
         .get_spy_mymission_ilaunch_notcatchedlist();
     await Provider.of<ChatProvider>(context, listen: false)
         .get_spy_mymission_ilaunch_finishlist();
+    //審核
+    await Provider.of<ChatProvider>(context, listen: false)
+        .get_spy_mymission_ilaunch_approvelist();
   }
 
   @override
@@ -94,7 +100,7 @@ class _MyMissionState extends State<MyMission> {
                       padding: const EdgeInsets.symmetric(
                           vertical: 10, horizontal: 10),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           AnimatedToggleSwitch<bool>.dual(
                             current: positive,
@@ -124,6 +130,52 @@ class _MyMissionState extends State<MyMission> {
                                   )),
                             innerColor: Colors.blueGrey,
                           ),
+                          positive
+                              //待審核
+                              ? Consumer<ChatProvider>(
+                                  builder: (context, value, child) {
+                                    return GestureDetector(
+                                      child: Stack(
+                                        children: [
+                                          Container(
+                                            width: 100,
+                                            height: 35,
+                                            decoration: BoxDecoration(
+                                                border: Border.all(
+                                                    width: 1,
+                                                    color: Colors.white),
+                                                borderRadius:
+                                                    BorderRadius.circular(20)),
+                                            child: Center(
+                                              child: Text(
+                                                '待審核',
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              ),
+                                            ),
+                                          ),
+                                          Positioned(
+                                            right: 0,
+                                            child: value.approvenum != 0
+                                                ? CircleAvatar(
+                                                    radius: 5,
+                                                    backgroundColor: Colors.red,
+                                                  )
+                                                : Container(),
+                                          )
+                                        ],
+                                      ),
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ApprovePage()));
+                                      },
+                                    );
+                                  },
+                                )
+                              : Container()
                         ],
                       ),
                     ),
@@ -160,10 +212,10 @@ class _MyMissionState extends State<MyMission> {
                                   text: '已申請',
                                 ),
                                 Tab(
-                                  text: '任務成功',
+                                  text: '待審核',
                                 ),
                                 Tab(
-                                  text: '任務失敗',
+                                  text: '任務結束',
                                 ),
                               ],
                       ),
@@ -377,38 +429,47 @@ class _MyMissionState extends State<MyMission> {
                                                                         MainAxisAlignment
                                                                             .end,
                                                                     children: [
-                                                                      Container(
-                                                                        width:
-                                                                            100,
-                                                                        height:
-                                                                            30,
-                                                                        decoration: BoxDecoration(
-                                                                            borderRadius: BorderRadius.only(
-                                                                              bottomLeft: Radius.circular(0),
-                                                                              bottomRight: Radius.circular(12),
-                                                                              topLeft: Radius.circular(12),
-                                                                              topRight: Radius.circular(0),
-                                                                            ),
-                                                                            gradient: LinearGradient(colors: [
-                                                                              spy_gradient_light_blue,
-                                                                              spy_gradient_light_purple,
-                                                                            ])),
+                                                                      GestureDetector(
                                                                         child:
-                                                                            Padding(
-                                                                          padding: EdgeInsetsDirectional.fromSTEB(
-                                                                              0,
-                                                                              5,
-                                                                              0,
-                                                                              0),
+                                                                            Container(
+                                                                          width:
+                                                                              100,
+                                                                          height:
+                                                                              30,
+                                                                          decoration: BoxDecoration(
+                                                                              borderRadius: BorderRadius.only(
+                                                                                bottomLeft: Radius.circular(0),
+                                                                                bottomRight: Radius.circular(12),
+                                                                                topLeft: Radius.circular(12),
+                                                                                topRight: Radius.circular(0),
+                                                                              ),
+                                                                              gradient: LinearGradient(colors: [
+                                                                                spy_gradient_light_blue,
+                                                                                spy_gradient_light_purple,
+                                                                              ])),
                                                                           child:
-                                                                              Text(
-                                                                            '立即觀看',
-                                                                            textAlign:
-                                                                                TextAlign.center,
-                                                                            style:
-                                                                                TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                                                                              Padding(
+                                                                            padding: EdgeInsetsDirectional.fromSTEB(
+                                                                                0,
+                                                                                5,
+                                                                                0,
+                                                                                0),
+                                                                            child:
+                                                                                Text(
+                                                                              '立即觀看',
+                                                                              textAlign: TextAlign.center,
+                                                                              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                                                                            ),
                                                                           ),
-                                                                        ),
+                                                                        ),onTap: (){
+                                                                        Navigator.push(
+                                                                            context,
+                                                                            MaterialPageRoute(
+                                                                                builder: (context) =>
+                                                                                    FakeStream(
+                                                                                      TheMission: value.mymission_ilaunch_streaming_list[index],
+                                                                                    )));
+                                                                      },
                                                                       ),
                                                                     ],
                                                                   ),
@@ -439,7 +500,7 @@ class _MyMissionState extends State<MyMission> {
                                                 );
                                               },
                                               itemCount: value
-                                                  .mymission_ilaunch_startyet_list
+                                                  .mymission_ilaunch_streaming_list
                                                   .length,
                                             )
                                           : Center(
@@ -991,6 +1052,7 @@ class _MyMissionState extends State<MyMission> {
                                           ),
                                         );
                                 }),
+                                // Container(), Container(), Container(), Container(),
                               ],
                             ),
                           )
@@ -999,7 +1061,8 @@ class _MyMissionState extends State<MyMission> {
                             child: TabBarView(
                               controller: _tabController,
                               children: [
-                                //未進行
+                                // Container(), Container(), Container(),
+                                // 未進行
                                 Consumer<ChatProvider>(
                                     builder: (context, value, child) {
                                   return value.mymission_icatch_startyet_list !=
@@ -1011,266 +1074,7 @@ class _MyMissionState extends State<MyMission> {
                                                 return Padding(
                                                   padding: EdgeInsetsDirectional
                                                       .fromSTEB(16, 8, 16, 0),
-                                                  child:
-
-                                                      // GestureDetector(
-                                                      //   child: Container(
-                                                      //     width: double.infinity,
-                                                      //     height: 150,
-                                                      //     decoration: BoxDecoration(
-                                                      //         color:
-                                                      //             spy_card_background,
-                                                      //         boxShadow: [
-                                                      //           BoxShadow(
-                                                      //             blurRadius: 2,
-                                                      //             color: index %
-                                                      //                         2 ==
-                                                      //                     0
-                                                      //                 ? Color(
-                                                      //                     0xff00CCFF)
-                                                      //                 : Color(
-                                                      //                     0xff9900CC),
-                                                      //             offset: Offset(
-                                                      //                 index % 2 == 0
-                                                      //                     ? 2
-                                                      //                     : -2,
-                                                      //                 0),
-                                                      //           )
-                                                      //         ],
-                                                      //         borderRadius:
-                                                      //             BorderRadius
-                                                      //                 .circular(12),
-                                                      //         border: Border.all(
-                                                      //             width: 1,
-                                                      //             color:
-                                                      //                 spy_card_border_background)),
-                                                      //     child: Padding(
-                                                      //       padding:
-                                                      //           EdgeInsetsDirectional
-                                                      //               .fromSTEB(
-                                                      //                   0, 8, 0, 0),
-                                                      //       child: Row(
-                                                      //         mainAxisSize:
-                                                      //             MainAxisSize.max,
-                                                      //         crossAxisAlignment:
-                                                      //             CrossAxisAlignment
-                                                      //                 .start,
-                                                      //         children: [
-                                                      //           Column(
-                                                      //             mainAxisSize:
-                                                      //                 MainAxisSize
-                                                      //                     .max,
-                                                      //             mainAxisAlignment:
-                                                      //                 MainAxisAlignment
-                                                      //                     .spaceBetween,
-                                                      //             crossAxisAlignment:
-                                                      //                 CrossAxisAlignment
-                                                      //                     .start,
-                                                      //             children: [
-                                                      //               Padding(
-                                                      //                 padding: EdgeInsetsDirectional
-                                                      //                     .fromSTEB(
-                                                      //                         16,
-                                                      //                         0,
-                                                      //                         0,
-                                                      //                         0),
-                                                      //                 child: Image
-                                                      //                     .network(
-                                                      //                   'https://picsum.photos/seed/556/600',
-                                                      //                   width: 100,
-                                                      //                   height: 100,
-                                                      //                   fit: BoxFit
-                                                      //                       .cover,
-                                                      //                 ),
-                                                      //               ),
-                                                      //               Container(
-                                                      //                 width: 100,
-                                                      //                 height: 30,
-                                                      //                 decoration:
-                                                      //                     BoxDecoration(
-                                                      //                         borderRadius: BorderRadius
-                                                      //                             .only(
-                                                      //                           bottomLeft:
-                                                      //                               Radius.circular(12),
-                                                      //                           bottomRight:
-                                                      //                               Radius.circular(0),
-                                                      //                           topLeft:
-                                                      //                               Radius.circular(0),
-                                                      //                           topRight:
-                                                      //                               Radius.circular(12),
-                                                      //                         ),
-                                                      //                         gradient:
-                                                      //                             LinearGradient(colors: [
-                                                      //                           spy_gradient_light_blue,
-                                                      //                           spy_gradient_light_purple,
-                                                      //                         ])),
-                                                      //                 child:
-                                                      //                     Padding(
-                                                      //                   padding: EdgeInsetsDirectional
-                                                      //                       .fromSTEB(
-                                                      //                           0,
-                                                      //                           5,
-                                                      //                           0,
-                                                      //                           0),
-                                                      //                   child: Text(
-                                                      //                     '觀看人數',
-                                                      //                     textAlign:
-                                                      //                         TextAlign
-                                                      //                             .center,
-                                                      //                     style: TextStyle(
-                                                      //                         color: Colors
-                                                      //                             .white,
-                                                      //                         fontWeight:
-                                                      //                             FontWeight.w700),
-                                                      //                   ),
-                                                      //                 ),
-                                                      //               ),
-                                                      //             ],
-                                                      //           ),
-                                                      //           Expanded(
-                                                      //             child: Column(
-                                                      //               mainAxisSize:
-                                                      //                   MainAxisSize
-                                                      //                       .max,
-                                                      //               mainAxisAlignment:
-                                                      //                   MainAxisAlignment
-                                                      //                       .spaceBetween,
-                                                      //               crossAxisAlignment:
-                                                      //                   CrossAxisAlignment
-                                                      //                       .center,
-                                                      //               children: [
-                                                      //                 Padding(
-                                                      //                   padding: EdgeInsetsDirectional
-                                                      //                       .fromSTEB(
-                                                      //                           10,
-                                                      //                           10,
-                                                      //                           0,
-                                                      //                           0),
-                                                      //                   child: Text(
-                                                      //                     '${value.mymission_icatch_startyet_list[index].title}',
-                                                      //                     textAlign:
-                                                      //                         TextAlign
-                                                      //                             .start,
-                                                      //                     style: TextStyle(
-                                                      //                         color: Colors
-                                                      //                             .white,
-                                                      //                         fontSize:
-                                                      //                             20,
-                                                      //                         fontWeight:
-                                                      //                             FontWeight.w700),
-                                                      //                   ),
-                                                      //                 ),
-                                                      //                 Padding(
-                                                      //                   padding: EdgeInsetsDirectional
-                                                      //                       .fromSTEB(
-                                                      //                           10,
-                                                      //                           0,
-                                                      //                           0,
-                                                      //                           0),
-                                                      //                   child:
-                                                      //                       Container(
-                                                      //                     height:
-                                                      //                         40,
-                                                      //                     width:
-                                                      //                         180,
-                                                      //                     child:
-                                                      //                         RichText(
-                                                      //                       overflow:
-                                                      //                           TextOverflow.ellipsis,
-                                                      //                       strutStyle:
-                                                      //                           StrutStyle(fontSize: 12.0),
-                                                      //                       text:
-                                                      //                           TextSpan(
-                                                      //                         style: TextStyle(
-                                                      //                             color: Colors.grey,
-                                                      //                             fontSize: 14,
-                                                      //                             fontWeight: FontWeight.w700),
-                                                      //                         text:
-                                                      //                             '${value.mymission_icatch_startyet_list[index].content}',
-                                                      //                       ),
-                                                      //                     ),
-                                                      //                   ),
-                                                      //                 ),
-                                                      //                 Padding(
-                                                      //                   padding: EdgeInsetsDirectional
-                                                      //                       .fromSTEB(
-                                                      //                           0,
-                                                      //                           0,
-                                                      //                           10,
-                                                      //                           0),
-                                                      //                   child: Text(
-                                                      //                     '懸賞獎金\$${value.mymission_icatch_startyet_list[index].price}',
-                                                      //                     style: TextStyle(
-                                                      //                         color:
-                                                      //                             spy_mission_money,
-                                                      //                         fontSize:
-                                                      //                             16,
-                                                      //                         fontWeight:
-                                                      //                             FontWeight.w700),
-                                                      //                   ),
-                                                      //                 ),
-                                                      //                 Row(
-                                                      //                   mainAxisSize:
-                                                      //                       MainAxisSize
-                                                      //                           .max,
-                                                      //                   mainAxisAlignment:
-                                                      //                       MainAxisAlignment
-                                                      //                           .end,
-                                                      //                   children: [
-                                                      //                     Container(
-                                                      //                       width:
-                                                      //                           100,
-                                                      //                       height:
-                                                      //                           30,
-                                                      //                       decoration: BoxDecoration(
-                                                      //                           borderRadius: BorderRadius.only(
-                                                      //                             bottomLeft: Radius.circular(0),
-                                                      //                             bottomRight: Radius.circular(12),
-                                                      //                             topLeft: Radius.circular(12),
-                                                      //                             topRight: Radius.circular(0),
-                                                      //                           ),
-                                                      //                           gradient: LinearGradient(colors: [
-                                                      //                             spy_gradient_light_blue,
-                                                      //                             spy_gradient_light_purple,
-                                                      //                           ])),
-                                                      //                       child:
-                                                      //                           Padding(
-                                                      //                         padding: EdgeInsetsDirectional.fromSTEB(
-                                                      //                             0,
-                                                      //                             5,
-                                                      //                             0,
-                                                      //                             0),
-                                                      //                         child:
-                                                      //                             Text(
-                                                      //                           '立即觀看',
-                                                      //                           textAlign:
-                                                      //                               TextAlign.center,
-                                                      //                           style:
-                                                      //                               TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
-                                                      //                         ),
-                                                      //                       ),
-                                                      //                     ),
-                                                      //                   ],
-                                                      //                 ),
-                                                      //               ],
-                                                      //             ),
-                                                      //           ),
-                                                      //         ],
-                                                      //       ),
-                                                      //     ),
-                                                      //   ),
-                                                      //   onTap: () {
-                                                      //     Navigator.push(
-                                                      //         context,
-                                                      //         MaterialPageRoute(
-                                                      //             builder: (context) =>
-                                                      //                 MissionDetailPage(
-                                                      //                     ThisMission:
-                                                      //                         value.mymission_icatch_startyet_list[
-                                                      //                             index])));
-                                                      //   },
-                                                      // ),
-                                                      GestureDetector(
+                                                  child: GestureDetector(
                                                     child: Container(
                                                       width: double.infinity,
                                                       height: 150,
@@ -1533,13 +1337,13 @@ class _MyMissionState extends State<MyMission> {
                                                                   ),
                                                                 ),
                                                                 GestureDetector(
-                                                                  child: Container(
+                                                                  child:
+                                                                      Container(
                                                                     decoration:
                                                                         BoxDecoration(
-                                                                            borderRadius: BorderRadius.circular(
-                                                                                20),
-                                                                            gradient:
-                                                                                LinearGradient(colors: [
+                                                                            borderRadius:
+                                                                                BorderRadius.circular(20),
+                                                                            gradient: LinearGradient(colors: [
                                                                               spy_gradient_light_blue,
                                                                               spy_gradient_light_purple,
                                                                             ])),
@@ -1550,36 +1354,31 @@ class _MyMissionState extends State<MyMission> {
                                                                               7,
                                                                           horizontal:
                                                                               30),
-                                                                      child: Text(
+                                                                      child:
+                                                                          Text(
                                                                         '跟TA聊聊',
                                                                         textAlign:
-                                                                            TextAlign
-                                                                                .center,
+                                                                            TextAlign.center,
                                                                         style: TextStyle(
                                                                             fontSize:
                                                                                 16,
-                                                                            color: Colors
-                                                                                .white,
-                                                                            fontWeight:
-                                                                                FontWeight.w700),
+                                                                            color:
+                                                                                Colors.white,
+                                                                            fontWeight: FontWeight.w700),
                                                                       ),
                                                                     ),
                                                                   ),
-                                                                  onTap: (){
+                                                                  onTap: () {
                                                                     Navigator.push(
                                                                         context,
                                                                         MaterialPageRoute(
                                                                             builder: (context) => O2OChatroom(
-                                                                              memberid: value
-                                                                                  .remoteUserInfo[0]
-                                                                                  .memberid,
-                                                                              chatroomid: value.mymission_icatch_applied_list[index].memberid
-                                                                                  .toHexString(),
-                                                                              nickname: value.mymission_icatch_applied_list[index]
-                                                                                  .nickname,
-                                                                              avatar: value.mymission_icatch_applied_list[index].avatar_sub,
-                                                                              fcmtoken: value.mymission_icatch_applied_list[index].fcmtoken,
-                                                                            )));
+                                                                                  memberid: value.remoteUserInfo[0].memberid,
+                                                                                  chatroomid: value.mymission_icatch_applied_list[index].memberid.toHexString(),
+                                                                                  nickname: value.mymission_icatch_applied_list[index].nickname,
+                                                                                  avatar: value.mymission_icatch_applied_list[index].avatar_sub,
+                                                                                  fcmtoken: value.mymission_icatch_applied_list[index].fcmtoken,
+                                                                                )));
                                                                   },
                                                                 ),
                                                               ],
@@ -1660,12 +1459,12 @@ class _MyMissionState extends State<MyMission> {
                                           ),
                                         );
                                 }),
-                                // 任務成功
+                                // 待審核
                                 Consumer<ChatProvider>(
                                     builder: (context, value, child) {
-                                  return value.mymission_icatch_success_list !=
+                                  return value.mymission_icatch_approve_list !=
                                           null
-                                      ? value.mymission_icatch_success_list
+                                      ? value.mymission_icatch_approve_list
                                               .isNotEmpty
                                           ? ListView.separated(
                                               itemBuilder: (context, index) {
@@ -1729,7 +1528,7 @@ class _MyMissionState extends State<MyMission> {
                                                                           0,
                                                                           0),
                                                                   child: Text(
-                                                                    '${value.mymission_icatch_success_list[index].title}',
+                                                                    '${value.mymission_icatch_approve_list[index].title}',
                                                                     textAlign:
                                                                         TextAlign
                                                                             .start,
@@ -1805,7 +1604,7 @@ class _MyMissionState extends State<MyMission> {
                                                                         fontWeight:
                                                                             FontWeight.w700),
                                                                     text:
-                                                                        '${value.mymission_icatch_success_list[index].content}',
+                                                                        '${value.mymission_icatch_approve_list[index].content}',
                                                                   ),
                                                                 ),
                                                               ),
@@ -1821,7 +1620,7 @@ class _MyMissionState extends State<MyMission> {
                                                               builder: (context) =>
                                                                   MissionDetailPage(
                                                                       ThisMission:
-                                                                          value.mymission_icatch_success_list[
+                                                                          value.mymission_icatch_approve_list[
                                                                               index])));
                                                     },
                                                   ),
@@ -1834,7 +1633,7 @@ class _MyMissionState extends State<MyMission> {
                                                 );
                                               },
                                               itemCount: value
-                                                  .mymission_icatch_success_list
+                                                  .mymission_icatch_approve_list
                                                   .length,
                                             )
                                           : Center(
@@ -1852,12 +1651,12 @@ class _MyMissionState extends State<MyMission> {
                                           ),
                                         );
                                 }),
-                                // 任務失敗
+                                // 任務結束
                                 Consumer<ChatProvider>(
                                     builder: (context, value, child) {
-                                  return value.mymission_icatch_fail_list !=
+                                  return value.mymission_icatch_finished_list !=
                                           null
-                                      ? value.mymission_icatch_fail_list
+                                      ? value.mymission_icatch_finished_list
                                               .isNotEmpty
                                           ? ListView.separated(
                                               itemBuilder: (context, index) {
@@ -1921,7 +1720,7 @@ class _MyMissionState extends State<MyMission> {
                                                                           0,
                                                                           0),
                                                                   child: Text(
-                                                                    '${value.mymission_icatch_fail_list[index].title}',
+                                                                    '${value.mymission_icatch_finished_list[index].title}',
                                                                     textAlign:
                                                                         TextAlign
                                                                             .start,
@@ -1998,7 +1797,7 @@ class _MyMissionState extends State<MyMission> {
                                                                           fontWeight:
                                                                               FontWeight.w700),
                                                                       text:
-                                                                          '${value.mymission_icatch_fail_list[index].content}',
+                                                                          '${value.mymission_icatch_finished_list[index].content}',
                                                                     ),
                                                                   ),
                                                                 )),
@@ -2013,7 +1812,7 @@ class _MyMissionState extends State<MyMission> {
                                                               builder: (context) =>
                                                                   MissionDetailPage(
                                                                       ThisMission:
-                                                                          value.mymission_icatch_fail_list[
+                                                                          value.mymission_icatch_finished_list[
                                                                               index])));
                                                     },
                                                   ),
@@ -2026,7 +1825,7 @@ class _MyMissionState extends State<MyMission> {
                                                 );
                                               },
                                               itemCount: value
-                                                  .mymission_icatch_fail_list
+                                                  .mymission_icatch_finished_list
                                                   .length,
                                             )
                                           : Center(

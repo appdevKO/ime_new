@@ -65,7 +65,9 @@ class DbUserinfoModel {
   int? height;
   int? age;
   int? followme_num;
+  //i幣
   int? icoin;
+  //零用錢
   String? money;
   String? constellation;
   String? introduction;
