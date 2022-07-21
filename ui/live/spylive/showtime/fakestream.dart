@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ime_new/business_logic/model/mission_model.dart';
 import 'package:ime_new/business_logic/provider/chat_provider.dart';
+import 'package:ime_new/utils/viewconfig.dart';
 import 'package:provider/provider.dart';
 
 class FakeStream extends StatefulWidget {
@@ -14,7 +15,18 @@ class FakeStream extends StatefulWidget {
 class _FakeStreamState extends State<FakeStream> {
   @override
   void initState() {
+    initData();
     super.initState();
+  }
+
+  Future initData() async {
+    if (widget.TheMission?.type == 3) {
+      await Provider.of<ChatProvider>(context, listen: false)
+          .get_showtime_detail(widget.TheMission?.id);
+    } else {
+      await Provider.of<ChatProvider>(context, listen: false)
+          .get_mission_detail_choose(widget.TheMission?.id);
+    }
   }
 
   @override
@@ -27,6 +39,7 @@ class _FakeStreamState extends State<FakeStream> {
               leading: IconButton(
                 icon: Icon(Icons.arrow_back),
                 onPressed: () async {
+                  //如果是showtime主播退出
                   if (widget.TheMission?.type == 3 &&
                       widget.TheMission?.memberid ==
                           Provider.of<ChatProvider>(context, listen: false)
@@ -84,7 +97,7 @@ class _FakeStreamState extends State<FakeStream> {
                                                     listen: false)
                                                 .get_spy_streaminglist();
                                           },
-                                          child: Text('確定'))
+                                          child: Text('確定(測試時退出為募資失敗)'))
                                     ],
                                   )));
                         });
@@ -137,11 +150,54 @@ class _FakeStreamState extends State<FakeStream> {
               ),
             ),
             body: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Text(
                   'status:${widget.TheMission?.status}     title:${widget.TheMission?.title} ',
                   style: TextStyle(fontSize: 30),
+                ),
+                Text(
+                  '募資名單 ',
+                ),
+                // Container(
+                //   color: Color(0xffddaadd),
+                //   height: 200,
+                //   child: Consumer<ChatProvider>(
+                //     builder: (context, value, child) {
+                //       return ListView.builder(
+                //         itemBuilder: (context, index) {
+                //           return Container(
+                //             child: Padding(
+                //               padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                //               child: Row(
+                //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //                 children: [
+                //                   CircleAvatar(
+                //                     backgroundImage: NetworkImage(
+                //                         '${value.mission_detail[0].pay_userinfo_list[index].avatar_sub}'),
+                //                   ),
+                //                   Padding(
+                //                     padding: const EdgeInsets.only(left: 5.0),
+                //                     child: Text(
+                //                       '${value.mission_detail[0].pay_userinfo_list[index].nickname}',
+                //                       style: TextStyle(color: Colors.black),
+                //                     ),
+                //                   ),
+                //                 ],
+                //               ),
+                //             ),
+                //           );
+                //         },
+                //         itemCount:
+                //             value.mission_detail[0].pay_userinfo_list.length,
+                //       );
+                //
+                //     },
+                //   ),
+                // ),
+                Consumer<ChatProvider>(
+                  builder: (context, value, child) {
+                    return Text('現在有多少點數:${value.remoteUserInfo[0].icoin}');
+                  },
                 ),
                 widget.TheMission?.type == 3
                     ? widget.TheMission?.memberid ==
@@ -151,7 +207,6 @@ class _FakeStreamState extends State<FakeStream> {
                         ?
                         //showtime 發起者 =主播本人
                         Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               GestureDetector(
                                 child: Container(
@@ -168,58 +223,67 @@ class _FakeStreamState extends State<FakeStream> {
                                       .start_showtime(widget.TheMission?.id);
                                 },
                               ),
-                              GestureDetector(
-                                child: Container(
-                                  width: 150,
-                                  height: 50,
-                                  color: Colors.blue,
-                                  child: Center(
-                                    child: Text('關閉 showtime 直播-募資成功 =任務成功=7'),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: GestureDetector(
+                                  child: Container(
+                                    width: 150,
+                                    height: 50,
+                                    color: Colors.blue,
+                                    child: Center(
+                                      child: Text(
+                                          '關閉 showtime (測試用 募資成功 =任務成功=7)'),
+                                    ),
                                   ),
+                                  onTap: () async {
+                                    Provider.of<ChatProvider>(context,
+                                            listen: false)
+                                        .approve_mission_success(
+                                            widget.TheMission?.id,
+                                            widget.TheMission?.executor,
+                                            widget.TheMission?.price);
+                                    Navigator.pop(context);
+                                    await Provider.of<ChatProvider>(context,
+                                            listen: false)
+                                        .get_mission_detail_choose(
+                                            widget.TheMission?.id);
+                                    await Provider.of<ChatProvider>(context,
+                                            listen: false)
+                                        .get_spy_showtime_streaminglist();
+                                    await Provider.of<ChatProvider>(context,
+                                            listen: false)
+                                        .get_spy_streaminglist();
+                                  },
                                 ),
-                                onTap: () async {
-                                  Provider.of<ChatProvider>(context,
-                                          listen: false)
-                                      .approve_mission_success(
-                                          widget.TheMission?.id);
-                                  Navigator.pop(context);
-                                  await Provider.of<ChatProvider>(context,
-                                          listen: false)
-                                      .get_mission_detail_choose(
-                                          widget.TheMission?.id);
-                                  await Provider.of<ChatProvider>(context,
-                                          listen: false)
-                                      .get_spy_showtime_streaminglist();
-                                  await Provider.of<ChatProvider>(context,
-                                          listen: false)
-                                      .get_spy_streaminglist();
-                                },
                               ),
-                              GestureDetector(
-                                child: Container(
-                                  width: 150,
-                                  height: 50,
-                                  color: Colors.blue,
-                                  child: Center(
-                                    child: Text('關閉 showtime 直播-募資失敗 6'),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: GestureDetector(
+                                  child: Container(
+                                    width: 150,
+                                    height: 50,
+                                    color: Colors.green,
+                                    child: Center(
+                                      child: Text('關閉 showtime (測試用 募資失敗 6)'),
+                                    ),
                                   ),
+                                  onTap: () async {
+                                    Provider.of<ChatProvider>(context,
+                                            listen: false)
+                                        .showtime_fail(widget.TheMission?.id);
+                                    Navigator.pop(context);
+                                    await Provider.of<ChatProvider>(context,
+                                            listen: false)
+                                        .get_mission_detail_choose(
+                                            widget.TheMission?.id);
+                                    await Provider.of<ChatProvider>(context,
+                                            listen: false)
+                                        .get_spy_showtime_streaminglist();
+                                    await Provider.of<ChatProvider>(context,
+                                            listen: false)
+                                        .get_spy_streaminglist();
+                                  },
                                 ),
-                                onTap: () async {
-                                  Provider.of<ChatProvider>(context,
-                                          listen: false)
-                                      .finish_mission(widget.TheMission?.id);
-                                  Navigator.pop(context);
-                                  await Provider.of<ChatProvider>(context,
-                                          listen: false)
-                                      .get_mission_detail_choose(
-                                          widget.TheMission?.id);
-                                  await Provider.of<ChatProvider>(context,
-                                          listen: false)
-                                      .get_spy_showtime_streaminglist();
-                                  await Provider.of<ChatProvider>(context,
-                                          listen: false)
-                                      .get_spy_streaminglist();
-                                },
                               )
                             ],
                           )
@@ -229,15 +293,15 @@ class _FakeStreamState extends State<FakeStream> {
                             children: [
                               GestureDetector(
                                 child: Container(
-                                  width: 150,
+                                  width: 250,
                                   height: 50,
                                   color: Colors.yellow,
                                   child: Center(
-                                    child: Text('抖內100'),
+                                    child: Text('我是showtime觀眾 抖內100'),
                                   ),
                                 ),
-                                onTap: () {
-                                  Provider.of<ChatProvider>(context,
+                                onTap: () async {
+                                  await Provider.of<ChatProvider>(context,
                                           listen: false)
                                       .donate_showtime(
                                           widget.TheMission?.id, 100);
@@ -276,7 +340,7 @@ class _FakeStreamState extends State<FakeStream> {
                                   height: 50,
                                   color: Colors.blue,
                                   child: Center(
-                                    child: Text('關閉  直播'),
+                                    child: Text('關閉  mission直播 =5'),
                                   ),
                                 ),
                                 onTap: () async {
@@ -322,6 +386,7 @@ class _FakeStreamState extends State<FakeStream> {
           ),
         ),
         onWillPop: () async {
+          //showtime 直播主 退出時
           if (widget.TheMission?.type == 3 &&
               widget.TheMission?.memberid ==
                   Provider.of<ChatProvider>(context, listen: false)
@@ -349,15 +414,14 @@ class _FakeStreamState extends State<FakeStream> {
                                     Navigator.pop(context);
                                     Navigator.pop(context);
 
-                                    ///
+                                    ///測試
                                     await Provider.of<ChatProvider>(context,
                                             listen: false)
                                         .approve_mission_success(
-                                            widget.TheMission?.id);
-                                    // await Provider.of<ChatProvider>(context,
-                                    //         listen: false)
-                                    //     .finish_mission(widget.TheMission?.id);
-                                    ///
+                                            widget.TheMission?.id,
+                                            widget.TheMission?.executor,
+                                            widget.TheMission?.price);
+
                                     Navigator.pop(context);
                                     await Provider.of<ChatProvider>(context,
                                             listen: false)
@@ -370,7 +434,7 @@ class _FakeStreamState extends State<FakeStream> {
                                             listen: false)
                                         .get_spy_streaminglist();
                                   },
-                                  child: Text('確定'))
+                                  child: Text('確定(測試時為募資成功=任務成功=7)'))
                             ],
                           )));
                 });

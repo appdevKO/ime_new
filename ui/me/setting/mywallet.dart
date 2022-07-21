@@ -22,7 +22,9 @@ class _MyWalletState extends State<MyWallet> {
     super.dispose();
   }
 
-  void initdata() {}
+  void initdata() {
+    Provider.of<ChatProvider>(context, listen: false).checkicoin();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,34 +55,73 @@ class _MyWalletState extends State<MyWallet> {
                     '我的錢包',
                     style: TextStyle(color: Colors.white, fontSize: 16),
                   )),
-                  Container(
-                    child: IconButton(
-                      icon: Text(
-                        '儲值',
-                        style: TextStyle(color: Colors.white),
+                  IconButton(
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Colors.transparent,
                       ),
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => FakeStore()));
+                      onPressed: () {}),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top:8.0),
+                    child: Text(
+                      'i幣餘額',
+                      style: TextStyle(fontSize: 20),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top:8.0),
+                    child: Consumer<ChatProvider>(
+                      builder: (context, value, child) {
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.monetization_on_sharp,
+                                  color: Colors.amber,
+                                  size: 30,
+                                ),
+                                Text(
+                                  '${value.remoteUserInfo[0].icoin}',
+                                  style: TextStyle(fontSize: 26),
+                                ),
+                              ],
+                            ),
+                            GestureDetector(
+                              child: Container(
+                                child: Text(
+                                  '去儲值',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 5),
+                                decoration: BoxDecoration(
+                                    color: Colors.blue,
+                                    borderRadius: BorderRadius.circular(5)),
+                              ),
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => FakeStore()));
+                              },
+                            ),
+                          ],
+                        );
                       },
                     ),
                   ),
                 ],
               ),
-            ),
-            Text(
-              '目前點數',
-              style: TextStyle(fontSize: 30),
-            ),
-            Consumer<ChatProvider>(
-              builder: (context, value, child) {
-                return Text(
-                  '${value.remoteUserInfo[0].icoin}',
-                  style: TextStyle(fontSize: 30),
-                );
-              },
             )
           ],
         ),

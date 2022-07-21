@@ -23,11 +23,12 @@ class MissionModel {
       this.avatar,
       this.status,
       this.apply_list,
-      this.applyedlist,
+      this.apply_userinfo_list,
       this.executor,
       this.executor_info,
       this.fcmtoken,
-      this.pay_list});
+      this.pay_list,
+      this.pay_userinfo_list});
 
   ObjectId? id;
   String? title;
@@ -42,41 +43,49 @@ class MissionModel {
   ObjectId? executor;
   String? nickname;
   String? avatar;
-  List? applyedlist;
+  List? apply_userinfo_list;
   List? executor_info;
   List? apply_list;
   List? pay_list;
   String? fcmtoken;
+  List? pay_userinfo_list;
 
-  factory MissionModel.fromJson(Map<String, dynamic> json) => MissionModel(
-        id: json["_id"],
-        title: json["title"],
-        executor: json["executor"],
-        content: json["content"],
-        price: json["price"],
-        actual_price: json["actual_price"],
-        starttime: json["starttime"],
-        endtime: json["endtime"],
-        type: json["type"],
-        status: json["status"],
-        memberid: json["memberid"],
-        nickname: json["nickname"],
-        fcmtoken: json["fcmtoken"],
-        avatar: json["avatar"],
-        apply_list: json["apply_list"] ?? [],
-        pay_list: json["pay_list"] ?? [],
-
-        ///重要
-        //收到list json 用 list generate  依次建造
-        applyedlist: json["applyedlist"] != null
-            ? List<DbUserinfoModel>.from(
-                json["applyedlist"]?.map((p) => DbUserinfoModel.fromJson(p)))
-            : null,
-        executor_info: json["executor_info"] != null
-            ? List<DbUserinfoModel>.from(
-                json["executor_info"]?.map((p) => DbUserinfoModel.fromJson(p)))
-            : null,
-      );
+  factory MissionModel.fromJson(Map<String, dynamic> json) {
+    print('456456${json["pay_log_list"]}');
+    return MissionModel(
+      id: json["_id"],
+      title: json["title"],
+      executor: json["executor"],
+      content: json["content"],
+      price: json["price"],
+      actual_price: json["actual_price"],
+      starttime: json["starttime"],
+      endtime: json["endtime"],
+      type: json["type"],
+      status: json["status"],
+      memberid: json["memberid"],
+      nickname: json["nickname"],
+      fcmtoken: json["fcmtoken"],
+      avatar: json["avatar"],
+      apply_list: json["apply_list"] ?? [],
+      pay_list: json["pay_list"] ?? [],
+      // test:json["pay_log_list"],
+      ///重要
+      //收到list json 用 list generate  依次建造
+      apply_userinfo_list: json["applyedlist"] != null
+          ? List<DbUserinfoModel>.from(
+              json["applyedlist"]?.map((p) => DbUserinfoModel.fromJson(p)))
+          : null,
+      executor_info: json["executor_info"] != null
+          ? List<DbUserinfoModel>.from(
+              json["executor_info"]?.map((p) => DbUserinfoModel.fromJson(p)))
+          : null,
+      pay_userinfo_list: json["pay_userinfo_list"] != null
+          ? List.from(
+              json["pay_userinfo_list"]?.map((p) => DbUserinfoModel.fromJson(p)))
+          : null,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         "_id": id,
@@ -94,8 +103,16 @@ class MissionModel {
         "avatar": avatar,
         "apply_list": apply_list,
         "pay_list": pay_list,
-        "applyedlist": applyedlist,
+        "apply_userinfo_list": apply_userinfo_list,
         "executor_info": executor_info,
+        "pay_userinfo_list": pay_userinfo_list,
         "fcmtoken": fcmtoken,
       };
+}
+
+class DonateUserInfo {
+  DonateUserInfo({required this.userinfo, required this.donate});
+
+  DbUserinfoModel userinfo;
+  int donate;
 }

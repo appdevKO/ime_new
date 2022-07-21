@@ -1407,8 +1407,7 @@ class ChatProvider with ChangeNotifier {
     print('獲得動態留言數量 $id');
     var result = await getcount(
       'action_msg',
-      'action_id',
-      id,
+      mongo.where.eq('action_id', id),
     );
 
     if (result is int) {
@@ -1608,23 +1607,33 @@ class ChatProvider with ChangeNotifier {
 
     try {
       if (type != 3) {
-        // mission 未選定 開始
-        _mongoDB.inserttomongo(
-          "spy_mission",
-          {
-            'status': 1,
-            "title": title,
-            "content": content,
-            "price": price,
-            "starttime": starttime,
-            "endtime": endtime,
-            "type": type,
-            "memberid": remoteUserInfo[0].memberid,
-            "nickname": remoteUserInfo[0].nickname,
-            'apply_list': [],
-            'fcmtoken': remoteUserInfo[0].fcmtoken,
-          },
-        );
+        checkicoin();
+        if (remoteUserInfo[0].icoin >= price) {
+          // mission 未選定 開始
+          _mongoDB.inserttomongo(
+            "spy_mission",
+            {
+              'status': 1,
+              "title": title,
+              "content": content,
+              "price": price,
+              "starttime": starttime,
+              "endtime": endtime,
+              "type": type,
+              "memberid": remoteUserInfo[0].memberid,
+              "nickname": remoteUserInfo[0].nickname,
+              'apply_list': [],
+              'fcmtoken': remoteUserInfo[0].fcmtoken,
+            },
+          );
+          // member 扣錢
+          await _mongoDB.plus_num(
+              'member', "_id", remoteUserInfo[0].memberid, 'i_coin', -price);
+          //再查一次
+          checkicoin();
+        } else {
+          print('沒錢 不能創建任務');
+        }
       } else {
         // showtime 募資中開始
         _mongoDB.inserttomongo(
@@ -2012,6 +2021,38 @@ class ChatProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future get_showtime_detail(id) async {
+    final pipeline = mongo.AggregationPipelineBuilder()
+          ..addStage(mongo.Match(mongo.where.eq('_id', id).map['\$query']))
+          ..addStage(mongo.Lookup(
+            from: 'showtime_donate_log',
+            as: 'pay_log_member_list',
+            foreignField: 'mission_id',
+            localField: '_id',
+          ))
+
+        ..addStage(mongo.Lookup(
+          from: 'member',
+          as: 'pay_userinfo_list',
+          foreignField: '_id',
+          localField: 'pay_list',
+        ))
+
+        // ..addStage(mongo.Unwind(mongo.Field('pay_userinfo_list')))
+        //       ..addStage(mongo.Group(id: {'_id': '\$pay_log_list.from_id'}))
+        // ..addStage(mongo.Project({'pay_userinfo_list': 0}))
+        ;
+
+    var result = await lookupmongodb(
+      MissionModel.fromJson,
+      'spy_mission',
+      pipeline,
+    );
+    print("get_showtime_detail $result");
+    mission_detail = result;
+    notifyListeners();
+  }
+
   Future get_mission_detail_choose(id) async {
     final pipeline = mongo.AggregationPipelineBuilder()
           ..addStage(mongo.Match(mongo.where.eq('_id', id).map['\$query']))
@@ -2102,42 +2143,72 @@ class ChatProvider with ChangeNotifier {
 
   Future donate_showtime(missionid, num) async {
     print('donate showtime ');
-    //mission 加上donate 價錢
-    await _mongoDB.plus_num(
-        'spy_mission', "_id", missionid, 'actual_price', num);
-    //mission 加上 donate名字
-    await _mongoDB.updateData_addSet(
-      "spy_mission",
-      "_id",
-      missionid,
-      'pay_list',
-      remoteUserInfo[0].memberid,
-    );
-    //donate log留下紀錄
-    _mongoDB.inserttomongo(
-      "showtime_donate_log",
-      {
-        "mission_id": missionid,
-        "type": 'showtime',
-        "time": DateTime.now().add(Duration(hours: 8)),
-        "from_memberid": remoteUserInfo[0].memberid,
-        'i_coin': num
-      },
-    );
+
+    //確認錢
+    checkicoin();
+    print('帳戶${remoteUserInfo[0].icoin} 要扣 $num');
+    if (remoteUserInfo[0].icoin >= num) {
+      //mission 加上donate 價錢
+      await _mongoDB.plus_num(
+          'spy_mission', "_id", missionid, 'actual_price', num);
+      //mission 加上 donate名字
+      await _mongoDB.updateData_addSet(
+        "spy_mission",
+        "_id",
+        missionid,
+        'pay_list',
+        remoteUserInfo[0].memberid,
+      );
+      //donate log留下紀錄
+      _mongoDB.inserttomongo(
+        "showtime_donate_log",
+        {
+          "mission_id": missionid,
+          "type": 'showtime',
+          "time": DateTime.now().add(Duration(hours: 8)),
+          "from_memberid": remoteUserInfo[0].memberid,
+          'i_coin': num
+        },
+      );
+      // member 扣錢
+      await _mongoDB.plus_num(
+          'member', "_id", remoteUserInfo[0].memberid, 'i_coin', -num);
+      //再查一次
+      checkicoin();
+    } else {
+      print('不夠錢  帳戶只有${remoteUserInfo[0].icoin} 要扣 $num');
+    }
   }
-  Future showtime_fail(missionid) async {
-    print('關閉直播 改變任務狀態  ');
+
+//  刷新錢包 查餘額
+  Future checkicoin() async {
+    var readresult = await readremotemongodb(DbUserinfoModel.fromJson, 'member',
+        field: mongo.where.eq('account', account_id));
+    if (readresult is List) {
+      print('現在錢包${readresult[0].icoin}i幣');
+      remoteUserInfo[0].icoin = readresult[0].icoin;
+      notifyListeners();
+    }
+  }
+
+  Future showtime_fail(
+    missionid,
+  ) async {
+    print('關閉直播 改變任務狀態');
     await change_mission_status(missionid, 6);
+    //退錢 退給多人
   }
 
-  Future approve_mission_success(missionid) async {
-    print('關閉直播 改變任務狀態  ');
+  Future approve_mission_success(missionid, memberid, num) async {
+    print('關閉直播 改變任務狀態');
     await change_mission_status(missionid, 7);
+    //給錢 給一個人
   }
 
-  Future approve_mission_fail(missionid) async {
-    print('關閉直播 改變任務狀態  ');
+  Future approve_mission_fail(missionid, memberid, num) async {
+    print('關閉直播 改變任務狀態');
     await change_mission_status(missionid, 8);
+    //退錢 退給一人
   }
 
   Future start_mission(missionid) async {
@@ -2147,8 +2218,8 @@ class ChatProvider with ChangeNotifier {
   }
 
   Future start_showtime(missionid) async {
-    print('開啟直播 改變任務狀態  ');
-    //3募資中
+    print('開啟直播 改變任務狀態');
+    //一打開就是 3募資中->改變為4
     await change_mission_status(missionid, 4);
   }
 
@@ -4487,13 +4558,11 @@ class ChatProvider with ChangeNotifier {
 
   Future getcount(
     collection,
-    con_field,
-    con_value,
+    field,
   ) async {
     final readresult = await queue.add(() => _mongoDB.count(
           collection,
-          con_field,
-          con_value,
+          field,
         ));
     print("countcountcount $readresult");
     return readresult;
@@ -4506,6 +4575,8 @@ class ChatProvider with ChangeNotifier {
 
       await _mongoDB.plus_num(
           'member', "_id", remoteUserInfo[0].memberid, 'i_coin', num);
+      //刷新錢包
+      checkicoin();
     } catch (e) {
       print('資料庫添加money exception $e');
     }

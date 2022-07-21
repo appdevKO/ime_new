@@ -93,6 +93,7 @@ class MongoDB {
 
     return datalist;
   }
+
   Future sweetGetUserInfo(collection_name, account) async {
     var coll = db.collection(collection_name);
     print(account);
@@ -171,6 +172,7 @@ class MongoDB {
       print('mongo create account exception :: $e');
     }
   }
+
   //登入用
   Future upsertData2(collection_name, con_field, con_value, data) async {
     print('測試一下2');
@@ -208,7 +210,6 @@ class MongoDB {
   }
 
   Future plus_num(collection, con_field, con_value, value, offset) async {
-    print('plus_num');
     var coll = db.collection(collection);
     try {
       await coll.updateOne(
@@ -221,15 +222,12 @@ class MongoDB {
 
   Future count(
     collection,
-    con_field,
-    con_value,
+    field,
   ) async {
     print('mongo db count');
     var coll = db.collection(collection);
     try {
-      var count = await coll.count(
-        mongo.where.eq(con_field, con_value),
-      );
+      var count = await coll.count(field);
       print('mongo db count');
       return count;
     } catch (e) {

@@ -164,7 +164,7 @@ class _MissionDetailPageState extends State<MissionDetailPage> {
                                                       listen: false)
                                                   .remoteUserInfo[0]
                                                   .memberid
-                                      ? value.mission_detail[0].applyedlist
+                                      ? value.mission_detail[0].apply_userinfo_list
                                               .isNotEmpty
                                           ? Container(
                                               decoration: BoxDecoration(
@@ -199,7 +199,7 @@ class _MissionDetailPageState extends State<MissionDetailPage> {
                                                                 CircleAvatar(
                                                                   backgroundImage:
                                                                       NetworkImage(
-                                                                          '${value.mission_detail[0].applyedlist[index].avatar_sub}'),
+                                                                          '${value.mission_detail[0].apply_userinfo_list[index].avatar_sub}'),
                                                                 ),
                                                                 Padding(
                                                                   padding: const EdgeInsets
@@ -207,7 +207,7 @@ class _MissionDetailPageState extends State<MissionDetailPage> {
                                                                       left:
                                                                           5.0),
                                                                   child: Text(
-                                                                    '${value.mission_detail[0].applyedlist[index].nickname}',
+                                                                    '${value.mission_detail[0].apply_userinfo_list[index].nickname}',
                                                                     style: TextStyle(
                                                                         color: Colors
                                                                             .white),
@@ -236,7 +236,7 @@ class _MissionDetailPageState extends State<MissionDetailPage> {
                                                                     value
                                                                         .mission_detail[
                                                                             0]
-                                                                        .applyedlist[
+                                                                        .apply_userinfo_list[
                                                                             index]
                                                                         .memberid);
                                                                 //刷新狀態
@@ -252,7 +252,7 @@ class _MissionDetailPageState extends State<MissionDetailPage> {
                                                       ),
                                                       itemCount: value
                                                           .mission_detail[0]
-                                                          .applyedlist
+                                                          .apply_userinfo_list
                                                           .length,
                                                       separatorBuilder:
                                                           (context, index) =>
@@ -776,9 +776,16 @@ class _MissionDetailPageState extends State<MissionDetailPage> {
                                                                     ),
                                                                     onTap:
                                                                         () async {
-                                                                      await value.approve_mission_success(widget
-                                                                          .ThisMission
-                                                                          .id);
+                                                                      await value.approve_mission_success(
+                                                                          widget
+                                                                              .ThisMission
+                                                                              .id,
+                                                                          widget
+                                                                              .ThisMission
+                                                                              .executor,
+                                                                          widget
+                                                                              .ThisMission
+                                                                              .price);
                                                                       await value.get_mission_detail_choose(widget
                                                                           .ThisMission
                                                                           .id);
@@ -809,9 +816,16 @@ class _MissionDetailPageState extends State<MissionDetailPage> {
                                                                     ),
                                                                     onTap:
                                                                         () async {
-                                                                      await value.approve_mission_fail(widget
-                                                                          .ThisMission
-                                                                          .id);
+                                                                      await value.approve_mission_fail(
+                                                                          widget
+                                                                              .ThisMission
+                                                                              .id,
+                                                                          widget
+                                                                              .ThisMission
+                                                                              .memberid,
+                                                                          widget
+                                                                              .ThisMission
+                                                                              .price);
 
                                                                       await value.get_mission_detail_choose(widget
                                                                           .ThisMission
