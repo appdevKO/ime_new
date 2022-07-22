@@ -167,9 +167,11 @@ class _FakeStreamState extends State<FakeStream> {
                 //         itemBuilder: (context, index) {
                 //           return Container(
                 //             child: Padding(
-                //               padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                //               padding:
+                //                   const EdgeInsets.symmetric(horizontal: 15.0),
                 //               child: Row(
-                //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //                 mainAxisAlignment:
+                //                     MainAxisAlignment.spaceBetween,
                 //                 children: [
                 //                   CircleAvatar(
                 //                     backgroundImage: NetworkImage(
@@ -190,13 +192,50 @@ class _FakeStreamState extends State<FakeStream> {
                 //         itemCount:
                 //             value.mission_detail[0].pay_userinfo_list.length,
                 //       );
-                //
                 //     },
                 //   ),
                 // ),
+                Container(
+                  color: Color(0xffaabadd),
+                  height: 200,
+                  child: Consumer<ChatProvider>(
+                    builder: (context, value, child) {
+                      return ListView.builder(
+                        itemBuilder: (context, index) {
+                          return Container(
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 15.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  CircleAvatar(
+                                    backgroundImage: NetworkImage(
+                                        '${value.mission_detail[0].user_pay_sum_list[index].userinfo.avatar_sub}'),
+                                  ),
+                                  Text(
+                                    '${value.mission_detail[0].user_pay_sum_list[index].userinfo.nickname}',
+                                    style: TextStyle(color: Colors.black),
+                                  ),
+                                  Text(
+                                    '累積消費:${value.mission_detail[0].user_pay_sum_list[index].donate}',
+                                    style: TextStyle(color: Colors.black),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                        itemCount:
+                            value.mission_detail[0].user_pay_sum_list.length,
+                      );
+                    },
+                  ),
+                ),
                 Consumer<ChatProvider>(
                   builder: (context, value, child) {
-                    return Text('現在有多少點數:${value.remoteUserInfo[0].icoin}');
+                    return Text('現在有多少點數:${value.remoteUserInfo[0].icoin} ');
                   },
                 ),
                 widget.TheMission?.type == 3
@@ -305,6 +344,10 @@ class _FakeStreamState extends State<FakeStream> {
                                           listen: false)
                                       .donate_showtime(
                                           widget.TheMission?.id, 100);
+                                  await Provider.of<ChatProvider>(context,
+                                          listen: false)
+                                      .get_showtime_detail(
+                                          widget.TheMission?.id);
                                 },
                               ),
                             ],

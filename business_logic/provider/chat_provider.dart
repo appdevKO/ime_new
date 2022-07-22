@@ -2024,19 +2024,28 @@ class ChatProvider with ChangeNotifier {
   Future get_showtime_detail(id) async {
     final pipeline = mongo.AggregationPipelineBuilder()
           ..addStage(mongo.Match(mongo.where.eq('_id', id).map['\$query']))
-          ..addStage(mongo.Lookup(
+          ..addStage(mongo.Lookup.withPipeline(
             from: 'showtime_donate_log',
-            as: 'pay_log_member_list',
-            foreignField: 'mission_id',
-            localField: '_id',
+            as: 'pay_log_list',
+            let: {},
+            pipeline: [
+              mongo.Group(id: {
+                'memberid': '\$from_memberid'
+              }, fields: {
+                'donate_price': mongo.Sum('\$i_coin'),
+              }),
+              mongo.Lookup(
+                from: 'member',
+                as: 'pay_userinfo',
+                foreignField: '_id',
+                localField: '_id.memberid',
+              ),
+              mongo.Unwind(mongo.Field('pay_userinfo')),
+              //去掉
+              mongo.Project({'_id': 0})
+            ],
           ))
 
-        ..addStage(mongo.Lookup(
-          from: 'member',
-          as: 'pay_userinfo_list',
-          foreignField: '_id',
-          localField: 'pay_list',
-        ))
 
         // ..addStage(mongo.Unwind(mongo.Field('pay_userinfo_list')))
         //       ..addStage(mongo.Group(id: {'_id': '\$pay_log_list.from_id'}))

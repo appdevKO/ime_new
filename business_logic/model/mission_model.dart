@@ -28,7 +28,8 @@ class MissionModel {
       this.executor_info,
       this.fcmtoken,
       this.pay_list,
-      this.pay_userinfo_list});
+      this.pay_userinfo_list,
+      this.user_pay_sum_list});
 
   ObjectId? id;
   String? title;
@@ -49,9 +50,9 @@ class MissionModel {
   List? pay_list;
   String? fcmtoken;
   List? pay_userinfo_list;
+  List? user_pay_sum_list;
 
   factory MissionModel.fromJson(Map<String, dynamic> json) {
-    print('456456${json["pay_log_list"]}');
     return MissionModel(
       id: json["_id"],
       title: json["title"],
@@ -69,7 +70,7 @@ class MissionModel {
       avatar: json["avatar"],
       apply_list: json["apply_list"] ?? [],
       pay_list: json["pay_list"] ?? [],
-      // test:json["pay_log_list"],
+
       ///重要
       //收到list json 用 list generate  依次建造
       apply_userinfo_list: json["applyedlist"] != null
@@ -80,9 +81,10 @@ class MissionModel {
           ? List<DbUserinfoModel>.from(
               json["executor_info"]?.map((p) => DbUserinfoModel.fromJson(p)))
           : null,
-      pay_userinfo_list: json["pay_userinfo_list"] != null
-          ? List.from(
-              json["pay_userinfo_list"]?.map((p) => DbUserinfoModel.fromJson(p)))
+      user_pay_sum_list: json["pay_log_list"] != null
+          ? List.from(json["pay_log_list"]?.map((p) => DonateUserInfo(
+              userinfo: DbUserinfoModel.fromJson(p['pay_userinfo']),
+              donate: p['donate_price'])))
           : null,
     );
   }
@@ -106,13 +108,17 @@ class MissionModel {
         "apply_userinfo_list": apply_userinfo_list,
         "executor_info": executor_info,
         "pay_userinfo_list": pay_userinfo_list,
+        "pay_user_sum_list": user_pay_sum_list,
         "fcmtoken": fcmtoken,
       };
 }
 
 class DonateUserInfo {
-  DonateUserInfo({required this.userinfo, required this.donate});
+  DonateUserInfo({
+    required this.userinfo,
+    required this.donate,
+  });
 
-  DbUserinfoModel userinfo;
-  int donate;
+  var donate;
+  DbUserinfoModel? userinfo;
 }
